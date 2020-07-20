@@ -1,3 +1,2 @@
-25/9/2022  
-Demo
-not available now. dont use it
+# material-components-android-compose-theme-adapter
+A library that enables reuse of Material themes defined in XML for theming in Jetpack Compose.
