@@ -73,10 +73,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.BottomNavigation
+import com.example.myapplication.backstage.Schedule
+import com.example.myapplication.backstage.TestDataConfig
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class Material3IntegrationActivity : AppCompatActivity() {
+    lateinit var schedule: Schedule
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -85,259 +89,20 @@ class Material3IntegrationActivity : AppCompatActivity() {
         val contentView = ComposeView(this)
         setContentView(contentView)
 
+        var config = TestDataConfig(20,1,5,12)
+
+        schedule = Schedule(this, config)
         contentView.setContent {
             Mdc3Theme {
-                Material3ComponentsSample()
+                Greeting()
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun Material3ComponentsSamplePreview() {
-    Mdc3Theme {
-        Material3ComponentsSample()
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Material3ComponentsSample() {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(text = stringResource(R.string.material_3_integration)) },
-                scrollBehavior = scrollBehavior
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(padding)
-                .padding(16.dp)
-        ) {
-            Button(onClick = {}) {
-                Text(text = "Filled button")
-            }
-            VerticalSpacer()
-
-            ElevatedButton(onClick = {}) {
-                Text(text = "Elevated button")
-            }
-            VerticalSpacer()
-
-            FilledTonalButton(onClick = {}) {
-                Text(text = "Filled tonal button")
-            }
-            VerticalSpacer()
-
-            OutlinedButton(onClick = {}) {
-                Text(text = "Outlined button")
-            }
-            VerticalSpacer()
-
-            TextButton(onClick = {}) {
-                Text(text = "Text button")
-            }
-            VerticalSpacer()
-
-            SmallFloatingActionButton(
-                onClick = {},
-                content = { Icon(Icons.Default.Favorite, null) }
-            )
-            VerticalSpacer()
-
-            FloatingActionButton(
-                onClick = {},
-                content = { Icon(Icons.Default.Favorite, null) }
-            )
-            VerticalSpacer()
-
-            LargeFloatingActionButton(
-                onClick = {},
-                content = { Icon(Icons.Default.Favorite, null) }
-            )
-            VerticalSpacer()
-
-            ExtendedFloatingActionButton(
-                onClick = {},
-                text = { Text(text = "Extended FAB") },
-                icon = { Icon(Icons.Default.Favorite, null) }
-            )
-            VerticalSpacer()
-
-            Card(modifier = Modifier.size(width = 180.dp, height = 100.dp)) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Card")
-                }
-            }
-            VerticalSpacer()
-
-            var checkboxChecked by remember { mutableStateOf(true) }
-            Checkbox(
-                checked = checkboxChecked,
-                onCheckedChange = { checkboxChecked = it }
-            )
-            VerticalSpacer()
-
-            var radioButtonChecked by remember { mutableStateOf(true) }
-            Row(Modifier.selectableGroup()) {
-                RadioButton(
-                    selected = radioButtonChecked,
-                    onClick = { radioButtonChecked = true }
-                )
-                RadioButton(
-                    selected = !radioButtonChecked,
-                    onClick = { radioButtonChecked = false }
-                )
-            }
-            VerticalSpacer()
-
-            var switchChecked by remember { mutableStateOf(true) }
-            Switch(
-                checked = switchChecked,
-                onCheckedChange = { switchChecked = it }
-            )
-            VerticalSpacer()
-
-            var linearProgress by remember { mutableStateOf(0.1f) }
-            val animatedLinearProgress by animateFloatAsState(
-                targetValue = linearProgress,
-                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                LinearProgressIndicator(progress = animatedLinearProgress)
-                HorizontalSpacer()
-                TextButton(
-                    onClick = {
-                        if (linearProgress < 1f) linearProgress += 0.1f
-                    }
-                ) {
-                    Text("Increase")
-                }
-            }
-            VerticalSpacer()
-
-            var circularProgress by remember { mutableStateOf(0.1f) }
-            val animatedCircularProgress by animateFloatAsState(
-                targetValue = circularProgress,
-                animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                CircularProgressIndicator(progress = animatedCircularProgress)
-                HorizontalSpacer()
-                TextButton(
-                    onClick = {
-                        if (circularProgress < 1f) circularProgress += 0.1f
-                    }
-                ) {
-                    Text("Increase")
-                }
-            }
-            VerticalSpacer()
-
-            var sliderValue by remember { mutableStateOf(0f) }
-            Column {
-                Text(text = sliderValue.toString())
-                Slider(value = sliderValue, onValueChange = { sliderValue = it })
-            }
-            VerticalSpacer()
-
-            var text by rememberSaveable { mutableStateOf("") }
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Text field") },
-                singleLine = true
-            )
-            VerticalSpacer()
-
-            var outlinedText by rememberSaveable { mutableStateOf("") }
-            OutlinedTextField(
-                value = outlinedText,
-                onValueChange = { outlinedText = it },
-                label = { Text("Outlined text field") },
-                singleLine = true
-            )
-            VerticalSpacer()
-
-            Text(
-                text = "Display Large",
-                style = MaterialTheme.typography.displayLarge
-            )
-            Text(
-                text = "Display Medium",
-                style = MaterialTheme.typography.displayMedium
-            )
-            Text(
-                text = "Display Small",
-                style = MaterialTheme.typography.displaySmall
-            )
-            Text(
-                text = "Headline Large",
-                style = MaterialTheme.typography.headlineLarge
-            )
-            Text(
-                text = "Headline Medium",
-                style = MaterialTheme.typography.headlineMedium
-            )
-            Text(
-                text = "Headline Small",
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = "Title Large",
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
-                text = "Title Medium",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Title Small",
-                style = MaterialTheme.typography.titleSmall
-            )
-            Text(
-                text = "Body Large",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "Body Medium",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Body Small",
-                style = MaterialTheme.typography.bodySmall
-            )
-            Text(
-                text = "Label Large",
-                style = MaterialTheme.typography.labelLarge
-            )
-            Text(
-                text = "Label Medium",
-                style = MaterialTheme.typography.labelMedium
-            )
-            Text(
-                text = "Label Small",
-                style = MaterialTheme.typography.labelSmall
-            )
-        }
-    }
+fun Greeting() {
+    BottomNavigation()
 }
 
-@Composable
-private fun VerticalSpacer() {
-    Spacer(Modifier.height(8.dp))
-}
-
-@Composable
-private fun HorizontalSpacer() {
-    Spacer(Modifier.width(8.dp))
-}
