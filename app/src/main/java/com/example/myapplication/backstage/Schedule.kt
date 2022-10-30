@@ -1,11 +1,12 @@
 package com.example.myapplication.backstage
 
-import java.util.TreeMap
-import java.util.TreeSet
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import java.util.TreeMap
+import java.util.TreeSet
+import androidx.activity.ComponentActivity
+
 
 /**
  * @author WWzzEE2
@@ -35,13 +36,17 @@ class TemplateMap : TreeMap<Short, HashSet<CourseTemplate>>() {
         val set = this[template.StartingTime]?: HashSet()
         set.add(template)
         this[template.StartingTime] = set
+        template.info.TimeInfo.add(template)
         return true
     }
 
     /**
      * Add a course
      */
-    fun removeTemplate(template: CourseTemplate) = this[template.StartingTime]?.remove(template)
+    fun removeTemplate(template: CourseTemplate) {
+        this[template.StartingTime]?.remove(template)
+        template.info.TimeInfo.remove(template)
+    }
 
     /**
      *  Check if there are any courses at given time
@@ -64,9 +69,9 @@ class TemplateMap : TreeMap<Short, HashSet<CourseTemplate>>() {
     fun conflictCheck(template: CourseTemplate) : Boolean {
         for ((k, v) in this) {
             if (k > template.EndingTime) break
-            for (t in v) if (conflictCheck(t, template)) return false
+            for (t in v) if (conflictCheck(t, template)) return true
         }
-        return true
+        return false
     }
 
     /**
@@ -93,42 +98,54 @@ class TemplateMap : TreeMap<Short, HashSet<CourseTemplate>>() {
 
 object Schedule {
 
-    private val course_map = Array(7) { TemplateMap() }
+    private val courseMap = Array(7) { TemplateMap() }
 
-    private val ddl_set = TreeSet<DDlInfo> { o1, o2 ->
-        (o1.EndingTime - o2.EndingTime).toInt()
+    private val ddlSet = TreeSet<DDlInfo> { o1, o2 -> (o1.EndingTime - o2.EndingTime).toInt() }
+
+    private lateinit var courseSet: HashSet<CourseInfo>
+
+    /**
+     * Load all data from disk
+     * @see load
+     */
+    fun initAll(activity: ComponentActivity) {
+
+        val (ddl_list, course_list) = load(activity)
+
+        courseSet = HashSet(course_list)
+
+        for (course in this.courseSet)
+            addCourse(course)
+
+        ddlSet.addAll(ddl_list)
+
     }
 
     /**
-     * Load course and ddl from disk
+     * Save all data to disk
+     * @see save
      */
-    fun initAll(courseList: List<CourseInfo>, ddlList: List<DDlInfo>) {
-        for (course in courseList)
-            addCourse(course)
-
-        for (ddl in ddlList)
-            addDDl(ddl)
-    }
+    fun saveAll(activity: ComponentActivity) = save(ddlSet.toList(), courseSet.toList(), activity)
 
     /**
      * @see TemplateMap.getTemplate
      */
     fun getTemplate(colum: Short, time: Short, week: Long) : CourseTemplate? {
-        return course_map[colum.toInt()].getTemplate(time ,week)
+        return courseMap[colum.toInt()].getTemplate(time ,week)
     }
 
     /**
      * @see TemplateMap.addTemplate
      */
     fun addTemplate(courseTemplate: CourseTemplate) : Boolean {
-        return course_map[courseTemplate.Column.toInt()].addTemplate(courseTemplate)
+        return courseMap[courseTemplate.Column.toInt()].addTemplate(courseTemplate)
     }
 
     /**
      * @see TemplateMap.removeTemplate
      */
     fun removeTemplate(courseTemplate: CourseTemplate) {
-        course_map[courseTemplate.Column.toInt()].removeTemplate(courseTemplate)
+        courseMap[courseTemplate.Column.toInt()].removeTemplate(courseTemplate)
     }
 
     /**
@@ -138,11 +155,13 @@ object Schedule {
     fun addCourse(course: CourseInfo) : Boolean {
 
         for (template in course.TimeInfo)
-            if(!course_map[template.Column.toInt()].conflictCheck(template))
+            if(courseMap[template.Column.toInt()].conflictCheck(template))
                 return false
 
         for (template in course.TimeInfo)
-            course_map[template.Column.toInt()].addTemplate(template, false)
+            courseMap[template.Column.toInt()].addTemplate(template, false)
+
+        courseSet.add(course)
 
         return true
     }
@@ -152,23 +171,25 @@ object Schedule {
      */
     fun removeCourse(course: CourseInfo) {
         for (template in course.TimeInfo)
-            course_map[template.Column.toInt()].removeTemplate(template)
+            courseMap[template.Column.toInt()].removeTemplate(template)
+
+        courseSet.remove(course)
     }
 
     /**
      * Add a new ddl
      */
     fun addDDl(ddl: DDlInfo) {
-        ddl_set.add(ddl)
+        ddlSet.add(ddl)
     }
 
     /**
      * Remove a ddl
      */
     fun removeDDl(ddl : DDlInfo) {
-        ddl_set.remove(ddl)
+        ddlSet.remove(ddl)
     }
 
-    fun getDDl(fromTime: DDlInfo, endTime: DDlInfo) : Set<DDlInfo> = ddl_set.subSet(fromTime, endTime)
+    fun getDDl(fromTime: DDlInfo, endTime: DDlInfo) : Set<DDlInfo> = ddlSet.subSet(fromTime, endTime)
 
 }
