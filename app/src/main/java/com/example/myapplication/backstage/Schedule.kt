@@ -150,10 +150,10 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
                 addDDl(DDlInfo("Test ddl$i", rand.nextLong() % (weekSec * testData.totWeek), "This is DDL $i", 0))
             for (i in 0 until testData.courseTryCnt) {
                 val course = CourseInfo("Test Course$i", 0, weekSec * testData.totWeek, ArrayList(), "This is Course $i", "Classroom $i")
-                val strTime = (rand.nextInt() % testData.maxTime).toShort()
-                val template = CourseTemplate((rand.nextInt() % 7).toShort(),
+                val strTime = (0 until testData.maxTime).random().toShort()
+                val template = CourseTemplate((0 until 7).random().toShort(),
                     strTime,
-                    ((strTime + 2 + (rand.nextInt() % 2)).toShort() % (testData.maxTime + 1)).toShort(),
+                    ((strTime + 2 + (0..1).random()).toShort() % (testData.maxTime + 1)).toShort(),
                     1
                 )
                 template.info = course
