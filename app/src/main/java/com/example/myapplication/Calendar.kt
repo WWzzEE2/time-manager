@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.graphics.Paint.Align
+import android.widget.DatePicker
 import android.widget.TextView
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -8,13 +10,17 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
@@ -29,7 +35,6 @@ fun CalendarPage()
     Scaffold(
         topBar = {TopBar()},
     ){
-
        CalendarGrid(0)
     }
 }
@@ -45,7 +50,7 @@ fun TopBar()
                 Icon(Icons.Filled.Menu, contentDescription = "Localized description")
             }
             IconButton(onClick = { /* doSomething() */ }) {
-                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                Icon(Icons.Filled.Add, contentDescription = "Localized description")
             }
         })
 }
@@ -73,27 +78,44 @@ fun CalendarGrid(weekIndex:Int)
 @Composable
 fun DailyList(weekIndex: Int,dayIndex: Int)
 {
+    val width = 100.dp
     Column(
         modifier = Modifier.padding(5.dp,0.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
-        Text(text = weekday[dayIndex])
+        CenterText(width = width, text = weekday[dayIndex])
         Spacer(modifier = Modifier.padding(10.dp))
         for(i in 0..10)
         {
             var len:Int = (1..3).random()
-            Button(
-                onClick = { /*TODO*/ },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(len * 60.dp + (len-1)*5.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-
-            ) {
-                Text("class 1")
-            }
+            ClassBlock ({ Text(text = "course 1")},len,width)
         }
 
     }
 }
+@Composable
+fun CenterText(width: Dp,text:String)
+{
+    Text(
+        text = text,
+        modifier = Modifier.width(width),
+        textAlign = TextAlign.Center
+    )
+}
+@Composable
+fun ClassBlock(content:@Composable ()->Unit,len:Int,width:Dp)
+{
+    Button(
+        onClick = { /*TODO*/ },
+        shape = RoundedCornerShape(10.dp),
+        modifier = Modifier
+            .width(width)
+            .height(len * 60.dp + (len - 1) * 5.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+        contentPadding = PaddingValues(10.dp)
+
+    ) {
+        content()
+    }
+}
+
