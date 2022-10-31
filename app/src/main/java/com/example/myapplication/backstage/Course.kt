@@ -8,20 +8,29 @@ data class DDlInfo(
 )
 
 data class CourseTemplate(              //模板，对应以周为单位的日历上的一块\
-    var Column: Long,                  //课程位于哪一列
-    var StartingTime: Short,           //课程开始于哪一行
-    var EndingTime: Short,             //课程结束于哪一行
-    var Period: Long                  //一周一次或两周一次(应该不存在三天一次的课吧，
+    val Column: Short,                  //课程位于哪一列
+    val StartingTime : Short,           //课程开始于哪一行
+    val EndingTime : Short,             //课程结束于哪一行
+    val Period: Long                    //一周一次或两周一次(应该不存在三天一次的课吧，
     // 一周两次的话就建立两个template)
 ) {
     lateinit var info: CourseInfo
 }
 
 data class CourseInfo(
-    var Name:  String,                  //课程名字
+    val Name:  String,                  //课程名字
     val StartingTime : Long,            //课程开始时间，直接使用时间戳
     val EndingTime : Long,              //课程结束时间，直接使用时间戳，(前端输入时可以选择持续多少周，但后端不记录)
-    var TimeInfo : MutableList<CourseTemplate>,//课程时间，存放CourseTemplate的List
-    var Prompt : String,                //课程描述
-    var Location: String,               //课程位置
-)
+    val TimeInfo : MutableList<CourseTemplate>,//课程时间，存放CourseTemplate的List
+    val Prompt : String,                //课程描述
+    val Location: String,               //课程位置
+){
+    fun addCourse(courseTime:CourseTemplate)
+    {
+        courseTime.info= this
+        TimeInfo.add(courseTime)
+    }
+}
+
+var RowStart = arrayOfNulls<Long>(24)
+var RowEnd = arrayOfNulls<Long>(24)
