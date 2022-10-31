@@ -12,17 +12,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.backstage.Schedule
-import com.example.myapplication.backstage.TestDataConfig
+import com.example.myapplication.backstage.*
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
-    //lateinit var schedule:Schedule
+    lateinit var schedule:Schedule
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        TestDataConfig(5,5,5,12)
-        //schedule = Schedule(this,config)
+        var config = TestDataConfig(20,1,1,12)
+        schedule = Schedule(this,config)
         setContent {
             MyApplicationTheme {
                 // A surface container using the 'background' color from the theme
@@ -41,8 +40,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String) {
 
-    //CalendarPage()
-    Text(text = "Hello $name!")
+    CalendarPage()
+    //Text(text = "Hello $name!")
 }
 
 @Preview(showBackground = true)
