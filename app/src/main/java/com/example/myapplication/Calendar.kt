@@ -10,11 +10,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,20 +31,37 @@ val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage()
+fun CalendarPage(week:Int = 0)
 {
     Scaffold(
-        topBar = {TopBar()},
+        topBar = {TopBar(week)},
     ){
-       CalendarGrid(0)
+       CalendarGrid(week)
     }
 }
 
+@Preview
 @Composable
-fun TopBar()
+fun previewweekselector()
+{
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CenterText(text = "Week 0", fontsize = 15.sp)
+        WeekSelector()
+    }
+}
+@Composable
+fun TopBar(week:Int)
 {
     SmallTopAppBar(
-        title = { Text("TopAppBar") },
+        title = {
+                //WeekSelector()
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Week $week")
+                WeekSelector()
+            }
+        },
         actions = {
             // RowScope here, so these icons will be placed horizontally
             IconButton(onClick = { /* doSomething() */ }) {
@@ -56,41 +72,65 @@ fun TopBar()
             }
         })
 }
-
+@Composable
+fun WeekSelector()
+{
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = Modifier) {
+        IconButton(onClick = { expanded = true }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "Localized description")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Edit") },
+                onClick = { /* Handle edit! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Edit,
+                        contentDescription = null
+                    )
+                })
+        }
+    }
+}
 @Composable
 fun CalendarGrid(weekIndex:Int)
 {
-            LazyRow(
-                modifier = Modifier.padding(10.dp,0.dp),
-                horizontalArrangement = Arrangement.spacedBy(0.dp),
-            ) {
-                item {
-                    Column() {
-                        val width = 100.dp
-                        Row() {
+    LazyRow(
+        modifier = Modifier.padding(10.dp,0.dp),
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+    ) {
+        item {
+            Column() {
+                val width = 100.dp
+                Row() {
+                    for (i in 0..6) {
+                        CenterText(modifier = Modifier.padding(5.dp,0.dp).width(width), text = weekday[i])
+                    }
+                }
+                LazyColumn(
+                    modifier = Modifier.height(760.dp)
+                ) {
+                    item{ Spacer(modifier = Modifier.padding(10.dp))}
+                    item {
+                        Row()
+                        {
+
                             for (i in 0..6) {
-                                CenterText(modifier = Modifier.padding(5.dp,0.dp),width = width, text = weekday[i])
-                            }
-                        }
-                        Spacer(modifier = Modifier.padding(10.dp))
-                        LazyColumn(
-                            modifier = Modifier.height(760.dp)
-                        ) {
-                            item {
-                                Row()
-                                {
-                                    for (i in 0..6) {
-                                        DailyList(Modifier.padding(5.dp,0.dp),weekIndex, i,width = width)
-                                    }
-                                }
-                            }
-                            item{
-                                Spacer(modifier = Modifier.padding(50.dp))
+                                DailyList(Modifier.padding(5.dp,0.dp),weekIndex, i,width = width)
                             }
                         }
                     }
+                    item{
+                        Spacer(modifier = Modifier.padding(50.dp))
+                    }
                 }
             }
+        }
+    }
 }
 
 @Composable
@@ -136,8 +176,8 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
                 ClassBlock({
                     LazyColumn() {
                         item {
-                            CenterText(width = width,text = coursename)
-                            CenterText(width = width,text = courselocation)
+                            CenterText(modifier = Modifier.width(width),text = coursename)
+                            CenterText(modifier = Modifier.width(width),text = courselocation)
                         }
                     }
                 }, MaterialTheme.colorScheme.secondary, len,width)
@@ -149,11 +189,11 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
 }
 
 @Composable
-fun CenterText(modifier: Modifier = Modifier, width: Dp,text:String, fontsize: TextUnit = 14.sp)
+fun CenterText(modifier: Modifier = Modifier,text:String, fontsize: TextUnit = 13.sp)
 {
     Text(
         text = text,
-        modifier = modifier.width(width),
+        modifier = modifier,
         textAlign = TextAlign.Center,
         fontSize = fontsize
     )
