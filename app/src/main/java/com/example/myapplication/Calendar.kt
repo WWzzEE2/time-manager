@@ -19,10 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.example.myapplication.backstage.CourseTemplate
+import com.example.myapplication.backstage.Schedule
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
@@ -76,7 +79,7 @@ fun CalendarGrid(weekIndex:Int)
 }
 
 @Composable
-fun DailyList(weekIndex: Int,dayIndex: Int)
+fun DailyList(weekIndex: Short,dayIndex: Short)
 {
     val width = 100.dp
     Column(
@@ -85,10 +88,15 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
     ) {
         CenterText(width = width, text = weekday[dayIndex])
         Spacer(modifier = Modifier.padding(10.dp))
-        for(i in 0..10)
+        var i:Short = 0
+        var activity = LocalContext.current as MainActivity
+        var schedule = activity.schedule
+        while(i<12)
         {
-            var len:Int = (1..3).random()
+            var course:CourseTemplate?= schedule.getTemplate(dayIndex,i,weekIndex)
+            var len:Int = course?.EndingTime!! - course?.StartingTime!!
             ClassBlock ({ Text(text = "course 1")},len,width)
+            i = (i + len).toShort()
         }
 
     }
