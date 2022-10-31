@@ -21,9 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.*
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.Schedule
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
@@ -80,6 +79,19 @@ fun CalendarGrid(weekIndex:Int)
 }
 
 @Composable
+fun TimeList()
+{
+    Column(modifier = Modifier.width(20.dp)){
+        Text(text = "")
+        Spacer(modifier = Modifier.padding(10.dp))
+        for(i in 0..11)
+        {
+
+        }
+    }
+}
+
+@Composable
 fun DailyList(weekIndex: Int,dayIndex: Int)
 {
     val width = 100.dp
@@ -87,11 +99,16 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
         modifier = Modifier.padding(5.dp,0.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
+
         CenterText(width = width, text = weekday[dayIndex])
         Spacer(modifier = Modifier.padding(10.dp))
+
+        // get class info
         var i:Short = 0
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
+
+        //render classBlock
         while(i<12)
         {
             var course:CourseTemplate?= schedule.getTemplate(i,dayIndex.toShort(),weekIndex.toShort())
@@ -102,8 +119,17 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
                 ClassBlock({ Text(text = "") }, MaterialTheme.colorScheme.background,len, width)
             }
             else {
+                var coursename = course.info.Name
+                var courselocation = course.info.Location
                 len = course?.EndingTime!! - course?.StartingTime!!
-                ClassBlock({ Text(text = "course 1") }, MaterialTheme.colorScheme.secondary, len,width)
+                ClassBlock({
+                    LazyColumn() {
+                        item {
+                            CenterText(width = width,text = coursename)
+                            CenterText(width = width,text = courselocation)
+                        }
+                    }
+                }, MaterialTheme.colorScheme.secondary, len,width)
             }
 
             i = (i + len).toShort()
@@ -112,12 +138,13 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
 }
 
 @Composable
-fun CenterText(width: Dp,text:String)
+fun CenterText(width: Dp,text:String, fontsize: TextUnit = 14.sp)
 {
     Text(
         text = text,
         modifier = Modifier.width(width),
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        fontSize = fontsize
     )
 }
 
@@ -132,10 +159,16 @@ fun ClassBlock(content:@Composable ()->Unit,color:Color,len:Int,width:Dp)
             .height(len * 60.dp + (len - 1) * 5.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color),
         contentPadding = PaddingValues(10.dp),
-        elevation = ButtonDefaults.buttonElevation(2.dp,1.dp,1.dp)
+        elevation = ButtonDefaults.buttonElevation(2.dp,1.dp,2.dp)
 
     ) {
         content()
     }
+}
+@Preview
+@Composable
+fun previewclassblock()
+{
+    ClassBlock(content = {Text(text = "114514")},color = Color.LightGray, len = 1, width = 100.dp)
 }
 
