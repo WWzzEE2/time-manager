@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,11 +17,12 @@ import com.example.myapplication.backstage.TestDataConfig
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
-    lateinit var schedule:Schedule
+    //lateinit var schedule:Schedule
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val config = TestDataConfig(5,5,1,1)
-        schedule = Schedule(this,config)
+        TestDataConfig(5,5,5,12)
+        //schedule = Schedule(this,config)
         setContent {
             MyApplicationTheme {
                 // A surface container using the 'background' color from the theme
@@ -39,8 +41,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String) {
 
-    CalendarPage()
-    //Text(text = "Hello $name!")
+    //CalendarPage()
+    Text(text = "Hello $name!")
 }
 
 @Preview(showBackground = true)
