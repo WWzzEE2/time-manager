@@ -74,6 +74,7 @@ fun CalendarGrid(weekIndex:Int)
                     item { DailyList(weekIndex, i) }
                 }
             }
+            Spacer(modifier = Modifier.padding(50.dp))
         }
     }
 }
@@ -98,16 +99,15 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
             if(course == null)
             {
                 len = 1
-                ClassBlock({ Text(text = "") }, len, width)
+                ClassBlock({ Text(text = "") }, MaterialTheme.colorScheme.background,len, width)
             }
             else {
                 len = course?.EndingTime!! - course?.StartingTime!!
-                ClassBlock({ Text(text = "course 1") }, len, width)
+                ClassBlock({ Text(text = "course 1") }, MaterialTheme.colorScheme.secondary, len,width)
             }
 
             i = (i + len).toShort()
         }
-
     }
 }
 @Composable
@@ -120,7 +120,7 @@ fun CenterText(width: Dp,text:String)
     )
 }
 @Composable
-fun ClassBlock(content:@Composable ()->Unit,len:Int,width:Dp)
+fun ClassBlock(content:@Composable ()->Unit,color:Color,len:Int,width:Dp)
 {
     Button(
         onClick = { /*TODO*/ },
@@ -128,8 +128,9 @@ fun ClassBlock(content:@Composable ()->Unit,len:Int,width:Dp)
         modifier = Modifier
             .width(width)
             .height(len * 60.dp + (len - 1) * 5.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
-        contentPadding = PaddingValues(10.dp)
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        contentPadding = PaddingValues(10.dp),
+        elevation = ButtonDefaults.buttonElevation(2.dp,1.dp,1.dp)
 
     ) {
         content()
