@@ -88,16 +88,16 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
     ) {
         CenterText(width = width, text = weekday[dayIndex])
         Spacer(modifier = Modifier.padding(10.dp))
-        var i:Short = 0
-        var activity = LocalContext.current as MainActivity
-        var schedule = activity.schedule
-        while(i<12)
-        {
-            var course:CourseTemplate?= schedule.getTemplate(dayIndex.toShort(),i,weekIndex.toShort())
-            var len:Int = course?.EndingTime!! - course?.StartingTime!!
-            ClassBlock ({ Text(text = "course 1")},len,width)
-            i = (i + len).toShort()
-        }
+//        var i:Short = 0
+//        var activity = LocalContext.current as MainActivity
+//        var schedule = activity.schedule
+//        while(i<12)
+//        {
+//            var course:CourseTemplate?= schedule.getTemplate(dayIndex.toShort(),i,weekIndex.toShort())
+//            var len:Int = course?.EndingTime!! - course?.StartingTime!!
+//            ClassBlock ({ Text(text = "course 1")},len,width)
+//            i = (i + len).toShort()
+//        }
 
     }
 }
