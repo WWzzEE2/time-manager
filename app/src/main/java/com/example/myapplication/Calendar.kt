@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -34,7 +35,6 @@ fun CalendarPage()
     Scaffold(
         topBar = {TopBar()},
     ){
-
        CalendarGrid(0)
     }
 }
@@ -50,7 +50,7 @@ fun TopBar()
                 Icon(Icons.Filled.Menu, contentDescription = "Localized description")
             }
             IconButton(onClick = { /* doSomething() */ }) {
-                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                Icon(Icons.Filled.Add, contentDescription = "Localized description")
             }
         })
 }
