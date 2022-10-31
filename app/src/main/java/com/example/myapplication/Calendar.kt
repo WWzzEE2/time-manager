@@ -60,22 +60,37 @@ fun TopBar()
 @Composable
 fun CalendarGrid(weekIndex:Int)
 {
-    LazyColumn(
-        modifier = Modifier.height(760.dp)
-    )
-    {
-        item{
             LazyRow(
                 modifier = Modifier.padding(10.dp,0.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
             ) {
-                for (i in 0..6) {
-                    item { DailyList(weekIndex, i) }
+                item {
+                    Column() {
+                        val width = 100.dp
+                        Row() {
+                            for (i in 0..6) {
+                                CenterText(modifier = Modifier.padding(5.dp,0.dp),width = width, text = weekday[i])
+                            }
+                        }
+                        Spacer(modifier = Modifier.padding(10.dp))
+                        LazyColumn(
+                            modifier = Modifier.height(760.dp)
+                        ) {
+                            item {
+                                Row()
+                                {
+                                    for (i in 0..6) {
+                                        DailyList(Modifier.padding(5.dp,0.dp),weekIndex, i,width = width)
+                                    }
+                                }
+                            }
+                            item{
+                                Spacer(modifier = Modifier.padding(50.dp))
+                            }
+                        }
+                    }
                 }
             }
-            Spacer(modifier = Modifier.padding(50.dp))
-        }
-    }
 }
 
 @Composable
@@ -92,16 +107,12 @@ fun TimeList()
 }
 
 @Composable
-fun DailyList(weekIndex: Int,dayIndex: Int)
+fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp = 100.dp)
 {
-    val width = 100.dp
     Column(
-        modifier = Modifier.padding(5.dp,0.dp),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
-
-        CenterText(width = width, text = weekday[dayIndex])
-        Spacer(modifier = Modifier.padding(10.dp))
 
         // get class info
         var i:Short = 0
@@ -138,11 +149,11 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
 }
 
 @Composable
-fun CenterText(width: Dp,text:String, fontsize: TextUnit = 14.sp)
+fun CenterText(modifier: Modifier = Modifier, width: Dp,text:String, fontsize: TextUnit = 14.sp)
 {
     Text(
         text = text,
-        modifier = Modifier.width(width),
+        modifier = modifier.width(width),
         textAlign = TextAlign.Center,
         fontSize = fontsize
     )
