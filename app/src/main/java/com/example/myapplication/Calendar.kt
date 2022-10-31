@@ -21,25 +21,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.*
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.Schedule
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
-
 
 val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage(screenState: ScreenState)
+fun CalendarPage()
 {
     Scaffold(
         topBar = {TopBar()},
     ){
-       CalendarGrid(screenState, 0)
+       CalendarGrid(0)
     }
 }
 
@@ -56,12 +54,11 @@ fun TopBar()
             IconButton(onClick = { /* doSomething() */ }) {
                 Icon(Icons.Filled.Add, contentDescription = "Localized description")
             }
-        }
-    )
+        })
 }
 
 @Composable
-fun CalendarGrid(screenState: ScreenState, weekIndex:Int)
+fun CalendarGrid(weekIndex:Int)
 {
     LazyColumn(
         modifier = Modifier.height(760.dp)
@@ -73,7 +70,7 @@ fun CalendarGrid(screenState: ScreenState, weekIndex:Int)
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 for (i in 0..6) {
-                    item { DailyList(screenState, weekIndex, i) }
+                    item { DailyList(weekIndex, i) }
                 }
             }
             Spacer(modifier = Modifier.padding(50.dp))
@@ -82,69 +79,96 @@ fun CalendarGrid(screenState: ScreenState, weekIndex:Int)
 }
 
 @Composable
-fun DailyList(screenState: ScreenState, weekIndex: Int,dayIndex: Int)
+fun TimeList()
+{
+    Column(modifier = Modifier.width(20.dp)){
+        Text(text = "")
+        Spacer(modifier = Modifier.padding(10.dp))
+        for(i in 0..11)
+        {
+
+        }
+    }
+}
+
+@Composable
+fun DailyList(weekIndex: Int,dayIndex: Int)
 {
     val width = 100.dp
     Column(
         modifier = Modifier.padding(5.dp,0.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
+
         CenterText(width = width, text = weekday[dayIndex])
         Spacer(modifier = Modifier.padding(10.dp))
-        var i:Long = 0
+
+        // get class info
+        var i:Short = 0
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
-        println("regenerate")
+
+        //render classBlock
         while(i<12)
         {
-            var course:CourseTemplate?= schedule.getTemplate(i,dayIndex.toLong(),weekIndex.toLong())
+            var course:CourseTemplate?= schedule.getTemplate(i,dayIndex.toShort(),weekIndex.toShort())
             var len:Int = 1
             if(course == null)
             {
                 len = 1
-                ClassBlock(screenState, MaterialTheme.colorScheme.background,len, width){
-                    Text(text = "")
-                }
+                ClassBlock({ Text(text = "") }, MaterialTheme.colorScheme.background,len, width)
             }
             else {
-                len = (course.EndingTime - course.StartingTime).toInt()
-                ClassBlock(screenState, MaterialTheme.colorScheme.secondary, len, width) {
-                    Column() {
-                        CenterText( width = 150.dp,text = course.info.Name)
-                        CenterText( width = 150.dp,text = course.info.Location)
+                var coursename = course.info.Name
+                var courselocation = course.info.Location
+                len = course?.EndingTime!! - course?.StartingTime!!
+                ClassBlock({
+                    LazyColumn() {
+                        item {
+                            CenterText(width = width,text = coursename)
+                            CenterText(width = width,text = courselocation)
+                        }
                     }
-                }
+                }, MaterialTheme.colorScheme.secondary, len,width)
             }
-            i = (i + len).toLong()
+
+            i = (i + len).toShort()
         }
     }
 }
 
 @Composable
-fun CenterText(width: Dp,text:String)
+fun CenterText(width: Dp,text:String, fontsize: TextUnit = 14.sp)
 {
     Text(
         text = text,
         modifier = Modifier.width(width),
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        fontSize = fontsize
     )
 }
 
 @Composable
-fun ClassBlock(screenState: ScreenState, color:Color,len:Int,width:Dp, content:@Composable ()->Unit)
+fun ClassBlock(content:@Composable ()->Unit,color:Color,len:Int,width:Dp)
 {
     Button(
-        onClick = {screenState.goToEdit()},
+        onClick = { /*TODO*/ },
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .width(width)
             .height(len * 60.dp + (len - 1) * 5.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color),
         contentPadding = PaddingValues(10.dp),
-        elevation = ButtonDefaults.buttonElevation(2.dp,1.dp,1.dp)
+        elevation = ButtonDefaults.buttonElevation(2.dp,1.dp,2.dp)
 
     ) {
         content()
     }
+}
+@Preview
+@Composable
+fun previewclassblock()
+{
+    ClassBlock(content = {Text(text = "114514")},color = Color.LightGray, len = 1, width = 100.dp)
 }
 
