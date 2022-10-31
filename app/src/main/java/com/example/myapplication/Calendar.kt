@@ -71,7 +71,7 @@ fun CalendarGrid(weekIndex:Int)
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 for (i in 0..6) {
-                    item { DailyList(weekIndex, i) }
+                    item { DailyList(weekIndex, i.toInt()) }
                 }
             }
         }
@@ -79,7 +79,7 @@ fun CalendarGrid(weekIndex:Int)
 }
 
 @Composable
-fun DailyList(weekIndex: Short,dayIndex: Short)
+fun DailyList(weekIndex: Int,dayIndex: Int)
 {
     val width = 100.dp
     Column(
@@ -93,7 +93,7 @@ fun DailyList(weekIndex: Short,dayIndex: Short)
         var schedule = activity.schedule
         while(i<12)
         {
-            var course:CourseTemplate?= schedule.getTemplate(dayIndex,i,weekIndex)
+            var course:CourseTemplate?= schedule.getTemplate(dayIndex.toShort(),i,weekIndex.toShort())
             var len:Int = course?.EndingTime!! - course?.StartingTime!!
             ClassBlock ({ Text(text = "course 1")},len,width)
             i = (i + len).toShort()
