@@ -24,4 +24,13 @@ data class CourseInfo(
     val TimeInfo : MutableList<CourseTemplate>,//课程时间，存放CourseTemplate的List
     val Prompt : String,                //课程描述
     val Location: String,               //课程位置
-)
+){
+    fun addCourse(courseTime:CourseTemplate)
+    {
+        courseTime.info= this
+        TimeInfo.add(courseTime)
+    }
+}
+
+var RowStart = arrayOfNulls<Long>(24)
+var RowEnd = arrayOfNulls<Long>(24)
