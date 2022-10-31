@@ -45,8 +45,7 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Short, HashSet<C
         for ((k, v) in this) {
             if (k > time) break
             for (t in v) {
-                val startWeek = bindSchedule.getWeek(t.info.StartingTime)
-                if (t.EndingTime > time && week > startWeek && ((week - startWeek) % t.Period == 0L)) return t
+                if (t.EndingTime > time && bindSchedule.templateAvailable(t, week)) return t
             }
         }
         return null
@@ -154,19 +153,20 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
                 val strTime = (rand.nextInt() % testData.maxTime).toShort()
                 val template = CourseTemplate((rand.nextInt() % 7).toShort(),
                     strTime,
-                    (strTime + 2 + (rand.nextInt() % 2)).toShort(),
+                    ((strTime + 2 + (rand.nextInt() % 2)).toShort() % (testData.maxTime + 1)).toShort(),
                     1
                 )
+                template.info = course
                 course.TimeInfo.add(template)
                 addCourse(course)
             }
         }
-        else
+        else {
             load(this, context)
 
-        for (course in this.courseSet)
-            addCourse(course)
-
+            for (course in this.courseSet)
+                addCourse(course)
+        }
     }
 
     /**
@@ -185,8 +185,26 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     /**
      * @see TemplateMap.getTemplate
      */
-    fun getTemplate(colum: Short, time: Short, week: Short) : CourseTemplate? {
+    fun getTemplate(time: Short, colum: Short, week: Short) : CourseTemplate? {
         return courseMap[colum.toInt()].getTemplate(time ,week)
+    }
+
+    /**
+     * Get all template in given day of week
+     */
+    fun getTemplate(colum: Short, week:Short) : List<CourseTemplate> {
+        val dayMap = courseMap[colum.toInt()]
+        val res = ArrayList<CourseTemplate>()
+        for ((k, v) in dayMap) {
+            if (res.isNotEmpty() && k < res.last().EndingTime) continue
+            for (template in v) {
+                if (templateAvailable(template, week)) {
+                    res.add(template)
+                    break
+                }
+            }
+        }
+        return res
     }
 
     /**
@@ -253,4 +271,8 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     fun getAllDDl() : List<DDlInfo> = ddlMap.toList()
 
     fun getAllCourse() : List<CourseInfo> = courseSet.toList()
+
+    internal fun templateAvailable(template: CourseTemplate, week: Short) : Boolean = getWeek(template.info.StartingTime).let {
+        return week >= it && (week - it) % template.Period == 0L
+    }
 }
