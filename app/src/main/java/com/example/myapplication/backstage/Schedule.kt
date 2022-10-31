@@ -1,11 +1,10 @@
 package com.example.myapplication.backstage
 
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import java.util.TreeMap
-import java.util.TreeSet
-import androidx.activity.ComponentActivity
+
+import android.content.Context
+import java.util.*
+import kotlin.collections.HashSet
+import kotlin.collections.ArrayList
 
 
 /**
@@ -15,17 +14,7 @@ import androidx.activity.ComponentActivity
  * The backstage functions of the program
  */
 
-tailrec fun gcd(a: Int, b: Int): Int = if (b == 0) abs(a) else gcd(b, a % b)
-tailrec fun gcd(a: Long, b: Long): Long = if (b == 0L) abs(a) else gcd(b, a % b)
-fun crossover(s1: Int, e1: Int, s2: Int, e2: Int) = max(s1, s2) < min(e1, e2)
-fun crossover(s1: Long, e1: Long, s2: Long, e2: Long) = max(s1, s2) < min(e1, e2)
-
-// TODO not my work
-fun getWeek(time:Long) : Int {
-    return 114514
-}
-
-class TemplateMap : TreeMap<Short, HashSet<CourseTemplate>>() {
+private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Short, HashSet<CourseTemplate>>() {
 
     /**
      * Add a template
@@ -52,11 +41,11 @@ class TemplateMap : TreeMap<Short, HashSet<CourseTemplate>>() {
      *  Check if there are any courses at given time
      *  The course's time is treated as [startTime, endTime)
      */
-    fun getTemplate(time:Short, week:Long) : CourseTemplate? {
+    fun getTemplate(time:Short, week:Short) : CourseTemplate? {
         for ((k, v) in this) {
             if (k > time) break
             for (t in v) {
-                val startWeek = getWeek(t.info.StartingTime)
+                val startWeek = bindSchedule.getWeek(t.info.StartingTime)
                 if (t.EndingTime > time && week > startWeek && ((week - startWeek) % t.Period == 0L)) return t
             }
         }
@@ -84,10 +73,10 @@ class TemplateMap : TreeMap<Short, HashSet<CourseTemplate>>() {
 
             val laterT = if(t1.info.StartingTime > t2.info.StartingTime) t1 else t2
             val otherT = if(laterT == t1) t2 else t1
-            val otherStart = getWeek(otherT.info.StartingTime)
-            val endWeek = min(getWeek(t1.info.EndingTime), getWeek(t2.info.EndingTime))
+            val otherStart = bindSchedule.getWeek(otherT.info.StartingTime)
+            val endWeek = min(bindSchedule.getWeek(t1.info.EndingTime), bindSchedule.getWeek(t2.info.EndingTime))
 
-            for (w in getWeek(laterT.info.StartingTime)until endWeek step laterT.Period.toInt()) {
+            for (w in bindSchedule.getWeek(laterT.info.StartingTime)until endWeek step laterT.Period.toInt()) {
                 if ((w - otherStart) % otherT.Period == 0L) return true
             }
         }
@@ -96,41 +85,107 @@ class TemplateMap : TreeMap<Short, HashSet<CourseTemplate>>() {
 
 }
 
-object Schedule {
+private class DDLMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<DDlInfo>>() {
 
-    private val courseMap = Array(7) { TemplateMap() }
+    /**
+     * @return False when ddl already exists
+     */
+    fun addDDl(ddl: DDlInfo) : Boolean {
+        val set = this[ddl.EndingTime]?: HashSet()
+        this[ddl.EndingTime] = set
+        return set.add(ddl)
+    }
 
-    private val ddlSet = TreeSet<DDlInfo> { o1, o2 -> (o1.EndingTime - o2.EndingTime).toInt() }
+    fun removeDDl(ddl: DDlInfo) =
+        this[ddl.EndingTime]?.let {
+            it.remove(ddl)
+            if (it.isEmpty()) remove(ddl.EndingTime)
+        }
 
-    private lateinit var courseSet: HashSet<CourseInfo>
+    fun getDDl(fromTime: Long, toTime: Long) : List<DDlInfo> = subMap(fromTime, true, toTime, false).values.let {
+        val res = ArrayList<DDlInfo>()
+        for (set in it)
+            res.addAll(set)
+        return res
+    }
+
+    fun addAll(ddlCollection: Collection<DDlInfo>) {
+        for (ddl in ddlCollection)
+            addDDl(ddl)
+    }
+
+    fun toList() : List<DDlInfo> = this.values.let {
+        val res = ArrayList<DDlInfo>()
+        for (set in it)
+            res.addAll(set)
+        return res
+    }
+
+}
+
+/**
+ * Config used to generate data
+ */
+data class TestDataConfig(val courseTryCnt: Int, val ddlCnt: Int, val totWeek: Short, val maxTime: Short)
+
+class Schedule(private val context: Context, testData: TestDataConfig? = null) {
+
+    private val courseMap = Array(7) { TemplateMap(this) }
+
+    private val ddlMap = DDLMap(this)
+
+    private val courseSet = HashSet<CourseInfo>()
+
+    var termStartTime: Long = 0
 
     /**
      * Load all data from disk
      * @see load
      */
-    fun initAll(activity: ComponentActivity) {
+    init {
 
-        val (ddl_list, course_list) = load(activity)
-
-        courseSet = HashSet(course_list)
+        if (testData != null) {
+            val rand = Random()
+            val weekSec = 3600 * 24 * 7L
+            for (i in 0 until testData.ddlCnt)
+                addDDl(DDlInfo("Test ddl$i", rand.nextLong() % (weekSec * testData.totWeek), "This is DDL $i", 0))
+            for (i in 0 until testData.courseTryCnt) {
+                val course = CourseInfo("Test Course$i", 0, weekSec * testData.totWeek, ArrayList(), "This is Course $i", "Classroom $i")
+                val strTime = (rand.nextInt() % testData.maxTime).toShort()
+                val template = CourseTemplate((rand.nextInt() % 7).toShort(),
+                    strTime,
+                    (strTime + 2 + (rand.nextInt() % 2)).toShort(),
+                    1
+                )
+                course.TimeInfo.add(template)
+                addCourse(course)
+            }
+        }
+        else
+            load(this, context)
 
         for (course in this.courseSet)
             addCourse(course)
 
-        ddlSet.addAll(ddl_list)
-
     }
+
+    /**
+     * @see com.example.myapplication.backstage.getWeek
+     */
+    fun getWeek(time: Long) = getWeek(termStartTime, time)
 
     /**
      * Save all data to disk
      * @see save
      */
-    fun saveAll(activity: ComponentActivity) = save(ddlSet.toList(), courseSet.toList(), activity)
+    fun saveAll() = save(this, context)
+
+    fun getTemplate(time: Long) : CourseTemplate? = getTemplate(getDay(time), getHour(time) , getWeek(time))
 
     /**
      * @see TemplateMap.getTemplate
      */
-    fun getTemplate(colum: Short, time: Short, week: Long) : CourseTemplate? {
+    fun getTemplate(colum: Short, time: Short, week: Short) : CourseTemplate? {
         return courseMap[colum.toInt()].getTemplate(time ,week)
     }
 
@@ -177,19 +232,25 @@ object Schedule {
     }
 
     /**
-     * Add a new ddl
+     * @see DDLMap.addDDl
      */
     fun addDDl(ddl: DDlInfo) {
-        ddlSet.add(ddl)
+        ddlMap.addDDl(ddl)
     }
 
     /**
-     * Remove a ddl
+     * @see DDLMap.removeDDl
      */
     fun removeDDl(ddl : DDlInfo) {
-        ddlSet.remove(ddl)
+        ddlMap.removeDDl(ddl)
     }
 
-    fun getDDl(fromTime: DDlInfo, endTime: DDlInfo) : Set<DDlInfo> = ddlSet.subSet(fromTime, endTime)
+    /**
+     * @see DDLMap.getDDl
+     */
+    fun getDDl(fromTime: Long, toTime: Long) : List<DDlInfo> = ddlMap.getDDl(fromTime, toTime)
 
+    fun getAllDDl() : List<DDlInfo> = ddlMap.toList()
+
+    fun getAllCourse() : List<CourseInfo> = courseSet.toList()
 }
