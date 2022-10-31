@@ -110,6 +110,7 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
         }
     }
 }
+
 @Composable
 fun CenterText(width: Dp,text:String)
 {
@@ -119,6 +120,7 @@ fun CenterText(width: Dp,text:String)
         textAlign = TextAlign.Center
     )
 }
+
 @Composable
 fun ClassBlock(content:@Composable ()->Unit,color:Color,len:Int,width:Dp)
 {
