@@ -154,7 +154,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
             for (i in 0 until testData.courseTryCnt) {
                 val course = CourseInfo("Test Course$i", 0, weekSec * testData.totWeek, ArrayList(), "This is Course $i", "Classroom $i")
                 val strTime = (rand.nextInt(testData.maxTime.toInt())).toShort()
-                val template = CourseTemplate(rand.nextInt(7).toShort(),
+                val template = CourseTemplate(rand.nextInt(7).toLong(),
                     strTime,
                     min((strTime + 2 + rand.nextInt(2)).toShort(), ((testData.maxTime + 1).toShort())),
                     1
