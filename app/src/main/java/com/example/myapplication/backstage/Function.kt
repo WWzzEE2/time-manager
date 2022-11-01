@@ -12,19 +12,19 @@ internal fun crossover(s1: Int, e1: Int, s2: Int, e2: Int) = max(s1, s2) < min(e
 internal fun crossover(s1: Long, e1: Long, s2: Long, e2: Long) = max(s1, s2) < min(e1, e2)
 
 data class WeekDay (
-    val week: Short,
-    val day:Short
+    val week: Long,
+    val day:Long
 )
 
 internal fun getWeekDay(termStart: Long, timeStamp: Long) : WeekDay {
     val week = (timeStamp - termStart) / 24 / 3600 / 1000 / 7
     return Calendar.getInstance().let {
         it.time = Date(timeStamp)
-        WeekDay(week.toShort(), (it[Calendar.DAY_OF_WEEK]-1).toShort())
+        WeekDay(week, (it[Calendar.DAY_OF_WEEK]-1).toLong())
     }
 }
 
-internal fun getWeek(termStart: Long, timeStamp: Long) = ((timeStamp - termStart) / 24 / 3600 / 1000 / 7).toShort()
+internal fun getWeek(termStart: Long, timeStamp: Long) = ((timeStamp - termStart) / 24 / 3600 / 1000 / 7)
 
 fun getDay(timeStamp: Long) = Calendar.getInstance().let {
     it.time = Date(timeStamp)
@@ -33,10 +33,10 @@ fun getDay(timeStamp: Long) = Calendar.getInstance().let {
 
 fun getHour(timeStamp: Long) = Calendar.getInstance().let {
     it.time = Date(timeStamp)
-    (it[Calendar.HOUR_OF_DAY].toShort())
+    (it[Calendar.HOUR_OF_DAY].toLong())
 }
 
-fun getMin(timeStamp: Long): Long {
+fun getPastMin(timeStamp: Long): Long {
     //输入时间戳，返回位于一天中的第几分钟
     val start_day=(timeStamp/24/3600/1000)*24*3600*1000
     val past_min=(timeStamp-start_day)/1000/60
@@ -45,13 +45,24 @@ fun getMin(timeStamp: Long): Long {
 
 fun getRow(timeStamp: Long):Short{
     //输入时间戳，返回属于哪一列
-    val min=getMin(timeStamp)
+    val past_min=getPastMin(timeStamp)
     var column=-1
-    for(index in 1..RowStart.size)
-        if(min>= RowStart.get(index)!!&&min< RowEnd.get(index)!!)
+    for(index in 1..termInfo.RowStart.size)
+        if(past_min>= termInfo.RowStart.get(index)!!&&past_min< termInfo.RowEnd.get(index)!!)
         {
             column=index
             break
         }
     return column.toShort()
+}
+
+fun getPastMin(hour: Short, min:Short):Long{
+    //输入小时和分钟，返回属于哪一列
+    val past_min=(hour*60+min).toLong()
+    return past_min
+}
+
+fun CreatRow(hour: Short,min: Short)
+{
+
 }
