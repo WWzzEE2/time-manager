@@ -1,5 +1,6 @@
 package com.example.myapplication.backstage
 
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
@@ -62,7 +63,21 @@ fun getPastMin(hour: Short, min:Short):Long{
     return past_min
 }
 
-fun CreatRow(hour: Short,min: Short)
-{
+fun getTimeStamp(year: Long,month: Long,day: Long): Long {
+    val dateTime = ""
+    dateTime.plus(year.toString())
+    dateTime.plus("-")
+    if(month<10)
+        dateTime.plus("0")
+    dateTime.plus(month.toString())
+    dateTime.plus("-")
+    if (day<10)
+        dateTime.plus(0)
+    dateTime.plus(day.toString())
 
+    dateTime.plus(" 00:00:01")
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val date = simpleDateFormat.parse(dateTime)
+    val timestamp = date?.time
+    return timestamp!!.toLong()
 }

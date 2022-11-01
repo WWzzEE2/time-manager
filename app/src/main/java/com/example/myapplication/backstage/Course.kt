@@ -1,10 +1,20 @@
 package com.example.myapplication.backstage
 
+import java.text.SimpleDateFormat
+import java.time.Month
+import java.time.Year
+import java.util.*
+
 data class TermInfo (
     var StartingTime: Long=0,
     var RowStart : MutableList<Long> = mutableListOf(),
     var RowEnd : MutableList<Long> =mutableListOf()
-)
+) {
+    fun setTime(year: Long,month: Long,day: Long)
+    {
+        StartingTime= getTimeStamp(year, month, day)
+    }
+}
 var termInfo:TermInfo=TermInfo()
 
 data class DDlInfo(
