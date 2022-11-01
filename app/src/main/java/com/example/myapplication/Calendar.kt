@@ -92,19 +92,14 @@ private fun WeekSelector(week:weekidx)
         IconButton(onClick = { expanded = true }) {
             Icon(Icons.Default.MoreVert, contentDescription = "Localized description")
         }
+        val width = 120.dp
         //var offset by remember { mutableStateOf(0f) }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .heightIn(max = 140.dp)
-//                .scrollable(
-//                    orientation = Orientation.Vertical,
-//                    state = rememberScrollableState { delta ->
-//                        offset += delta
-//                        delta
-//                    }
-//                )
+                .width(width)
             ,
             offset = DpOffset(x=20.dp,y=0.dp)
         ) {
@@ -112,17 +107,12 @@ private fun WeekSelector(week:weekidx)
                 DropdownMenuItem(
                     modifier = Modifier
                         .height(50.dp),
-                    text = { Text("week $i") },
+                    text = { CenterText(text = "week $i", modifier = Modifier.width(width)) },
                     onClick = {
                         week.index.value = i
                         expanded = false
                               },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Edit,
-                            contentDescription = null
-                        )
-                    })
+                    )
             }
         }
     }
@@ -131,7 +121,7 @@ private fun WeekSelector(week:weekidx)
 fun CalendarGrid(weekIndex:Int) {
     println(weekIndex)
     LazyRow(
-        modifier = Modifier.padding(10.dp,0.dp),
+        modifier = Modifier.padding(5.dp,0.dp),
         horizontalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         item {
@@ -180,8 +170,9 @@ fun TimeList()
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp = 100.dp)
+fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp = 100.dp )
 {
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -203,7 +194,10 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
                 len = 1
                 ClassBlock( MaterialTheme.colorScheme.background,
                     len,
-                    {/* TODO: your function here */},
+                    {/*
+                        TODO: your function here
+                        Triggered when clicking an empty button. You should navigate to the "course add" page with necessary arguments
+                     */},
                     Modifier.width(width)
                 ){ Text(text = "") }
             }
@@ -211,14 +205,23 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
                 var coursename = course.info.Name
                 var courselocation = course.info.Location
                 len = course?.EndingTime!! - course?.StartingTime!!
-                Box()
-                {
-                    var interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-                    val isPressed by interactionSource.collectIsPressedAsState()
+                var interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+                val isPressed by interactionSource.collectIsPressedAsState()
+
+                Box() {
                     ClassBlock(
                         MaterialTheme.colorScheme.secondary,
-                        len,
-                        {if(show_deletebutton && !isPressed) show_deletebutton = false},
+                        len, {
+                            if(show_deletebutton && !isPressed) {
+                                show_deletebutton = false
+                            }
+                            else {
+                                /*
+                                * TODO: your function here
+                                * Triggered when clicking a course button. You can edit it into whatever you like
+                                * */
+                            }
+                        },
                         Modifier.width(width),
                         interactionSource
                     ) {
@@ -232,11 +235,20 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
                     if(isPressed)
                         show_deletebutton = true;
                     if(show_deletebutton) {
-                        IconButton(
-                            onClick = { show_deletebutton = false },
+                        FloatingActionButton(
+                            onClick = {
+                                show_deletebutton = false
+                                /*
+                                * TODO: your function here
+                                * Triggered when clicking an "edit" button. You should navigate to the "course edit" page with necessary arguments
+                                * */
+                                      },
                             modifier = Modifier
+                                .width(35.dp)
+                                .height(35.dp)
+                                .padding(5.dp,5.dp),
                         ) {
-                            Icon(Icons.Outlined.Delete, contentDescription = "Localized description")
+                            Icon(Icons.Outlined.Edit,modifier = Modifier.width(20.dp).height(20.dp),  tint = MaterialTheme.colorScheme.secondary,contentDescription = "Localized description")
                         }
                     }
                 }
