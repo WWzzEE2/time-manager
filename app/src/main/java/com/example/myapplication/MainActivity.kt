@@ -39,8 +39,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Greeting(name: String) {
-
-    CalendarPage()
+    EditPage()
+    //CalendarPage()
     //Text(text = "Hello $name!")
 }
 
