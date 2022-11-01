@@ -35,9 +35,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Greeting(name: String) {
-
-    //CalendarPage()
-    DDLScreen()
+    BottomNavigation()
 }
 
 @Preview(showBackground = true)
