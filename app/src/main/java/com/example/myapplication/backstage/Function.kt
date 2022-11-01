@@ -18,7 +18,7 @@ data class WeekDay (
 )
 
 internal fun getWeekDay(termStart: Long, timeStamp: Long) : WeekDay {
-    val week = (timeStamp - termStart) / 24 / 3600 / 1000 / 7
+    val week = (timeStamp - termStart) / 24 / 3600 / 1000 / 7 + 1
     return Calendar.getInstance().let {
         it.time = Date(timeStamp)
         WeekDay(week, (it[Calendar.DAY_OF_WEEK]-1).toLong())
@@ -29,12 +29,13 @@ internal fun getWeek(termStart: Long, timeStamp: Long) = ((timeStamp - termStart
 
 fun getDay(timeStamp: Long) = Calendar.getInstance().let {
     it.time = Date(timeStamp)
-    (it[Calendar.DAY_OF_WEEK]-1).toShort()
+    (it[Calendar.DAY_OF_WEEK]-1).toLong()
 }
 
-fun getHour(timeStamp: Long) = Calendar.getInstance().let {
-    it.time = Date(timeStamp)
-    (it[Calendar.HOUR_OF_DAY].toLong())
+fun getHour(timeStamp: Long) :Long{
+    val start_day=(timeStamp/24/3600/1000)*24*3600*1000
+    val pasthour=(timeStamp-start_day)/1000/60/60
+    return pasthour
 }
 
 fun getPastMin(timeStamp: Long): Long {
@@ -58,24 +59,24 @@ fun getRow(timeStamp: Long):Short{
 }
 
 fun getPastMin(hour: Short, min:Short):Long{
-    //输入小时和分钟，返回属于哪一列
+    //输入小时和分钟，返回位于当天多少分钟
     val past_min=(hour*60+min).toLong()
     return past_min
 }
 
 fun getTimeStamp(year: Long,month: Long,day: Long): Long {
-    val dateTime = ""
-    dateTime.plus(year.toString())
-    dateTime.plus("-")
+    var dateTime:String = ""
+    dateTime += year.toString()
+    dateTime+=("-")
     if(month<10)
-        dateTime.plus("0")
-    dateTime.plus(month.toString())
-    dateTime.plus("-")
+        dateTime+=("0")
+    dateTime+=(month.toString())
+    dateTime+=("-")
     if (day<10)
-        dateTime.plus(0)
-    dateTime.plus(day.toString())
+        dateTime+=(0)
+    dateTime+=(day.toString())
 
-    dateTime.plus(" 00:00:01")
+    dateTime+=(" 00:00:01")
     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     val date = simpleDateFormat.parse(dateTime)
     val timestamp = date?.time
