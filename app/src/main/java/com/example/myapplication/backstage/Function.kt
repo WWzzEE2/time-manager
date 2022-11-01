@@ -1,5 +1,6 @@
 package com.example.myapplication.backstage
 
+import com.example.myapplication.weekday
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
@@ -18,11 +19,9 @@ data class WeekDay (
 )
 
 internal fun getWeekDay(termStart: Long, timeStamp: Long) : WeekDay {
-    val week = (timeStamp - termStart) / 24 / 3600 / 1000 / 7 + 1
-    return Calendar.getInstance().let {
-        it.time = Date(timeStamp)
-        WeekDay(week, (it[Calendar.DAY_OF_WEEK]-1).toLong())
-    }
+    val week = (timeStamp - termStart) /( 24 * 3600 * 1000 * 7)  + 1
+    val day= ((timeStamp-termStart)/(1000*3600*24))%7
+    return WeekDay(week,day)
 }
 
 internal fun getWeek(termStart: Long, timeStamp: Long) = ((timeStamp - termStart) / 24 / 3600 / 1000 / 7)
@@ -33,15 +32,13 @@ fun getDay(timeStamp: Long) = Calendar.getInstance().let {
 }
 
 fun getHour(timeStamp: Long) :Long{
-    val start_day=(timeStamp/24/3600/1000)*24*3600*1000
-    val pasthour=(timeStamp-start_day)/1000/60/60
+    val pasthour=((timeStamp- termInfo.StartingTime)/1000/3600)%24
     return pasthour
 }
 
 fun getPastMin(timeStamp: Long): Long {
     //输入时间戳，返回位于一天中的第几分钟
-    val start_day=(timeStamp/24/3600/1000)*24*3600*1000
-    val past_min=(timeStamp-start_day)/1000/60
+    val past_min=((timeStamp- termInfo.StartingTime)/1000/60)%(24*60)
     return past_min
 }
 

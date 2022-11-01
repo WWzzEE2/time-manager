@@ -5,6 +5,7 @@ import android.content.Context
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
+import kotlin.math.abs
 import kotlin.math.min
 
 
@@ -139,7 +140,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
     private val courseSet = HashSet<CourseInfo>()
 
-    var termStartTime: Long = getTimeStamp(2022,9,1)
+    var termStartTime: Long = getTimeStamp(2022,9,5)
 
 
     /**
@@ -151,9 +152,10 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
         if (testData != null) {
             termInfo.StartingTime=termStartTime
             val rand = Random()
-            val weekSec = 1000 * 3600 * 24 * 7L
+            val weekSec = 1000 * 3600 * 24 * 7
             for (i in 0 until testData.ddlCnt)
-                addDDl(DDlInfo("Test ddl$i", i.toLong(),rand.nextLong() % (weekSec * testData.totWeek)+termStartTime, "This is DDL $i", termStartTime))
+                addDDl(DDlInfo("Test ddl$i", i.toLong(),
+                    abs(rand.nextLong()) % (weekSec * testData.totWeek)+termStartTime, "This is DDL $i", termStartTime))
             for (i in 0 until testData.courseTryCnt) {
                 val course = CourseInfo("Test Course$i", termStartTime, weekSec * testData.totWeek+termStartTime, ArrayList(), "This is Course $i", "Classroom $i")
                 val strTime = (rand.nextInt(testData.maxTime.toInt())).toLong()
@@ -277,7 +279,9 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     /**
      * Get all ddl in given day (day and week start from 0)
      */
-    fun getDDl(week: Int, day: Int) : List<DDlInfo> = (termStartTime + (week * 7 + day) * 24 * 3600 * 1000).let { return getDDl(it, it + 24 * 3600 * 1000) }
+    fun getDDl(week: Int, day: Int):  List<DDlInfo> = (termStartTime + 1L * (week * 7 + day) * 24 * 3600 * 1000).let {
+        return getDDl(it, it + 24 * 3600 * 1000)
+    }
 
     fun getAllDDl() : List<DDlInfo> = ddlMap.toList()
 
