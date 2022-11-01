@@ -1,16 +1,51 @@
 package com.example.myapplication.backstage
 
+data class TermInfo (
+    var StartingTime: Long=0,
+    var RowStart : MutableList<Long> = mutableListOf(),
+    var RowEnd : MutableList<Long> =mutableListOf()
+)
+var termInfo:TermInfo=TermInfo()
+
 data class DDlInfo(
     val Name:  String,                  //DDL名字
+    val Id : Long,
     val EndingTime : Long,              //DDL结束时间
     val Prompt : String,                //DDL描述
     val StartingTime : Long             //DDL开始工作时间
-)
+){
+    fun getString():String
+    {
+       val weekDay= getWeekDay(termInfo.StartingTime,EndingTime)
+        var output ="第"
+        output.plus(weekDay.week.toString())
+        output.plus("周 ")
+        var day_string =""
+        when(weekDay.day)
+        {
+            1.toLong() -> day_string="周一"
+            2.toLong() -> day_string="周二"
+            3.toLong() -> day_string="周三"
+            4.toLong() -> day_string="周四"
+            5.toLong() -> day_string="周五"
+            6.toLong() -> day_string="周六"
+            7.toLong() -> day_string="周日"
+        }
+        output.plus(day_string)
+        val hour= getHour(EndingTime)
+        val min= getPastMin(EndingTime)-hour*60
+        output.plus(hour.toString())
+        output.plus(":")
+        output.plus(min.toString())
+        return output
+
+    }
+}
 
 data class CourseTemplate(              //模板，对应以周为单位的日历上的一块\
-    val Column: Short,                  //课程位于哪一列
-    val StartingTime : Short,           //课程开始于哪一行
-    val EndingTime : Short,             //课程结束于哪一行
+    val Column: Long,                  //课程位于哪一列
+    var StartingTime : Long,           //课程开始于哪一行
+    var EndingTime : Long,             //课程结束于哪一行
     val Period: Long                    //一周一次或两周一次(应该不存在三天一次的课吧，
     // 一周两次的话就建立两个template)
 ) {
@@ -32,5 +67,3 @@ data class CourseInfo(
     }
 }
 
-var RowStart = arrayOfNulls<Long>(24)
-var RowEnd = arrayOfNulls<Long>(24)
