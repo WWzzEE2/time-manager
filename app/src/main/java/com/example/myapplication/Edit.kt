@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -9,12 +10,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 import kotlin.collections.ArrayList
 
+@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditPage(){
@@ -34,7 +39,6 @@ fun ChangeStat(){
         title = { Text("Edit")},
         actions = {
             IconButton(onClick = {
-
             }) {
                 Icon(Icons.Filled.Done, contentDescription = "Save")
             }
@@ -49,24 +53,26 @@ fun EditDetail(){
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         EditName()
-        EditFrequency()
-        EditStartingTime()
-        EditEndingTime()
         EditLocation()
+        EditTimeChunk()
+
     }
 }
 
 @Composable
 fun SimpleOutlinedTextField(Label:String, content:String) {
     var text by rememberSaveable { mutableStateOf(content) }
+    Column() {
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                text = it
+                saveData(Label, text) },
+            label = { Text(Label) },
+        )
 
-    OutlinedTextField(
-        value = text,
-        onValueChange = { text = it },
-        label = { Text(Label) },
-        modifier = Modifier.testTag("OutlinedTextField")
-    )
-    SaveData(Label, text)
+    }
+
 }
 
 
@@ -88,8 +94,39 @@ fun EditName(){
 
 
 
+
+
 @Composable
-fun EditFrequency(){
+fun EditTimeChunk(){
+    var isExpand by remember {
+        mutableStateOf(false)
+    }
+    var t = false
+    Column(
+
+    ) {
+        EditColumn()
+        EditStartingTime()
+        EditEndingTime()
+        Button(onClick = { isExpand = !isExpand },
+            enabled = true,
+            modifier = Modifier.size(30.dp),
+            shape= RoundedCornerShape(8.dp),
+        ) {
+            Text(text = "+", fontSize = 10.em)
+        }
+        if (isExpand != t) {
+            EditColumn()
+            EditStartingTime()
+            EditEndingTime()
+            t = isExpand
+        }
+    }
+
+}
+
+@Composable
+fun EditColumn(){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -99,8 +136,8 @@ fun EditFrequency(){
             modifier = Modifier
                 .width(35.dp)
                 .height(35.dp),
-            contentDescription = "Frequency")
-        SimpleOutlinedTextField(Label = "Frequency", content = "")
+            contentDescription = "Column")
+        SimpleOutlinedTextField(Label = "Column", content = "")
     }
 }
 
@@ -126,12 +163,9 @@ fun EditEndingTime(){
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Icon(
-            Icons.Filled.Info,
-            modifier = Modifier
-                .width(35.dp)
-                .height(35.dp),
-            contentDescription = "EndingTime")
+        Spacer(modifier = Modifier
+            .width(35.dp)
+            .height(35.dp),)
         SimpleOutlinedTextField(Label = "EndingTime", content = "")
     }
 }
@@ -152,25 +186,19 @@ fun EditLocation(){
     }
 }
 
-
-fun SaveData(type:String, content: String){
-    var name : String
-    var column : Long
-    var startingtime : Long
-    var endingtime : Long
-    var period : Long
-    var location
-    var course = CourseInfo("Name", 0, 0, ArrayList(), "prompt", "location")
-    var template = CourseTemplate(0, 0, 0, 1)
-    template.info = course
+fun saveData(type:String, content: String){
+    var name = ""; var column : Long  = 0; var startingTime : Short = 0
+    var endingTime : Short  = 0; var period : Long  = 1; var location  = ""
     when(type) {
         "Name" -> name = content
-        "Frequency" -> period = content.toLong()
-        "Startingtime" -> template.StartingTime = content.toLong()
-        "Endingtime" -> template.EndingTime = content.toLong()
-        "Location" -> course.Location = content
-        "Save" ->
+        "Column" -> column = content.toLong()
+        "StartingTime" -> startingTime = content.toShort()
+        "EndingTime" -> endingTime = content.toShort()
+        "Location" -> location = content
+        "Save" -> {
+            var course = CourseInfo(name, 0, 0, ArrayList(), "prompt", location)
+            var template = CourseTemplate(column, startingTime, endingTime, 1)
+        }
     }
+
 }
-
-
