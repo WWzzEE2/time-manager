@@ -28,38 +28,35 @@ import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage(week:Int = 0)
+fun CalendarPage()
 {
+
+
+    var week = weekidx(remember { mutableStateOf(0) })
+
     Scaffold(
         topBar = {TopBar(week)},
     ){
-       CalendarGrid(week)
+        Column() {
+            CalendarGrid(week.index.value)
+            println("regenerate")
+        }
     }
 }
 
-@Preview
+private class weekidx(var index: MutableState<Int>)
+
 @Composable
-fun previewweekselector()
-{
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        CenterText(text = "Week 0", fontsize = 15.sp)
-        WeekSelector()
-    }
-}
-@Composable
-fun TopBar(week:Int)
+private fun TopBar(week:weekidx)
 {
     SmallTopAppBar(
         title = {
                 //WeekSelector()
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Week $week")
-                WeekSelector()
+                Text("Week ${week.index.value}")
+                WeekSelector(week)
             }
         },
         actions = {
@@ -73,7 +70,7 @@ fun TopBar(week:Int)
         })
 }
 @Composable
-fun WeekSelector()
+private fun WeekSelector(week:weekidx)
 {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = Modifier) {
@@ -84,21 +81,26 @@ fun WeekSelector()
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem(
-                text = { Text("Edit") },
-                onClick = { /* Handle edit! */ },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Edit,
-                        contentDescription = null
-                    )
-                })
+            for(i in 0..10) {
+                DropdownMenuItem(
+                    text = { Text("week $i") },
+                    onClick = {
+                        week.index.value = i
+                        expanded = false
+                              },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.Edit,
+                            contentDescription = null
+                        )
+                    })
+            }
         }
     }
 }
 @Composable
-fun CalendarGrid(weekIndex:Int)
-{
+fun CalendarGrid(weekIndex:Int) {
+    println(weekIndex)
     LazyRow(
         modifier = Modifier.padding(10.dp,0.dp),
         horizontalArrangement = Arrangement.spacedBy(0.dp),
@@ -108,7 +110,9 @@ fun CalendarGrid(weekIndex:Int)
                 val width = 100.dp
                 Row() {
                     for (i in 0..6) {
-                        CenterText(modifier = Modifier.padding(5.dp,0.dp).width(width), text = weekday[i])
+                        CenterText(modifier = Modifier
+                            .padding(5.dp, 0.dp)
+                            .width(width), text = weekday[i])
                     }
                 }
                 LazyColumn(
@@ -120,7 +124,7 @@ fun CalendarGrid(weekIndex:Int)
                         {
 
                             for (i in 0..6) {
-                                DailyList(Modifier.padding(5.dp,0.dp),weekIndex, i,width = width)
+                                DailyList(Modifier.padding(5.dp,5.dp),weekIndex, i,width = width)
                             }
                         }
                     }
@@ -160,6 +164,7 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
         var schedule = activity.schedule
 
         //render classBlock
+        println(weekIndex)
         while(i<12)
         {
             var course:CourseTemplate?= schedule.getTemplate(i,dayIndex.toShort(),weekIndex.toShort())
