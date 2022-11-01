@@ -24,11 +24,12 @@ data class DDlInfo(
     val Prompt : String,                //DDL描述
     val StartingTime : Long             //DDL开始工作时间
 ){
+    fun wrapTime(time:Long):String=if (time<10) {"0"+time.toString()} else {time.toString()}
     fun getString():String
     {
-       val weekDay= getWeekDay(termInfo.StartingTime,EndingTime)
-        var output ="第"
-        output.plus(weekDay.week.toString())
+        //val weekDay= getWeekDay(termInfo.StartingTime,EndingTime)
+        var output =""
+        /*output.plus(weekDay.week.toString())
         output.plus("周 ")
         var day_string =""
         when(weekDay.day)
@@ -41,14 +42,13 @@ data class DDlInfo(
             6.toLong() -> day_string="周六"
             7.toLong() -> day_string="周日"
         }
-        output.plus(day_string)
+        output.plus(day_string)*/
         val hour= getHour(EndingTime)
         val min= getPastMin(EndingTime)-hour*60
-        output.plus(hour.toString())
-        output.plus(":")
-        output.plus(min.toString())
+        output+=wrapTime(hour)
+        output+=":"
+        output+=wrapTime(min)
         return output
-
     }
 }
 
