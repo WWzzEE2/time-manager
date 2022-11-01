@@ -89,20 +89,10 @@ fun DeadLineCard(
     Row(modifier = Modifier
         .padding(all = 8.dp)
     ) {
-        Column (modifier = Modifier
-            .clickable { isExpanded = !isExpanded }
-            .weight(1f)
-        ){
-            Text(text = ddl.getString(),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.tertiary
-            )
-            val Cur: WeekDay= getWeekDay(termInfo.StartingTime,ddl.EndingTime)
-            Text(text = "Week"+Cur.week+" Day "+Cur.day,
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.tertiary
-            )
-        }
+        Text(text = ddl.getString(),
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.tertiary
+        )
         Spacer(modifier = Modifier.width(10.dp))
 
 
@@ -199,7 +189,6 @@ fun DDLScreen(modifier: Modifier = Modifier) {
             )
 
             list=schedule.getDDl(selectedMoonTab.ordinal,selectedWeekTab.ordinal).toMutableStateList()
-            Text(text = "Today is Week"+Cur.week+" Day "+Cur.day)
             DeadLineList(
                 list=list,
                 onCloseTask={ task -> list.remove(task) }
