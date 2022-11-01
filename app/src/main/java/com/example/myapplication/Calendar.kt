@@ -40,12 +40,8 @@ val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage(weekIndex:Int = 0)
-{
-
-
+fun CalendarPage(weekIndex:Int = 0) {
     var week = weekidx(remember { mutableStateOf(weekIndex) })
-
     Scaffold(
         topBar = {TopBar(week)},
     ){
@@ -60,8 +56,12 @@ private class weekidx(var index: MutableState<Int>)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TopBar(week:weekidx)
-{
+private fun TopBar(week:weekidx) {
+    
+    NavigationBar() {
+        
+    }
+    
     SmallTopAppBar(
         title = {
                 //WeekSelector()
@@ -84,6 +84,7 @@ private fun TopBar(week:weekidx)
             }
         })
 }
+
 @Composable
 private fun WeekSelector(week:weekidx)
 {
@@ -205,25 +206,31 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
                 var coursename = course.info.Name
                 var courselocation = course.info.Location
                 len = course?.EndingTime!! - course?.StartingTime!!
-                var interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-                val isPressed by interactionSource.collectIsPressedAsState()
+//                var interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+//                val isPressed by interactionSource.collectIsPressedAsState()
 
                 Box() {
                     ClassBlock(
                         MaterialTheme.colorScheme.secondary,
-                        len, {
-                            if(show_deletebutton && !isPressed) {
-                                show_deletebutton = false
-                            }
-                            else {
+                        len, MultiClick(
+                            onClick = {
+                                if(show_deletebutton) {
+                                    println(course.info.Name)
+                                    show_deletebutton = false;
+                                }else{
                                 /*
                                 * TODO: your function here
                                 * Triggered when clicking a course button. You can edit it into whatever you like
-                                * */
+                                * */} },
+                            doubleClick = {
+                                if(!show_deletebutton) {
+                                    println(course.info.Name)
+                                    show_deletebutton = true;
+                                }
                             }
-                        },
+                        ),
                         Modifier.width(width),
-                        interactionSource
+//                        interactionSource
                     ) {
                         LazyColumn() {
                             item {
@@ -232,11 +239,12 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
                             }
                         }
                     }
-                    if(isPressed)
-                        show_deletebutton = true;
+//                    if(isPressed)
+//                        show_deletebutton = true;
                     if(show_deletebutton) {
                         FloatingActionButton(
                             onClick = {
+                                println(course.info.Name)
                                 show_deletebutton = false
                                 /*
                                 * TODO: your function here
@@ -246,9 +254,11 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
                             modifier = Modifier
                                 .width(35.dp)
                                 .height(35.dp)
-                                .padding(5.dp,5.dp),
+                                .padding(5.dp, 5.dp),
                         ) {
-                            Icon(Icons.Outlined.Edit,modifier = Modifier.width(20.dp).height(20.dp),  tint = MaterialTheme.colorScheme.secondary,contentDescription = "Localized description")
+                            Icon(Icons.Outlined.Edit,modifier = Modifier
+                                .width(20.dp)
+                                .height(20.dp),  tint = MaterialTheme.colorScheme.secondary,contentDescription = "Localized description")
                         }
                     }
                 }
@@ -293,5 +303,26 @@ fun ClassBlock(color:Color,len:Int,onclick :()->Unit = {} ,modifier: Modifier = 
 fun previewclassblock()
 {
     ClassBlock(color = Color.LightGray, len = 1, modifier = Modifier.width(100.dp)){Text(text = "114514")}
+}
+
+@Composable
+inline fun MultiClick(
+    time: Int = 300,
+    crossinline onClick: () -> Unit,
+    crossinline doubleClick: () -> Unit
+): () -> Unit {
+    var lastClickTime by remember { mutableStateOf(value = 0L) }//使用remember函数记录上次点击的时间
+    return {
+        val currentTimeMillis = System.currentTimeMillis()
+        if (currentTimeMillis - lastClickTime <= time) {//判断点击间隔,如果在间隔内则不回调
+            println("double click")
+            doubleClick()
+        }
+        else {
+            println("click")
+            onClick()
+        }
+        lastClickTime = currentTimeMillis
+    }
 }
 
