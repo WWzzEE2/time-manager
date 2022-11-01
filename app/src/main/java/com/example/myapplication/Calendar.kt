@@ -3,25 +3,28 @@ package com.example.myapplication
 import android.graphics.Paint.Align
 import android.widget.DatePicker
 import android.widget.TextView
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.Schedule
+import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
@@ -54,6 +58,7 @@ fun CalendarPage(weekIndex:Int = 0)
 
 private class weekidx(var index: MutableState<Int>)
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TopBar(week:weekidx)
 {
@@ -61,7 +66,11 @@ private fun TopBar(week:weekidx)
         title = {
                 //WeekSelector()
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Week ${week.index.value}")
+                Text("Week ${week.index.value}",
+                    modifier = Modifier.combinedClickable(
+                        onClick = { println(" i clicked a button") },
+                        onLongClick = {println(" i pressed a button")}
+                    ))
                 WeekSelector(week)
             }
         },
@@ -138,11 +147,10 @@ fun CalendarGrid(weekIndex:Int) {
                 LazyColumn(
                     modifier = Modifier.height(760.dp)
                 ) {
-                    item{ Spacer(modifier = Modifier.padding(10.dp))}
+                    item { Spacer(modifier = Modifier.padding(10.dp)) }
                     item {
                         Row()
                         {
-
                             for (i in 0..6) {
                                 DailyList(Modifier.padding(5.dp,5.dp),weekIndex, i,width = width)
                             }
@@ -170,6 +178,7 @@ fun TimeList()
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp = 100.dp)
 {
@@ -187,25 +196,50 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
         println(weekIndex)
         while(i<12)
         {
+            var show_deletebutton by remember { mutableStateOf(false) }
             var course:CourseTemplate?= schedule.getTemplate(i,dayIndex.toShort(),weekIndex.toShort())
-            var len:Int = 1
-            if(course == null)
-            {
+            var len:Int
+            if(course == null) {
                 len = 1
-                ClassBlock({ Text(text = "") }, MaterialTheme.colorScheme.background,len, width)
+                ClassBlock( MaterialTheme.colorScheme.background,
+                    len,
+                    {/* TODO: your function here */},
+                    Modifier.width(width)
+                ){ Text(text = "") }
             }
             else {
                 var coursename = course.info.Name
                 var courselocation = course.info.Location
                 len = course?.EndingTime!! - course?.StartingTime!!
-                ClassBlock({
-                    LazyColumn() {
-                        item {
-                            CenterText(modifier = Modifier.width(width),text = coursename)
-                            CenterText(modifier = Modifier.width(width),text = courselocation)
+                Box()
+                {
+                    var interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+                    val isPressed by interactionSource.collectIsPressedAsState()
+                    ClassBlock(
+                        MaterialTheme.colorScheme.secondary,
+                        len,
+                        {if(show_deletebutton && !isPressed) show_deletebutton = false},
+                        Modifier.width(width),
+                        interactionSource
+                    ) {
+                        LazyColumn() {
+                            item {
+                                CenterText(modifier = Modifier.width(width), text = coursename)
+                                CenterText(modifier = Modifier.width(width), text = courselocation)
+                            }
                         }
                     }
-                }, MaterialTheme.colorScheme.secondary, len,width)
+                    if(isPressed)
+                        show_deletebutton = true;
+                    if(show_deletebutton) {
+                        IconButton(
+                            onClick = { show_deletebutton = false },
+                            modifier = Modifier
+                        ) {
+                            Icon(Icons.Outlined.Delete, contentDescription = "Localized description")
+                        }
+                    }
+                }
             }
 
             i = (i + len).toShort()
@@ -224,27 +258,28 @@ fun CenterText(modifier: Modifier = Modifier,text:String, fontsize: TextUnit = 1
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ClassBlock(content:@Composable ()->Unit,color:Color,len:Int,width:Dp)
+fun ClassBlock(color:Color,len:Int,onclick :()->Unit = {} ,modifier: Modifier = Modifier,interactionSource: MutableInteractionSource = MutableInteractionSource(),content:@Composable ()->Unit)
 {
-    Button(
-        onClick = { /*TODO*/ },
-        shape = RoundedCornerShape(10.dp),
-        modifier = Modifier
-            .width(width)
-            .height(len * 60.dp + (len - 1) * 5.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = color),
-        contentPadding = PaddingValues(10.dp),
-        elevation = ButtonDefaults.buttonElevation(2.dp,1.dp,2.dp)
+        Button(
+            onClick = onclick,
+            shape = RoundedCornerShape(10.dp),
+            modifier = modifier
+                .height(len * 60.dp + (len - 1) * 5.dp),
+            interactionSource = interactionSource,
+            colors = ButtonDefaults.buttonColors(containerColor = color),
+            contentPadding = PaddingValues(10.dp),
+            elevation = ButtonDefaults.buttonElevation(2.dp, 1.dp, 2.dp)
 
-    ) {
-        content()
-    }
+        ) {
+            content()
+        }
 }
 @Preview
 @Composable
 fun previewclassblock()
 {
-    ClassBlock(content = {Text(text = "114514")},color = Color.LightGray, len = 1, width = 100.dp)
+    ClassBlock(color = Color.LightGray, len = 1, modifier = Modifier.width(100.dp)){Text(text = "114514")}
 }
 
