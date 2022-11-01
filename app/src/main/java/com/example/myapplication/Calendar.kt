@@ -3,12 +3,17 @@ package com.example.myapplication
 import android.graphics.Paint.Align
 import android.widget.DatePicker
 import android.widget.TextView
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Edit
@@ -22,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.PopupProperties
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.Schedule
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
@@ -30,11 +36,11 @@ val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage()
+fun CalendarPage(weekIndex:Int = 0)
 {
 
 
-    var week = weekidx(remember { mutableStateOf(0) })
+    var week = weekidx(remember { mutableStateOf(weekIndex) })
 
     Scaffold(
         topBar = {TopBar(week)},
@@ -77,12 +83,26 @@ private fun WeekSelector(week:weekidx)
         IconButton(onClick = { expanded = true }) {
             Icon(Icons.Default.MoreVert, contentDescription = "Localized description")
         }
+        //var offset by remember { mutableStateOf(0f) }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .heightIn(max = 140.dp)
+//                .scrollable(
+//                    orientation = Orientation.Vertical,
+//                    state = rememberScrollableState { delta ->
+//                        offset += delta
+//                        delta
+//                    }
+//                )
+            ,
+            offset = DpOffset(x=20.dp,y=0.dp)
         ) {
-            for(i in 0..10) {
+            for(i in 0..100) {
                 DropdownMenuItem(
+                    modifier = Modifier
+                        .height(50.dp),
                     text = { Text("week $i") },
                     onClick = {
                         week.index.value = i
