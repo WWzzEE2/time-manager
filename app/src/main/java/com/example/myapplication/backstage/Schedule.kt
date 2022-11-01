@@ -2,6 +2,7 @@ package com.example.myapplication.backstage
 
 
 import android.content.Context
+import androidx.compose.foundation.interaction.DragInteraction
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
@@ -272,7 +273,9 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
     fun getAllCourse() : List<CourseInfo> = courseSet.toList()
 
-    internal fun templateAvailable(template: CourseTemplate, week: Short) : Boolean = getWeek(template.info.StartingTime).let {
-        return week >= it && (week - it) % template.Period == 0L
+    internal fun templateAvailable(template: CourseTemplate, week: Short) : Boolean {
+        val startTime = getWeek(template.info.StartingTime)
+        val endTime = getWeek(template.info.EndingTime)
+        return week in startTime until endTime && (week - startTime) % template.Period == 0L
     }
 }
