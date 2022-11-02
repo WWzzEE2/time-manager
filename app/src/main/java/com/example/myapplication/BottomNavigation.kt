@@ -10,12 +10,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.*
 import com.example.myapplication.backstage.*
 
+class ScreenState (private val inPage: String) {
+    var page by mutableStateOf(inPage)
+    fun goToCalendar() { page = "Calendar"}
+    fun goToDeadline() { page = "Deadline"}
+    fun goToEdit(){ page = "Edit"}
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigation() {
-    //val navController = rememberNavController()
-    var selectedPage by remember { mutableStateOf("A") }
-    val items = listOf("A", "B", "C")
+
+    var currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
+
+    val items = listOf("Calendar", "Deadline", "C")
     val icons = listOf(
         Icons.Default.Home,
         Icons.Default.Notifications,
@@ -27,16 +36,23 @@ fun BottomNavigation() {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         icon = { Icon(icons[index], contentDescription = item) },
-                        selected = selectedPage == item,
-                        onClick = { selectedPage = item }
+                        selected = currentState.page == item,
+                        onClick = {
+                            currentState.page = item
+                        }
                     )
                 }
             }
         }
     ) {
-        when(selectedPage) {
-            "A" -> CalendarPage()
-            "B" -> DDLScreen()
+        when(currentState.page) {
+            "Calendar" -> CalendarPage(currentState)
+            "Deadline" -> DDLScreen()
+            "Edit" ->  EditPage(currentState)
         }
     }
 }
+
+
+
+

@@ -23,22 +23,20 @@ import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 import kotlin.collections.ArrayList
 
-
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditPage(){
-    Scaffold(topBar = {ChangeStat()}) {
+fun EditPage(screenState:ScreenState){
+    Scaffold(topBar = {ChangeStat(screenState)}) {
         EditDetail()
     }
 }
 
 @Composable
-fun ChangeStat(){
+fun ChangeStat(screenState:ScreenState){
     val context = LocalContext.current
     SmallTopAppBar(
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { screenState.goToCalendar() }) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },
@@ -111,9 +109,6 @@ fun EditName(){
         SimpleOutlinedTextField(Label = "Name", content = "software")
         }
 }
-
-
-
 
 
 @Composable
