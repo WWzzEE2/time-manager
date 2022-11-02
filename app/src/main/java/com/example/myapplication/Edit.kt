@@ -243,6 +243,8 @@ fun saveData(context: Context) {
     val schedule = activity.schedule
     Log.d("Tudou", "Azp")
     schedule.addCourse(course)
+    templateList.clear()
+    course = CourseInfo("Name", 0, 0, templateList, "Prompt", "Location")
 }
 
 fun addTemplateToList(){
