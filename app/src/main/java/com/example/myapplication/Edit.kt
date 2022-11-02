@@ -1,7 +1,11 @@
 package com.example.myapplication
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -10,14 +14,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 import kotlin.collections.ArrayList
+
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +35,7 @@ fun EditPage(){
 
 @Composable
 fun ChangeStat(){
+    val context = LocalContext.current
     SmallTopAppBar(
         navigationIcon = {
             IconButton(onClick = { /*TODO*/ }) {
@@ -39,6 +45,7 @@ fun ChangeStat(){
         title = { Text("Edit")},
         actions = {
             IconButton(onClick = {
+                saveData(context)
             }) {
                 Icon(Icons.Filled.Done, contentDescription = "Save")
             }
@@ -62,17 +69,30 @@ fun EditDetail(){
 @Composable
 fun SimpleOutlinedTextField(Label:String, content:String) {
     var text by rememberSaveable { mutableStateOf(content) }
+    val maxLength = 5
+    if (Regex("[A-Za-z]+[0-9]").containsMatchIn(Label))
     Column() {
         OutlinedTextField(
             value = text,
             onValueChange = {
+                if (it.length < maxLength){
                 text = it
-                saveData(Label, text) },
-            label = { Text(Label) },
+                changeData(Label, text) }
+            },
+                label = { Text(Label) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-
     }
-
+    else
+        Column() {
+            OutlinedTextField(
+                value = text,
+                onValueChange = {
+                        text = it
+                        changeData(Label, text) },
+                label = { Text(Label) },
+            )
+        }
 }
 
 
@@ -98,35 +118,55 @@ fun EditName(){
 
 @Composable
 fun EditTimeChunk(){
-    var isExpand by remember {
-        mutableStateOf(false)
+    var expandTimeChunk by remember {
+        mutableStateOf(0)
     }
-    var t = false
     Column(
-
     ) {
+        addTemplateToList()
         EditColumn()
         EditStartingTime()
         EditEndingTime()
-        Button(onClick = { isExpand = !isExpand },
+        Button(
+            onClick = {
+                expandTimeChunk += 1
+                addTemplateToList() },
             enabled = true,
             modifier = Modifier.size(30.dp),
-            shape= RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(8.dp),
         ) {
-            Text(text = "+", fontSize = 10.em)
+                Text(text = "+", fontSize = 10.em)
         }
-        if (isExpand != t) {
-            EditColumn()
-            EditStartingTime()
-            EditEndingTime()
-            t = isExpand
+        LazyColumn() {
+            for (i in 1..expandTimeChunk) {
+                item { EditColumn(i.toString()) }
+                item { EditStartingTime(i.toString()) }
+                item { EditEndingTime(i.toString()) }
+                item {
+                    Button(
+                        onClick = {
+                            if (expandTimeChunk > 0) expandTimeChunk -= 1
+                            removeTemplateFromList(i.toString())
+                        },
+                        enabled = true,
+                        modifier = Modifier.size(30.dp),
+                        shape = RoundedCornerShape(8.dp),
+                    ) {
+                        Text(text = "-", fontSize = 10.em)
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider()
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
         }
-    }
-
+   }
 }
 
 @Composable
-fun EditColumn(){
+fun EditColumn(Number:String = "0"){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -137,12 +177,12 @@ fun EditColumn(){
                 .width(35.dp)
                 .height(35.dp),
             contentDescription = "Column")
-        SimpleOutlinedTextField(Label = "Column", content = "")
+        SimpleOutlinedTextField(Label = "Column$Number", content = "")
     }
 }
 
 @Composable
-fun EditStartingTime(){
+fun EditStartingTime(Number: String = "0"){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -153,12 +193,12 @@ fun EditStartingTime(){
                 .width(35.dp)
                 .height(35.dp),
             contentDescription = "StartingTime")
-        SimpleOutlinedTextField(Label = "StartingTime", content = "")
+        SimpleOutlinedTextField(Label = "StartingTime$Number", content = "")
     }
 }
 
 @Composable
-fun EditEndingTime(){
+fun EditEndingTime(Number: String = "0"){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -166,7 +206,7 @@ fun EditEndingTime(){
         Spacer(modifier = Modifier
             .width(35.dp)
             .height(35.dp),)
-        SimpleOutlinedTextField(Label = "EndingTime", content = "")
+        SimpleOutlinedTextField(Label = "EndingTime$Number", content = "")
     }
 }
 
@@ -186,19 +226,41 @@ fun EditLocation(){
     }
 }
 
-fun saveData(type:String, content: String){
-    var name = ""; var column : Long  = 0; var startingTime : Short = 0
-    var endingTime : Short  = 0; var period : Long  = 1; var location  = ""
-    when(type) {
-        "Name" -> name = content
-        "Column" -> column = content.toLong()
-        "StartingTime" -> startingTime = content.toShort()
-        "EndingTime" -> endingTime = content.toShort()
-        "Location" -> location = content
-        "Save" -> {
-            var course = CourseInfo(name, 0, 0, ArrayList(), "prompt", location)
-            var template = CourseTemplate(column, startingTime, endingTime, 1)
-        }
+
+private var templateList = mutableListOf<CourseTemplate>()
+private var course = CourseInfo("Name", 0, 0, templateList, "Prompt", "Location")
+fun changeData(type: String, content: String) {
+    val operate : String
+    var num = 0
+    if (Regex("[A-Za-z]+[0-9]").containsMatchIn(type)) {
+        num = type.last().code - 48
+        operate = type.take(type.length - 1)
+    }
+    else
+        operate = type
+    when (operate) {
+        "Name" -> course.Name = content
+        "Location" -> course.Location = content
+        "StartingTime" -> templateList[num].StartingTime = content.toShort()
+        "EndingTime" -> templateList[num].EndingTime = content.toShort()
+        "Column" -> templateList[num].Column = content.toLong()
     }
 
+}
+
+fun saveData(context: Context) {
+    val activity = context as MainActivity
+    val schedule = activity.schedule
+    Log.d("Tudou", "Azp")
+    schedule.addCourse(course)
+}
+
+fun addTemplateToList(){
+    val template = CourseTemplate(0, 0, 0, 1)
+    template.info = course
+    templateList.add(template)
+}
+
+fun removeTemplateFromList(Number:String){
+    templateList.removeAt(Number.toInt())
 }
