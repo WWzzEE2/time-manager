@@ -24,22 +24,20 @@ import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 import kotlin.collections.ArrayList
 
-
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditPage(){
-    Scaffold(topBar = {ChangeStat()}) {
+fun EditPage(screenState:ScreenState){
+    Scaffold(topBar = {ChangeStat(screenState)}) {
         EditDetail()
     }
 }
 
 @Composable
-fun ChangeStat(){
+fun ChangeStat(screenState:ScreenState){
     val context = LocalContext.current
     SmallTopAppBar(
         navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { screenState.goToCalendar() }) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },
@@ -47,6 +45,7 @@ fun ChangeStat(){
         actions = {
             IconButton(onClick = {
                 saveData(context)
+                screenState.goToCalendar()
             }) {
                 Icon(Icons.Filled.Done, contentDescription = "Save")
             }
@@ -114,9 +113,6 @@ fun EditName(){
 }
 
 
-
-
-
 @Composable
 fun EditTimeChunk(){
     var expandTimeChunk by remember {
@@ -128,7 +124,7 @@ fun EditTimeChunk(){
         EditColumn()
         EditStartingTime()
         EditEndingTime()
-        Button(
+        IconButton(
             onClick = {
                 expandTimeChunk += 1
                 addTemplateToList() },
@@ -246,7 +242,6 @@ fun changeData(type: String, content: String) {
 fun saveData(context: Context) {
     val activity = context as MainActivity
     val schedule = activity.schedule
-    Log.d("Tudou", "Azp")
     schedule.addCourse(course)
 }
 

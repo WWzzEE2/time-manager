@@ -28,22 +28,23 @@ import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.Schedule
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
+
 val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage()
+fun CalendarPage(screenState: ScreenState)
 {
     Scaffold(
-        topBar = {TopBar()},
+        topBar = {TopBar(screenState)},
     ){
-       CalendarGrid(0)
+       CalendarGrid(screenState, 0)
     }
 }
 
 @Composable
-fun TopBar()
+fun TopBar(screenState: ScreenState)
 {
     SmallTopAppBar(
         title = { Text("TopAppBar") },
@@ -52,14 +53,15 @@ fun TopBar()
             IconButton(onClick = { /* doSomething() */ }) {
                 Icon(Icons.Filled.Menu, contentDescription = "Localized description")
             }
-            IconButton(onClick = { /* doSomething() */ }) {
+            IconButton(onClick = { screenState.goToEdit() }) {
                 Icon(Icons.Filled.Add, contentDescription = "Localized description")
             }
-        })
+        }
+    )
 }
 
 @Composable
-fun CalendarGrid(weekIndex:Int)
+fun CalendarGrid(screenState: ScreenState, weekIndex:Int)
 {
     LazyColumn(
         modifier = Modifier.height(760.dp)
@@ -71,7 +73,7 @@ fun CalendarGrid(weekIndex:Int)
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 for (i in 0..6) {
-                    item { DailyList(weekIndex, i) }
+                    item { DailyList(screenState, weekIndex, i) }
                 }
             }
             Spacer(modifier = Modifier.padding(50.dp))
@@ -80,7 +82,7 @@ fun CalendarGrid(weekIndex:Int)
 }
 
 @Composable
-fun DailyList(weekIndex: Int,dayIndex: Int)
+fun DailyList(screenState: ScreenState, weekIndex: Int,dayIndex: Int)
 {
     val width = 100.dp
     Column(
@@ -99,11 +101,15 @@ fun DailyList(weekIndex: Int,dayIndex: Int)
             if(course == null)
             {
                 len = 1
-                ClassBlock({ Text(text = "") }, MaterialTheme.colorScheme.background,len, width)
+                ClassBlock(screenState, MaterialTheme.colorScheme.background,len, width){
+                    Text(text = "")
+                }
             }
             else {
-                len = (course?.EndingTime!! - course?.StartingTime!!).toInt()
-                ClassBlock({ Text(text = "course 1") }, MaterialTheme.colorScheme.secondary, len,width)
+                len = (course.EndingTime - course.StartingTime).toInt()
+                ClassBlock(screenState, MaterialTheme.colorScheme.secondary, len, width) {
+                    Text(text = "course 1")
+                }
             }
             i = (i + len).toLong()
         }
@@ -121,10 +127,10 @@ fun CenterText(width: Dp,text:String)
 }
 
 @Composable
-fun ClassBlock(content:@Composable ()->Unit,color:Color,len:Int,width:Dp)
+fun ClassBlock(screenState: ScreenState, color:Color,len:Int,width:Dp, content:@Composable ()->Unit)
 {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = {screenState.goToEdit()},
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .width(width)
