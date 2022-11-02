@@ -101,7 +101,10 @@ private class DDLMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<DDlInfo
             if (it.isEmpty()) remove(ddl.EndingTime)
         }
 
-    fun getDDl(fromTime: Long, toTime: Long) : List<DDlInfo> = subMap(fromTime, true, toTime, false).values.let {
+    /**
+     * DDl is different from course (about ddl at 24:00)
+     */
+    fun getDDl(fromTime: Long, toTime: Long) : List<DDlInfo> = subMap(fromTime, false, toTime, true).values.let {
         val res = ArrayList<DDlInfo>()
         for (set in it)
             res.addAll(set)
@@ -267,6 +270,11 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
      * @see DDLMap.getDDl
      */
     fun getDDl(fromTime: Long, toTime: Long) : List<DDlInfo> = ddlMap.getDDl(fromTime, toTime)
+
+    /**
+     * Get all ddl in given day (day and week start from 0)
+     */
+    fun getDDl(week: Int, day: Int) : List<DDlInfo> = (termStartTime + (week * 7 + day) * 24 * 3600 * 1000).let { return getDDl(it, it + 24 * 3600 * 1000) }
 
     fun getAllDDl() : List<DDlInfo> = ddlMap.toList()
 
