@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.*
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
@@ -131,11 +132,8 @@ fun EditTimeChunk(){
             onClick = {
                 expandTimeChunk += 1
                 addTemplateToList() },
-            enabled = true,
-            modifier = Modifier.size(30.dp),
-            shape = RoundedCornerShape(8.dp),
         ) {
-                Text(text = "+", fontSize = 10.em)
+            Icon(Icons.Outlined.Add, contentDescription ="AddTimeChunk")
         }
         LazyColumn() {
             for (i in 1..expandTimeChunk) {
@@ -143,16 +141,13 @@ fun EditTimeChunk(){
                 item { EditStartingTime(i.toString()) }
                 item { EditEndingTime(i.toString()) }
                 item {
-                    Button(
+                    IconButton(
                         onClick = {
                             if (expandTimeChunk > 0) expandTimeChunk -= 1
                             removeTemplateFromList(i.toString())
                         },
-                        enabled = true,
-                        modifier = Modifier.size(30.dp),
-                        shape = RoundedCornerShape(8.dp),
                     ) {
-                        Text(text = "-", fontSize = 10.em)
+                        Icon(Icons.Filled.Delete, contentDescription ="AddTimeChunk")
                     }
                 }
                 item {
@@ -241,8 +236,8 @@ fun changeData(type: String, content: String) {
     when (operate) {
         "Name" -> course.Name = content
         "Location" -> course.Location = content
-        "StartingTime" -> templateList[num].StartingTime = content.toShort()
-        "EndingTime" -> templateList[num].EndingTime = content.toShort()
+        "StartingTime" -> templateList[num].StartingTime = content.toLong()
+        "EndingTime" -> templateList[num].EndingTime = content.toLong()
         "Column" -> templateList[num].Column = content.toLong()
     }
 
