@@ -1,9 +1,12 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -45,6 +48,7 @@ fun ChangeStat(screenState:ScreenState){
         actions = {
             IconButton(onClick = {
                 saveData(context)
+                screenState.goToCalendar()
             }) {
                 Icon(Icons.Filled.Done, contentDescription = "Save")
             }
@@ -112,48 +116,53 @@ fun EditName(){
 }
 
 
+
 @Composable
 fun EditTimeChunk(){
-    var expandTimeChunk by remember {
-        mutableStateOf(0)
+    val expandTimeChunk = remember {
+        mutableStateListOf<Int>(1)
     }
+    var LatestInt=2
     Column(
+        modifier = Modifier
     ) {
         addTemplateToList()
-        EditColumn()
-        EditStartingTime()
-        EditEndingTime()
-        Button(
+        LazyColumn(
+            modifier = Modifier.heightIn(0.dp,380.dp)
+        ) {
+            items(expandTimeChunk){i->
+             EditColumn(i.toString())
+             EditStartingTime(i.toString())
+             EditEndingTime(i.toString())
+
+            IconButton(
+                    onClick = {
+                        if (expandTimeChunk.size > 1) {
+                            removeTemplateFromList(expandTimeChunk.indexOf(i))
+                            expandTimeChunk.remove(i)
+                        }
+                    },
+            ) {
+                Icon(Icons.Filled.Delete, contentDescription ="DeleteTimeChunk")
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
+        IconButton(
             onClick = {
-                expandTimeChunk += 1
+                expandTimeChunk.add(LatestInt)
+                LatestInt+=1
                 addTemplateToList() },
         ) {
             Icon(Icons.Outlined.Add, contentDescription ="AddTimeChunk")
         }
-        LazyColumn() {
-            for (i in 1..expandTimeChunk) {
-                item { EditColumn(i.toString()) }
-                item { EditStartingTime(i.toString()) }
-                item { EditEndingTime(i.toString()) }
-                item {
-                    IconButton(
-                        onClick = {
-                            if (expandTimeChunk > 0) expandTimeChunk -= 1
-                            removeTemplateFromList(i.toString())
-                        },
-                    ) {
-                        Icon(Icons.Filled.Delete, contentDescription ="AddTimeChunk")
-                    }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Divider()
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-        }
+
    }
 }
+
 
 @Composable
 fun EditColumn(Number:String = "0"){
@@ -235,15 +244,13 @@ fun changeData(type: String, content: String) {
         "EndingTime" -> templateList[num].EndingTime = content.toLong()
         "Column" -> templateList[num].Column = content.toLong()
     }
+
 }
 
 fun saveData(context: Context) {
     val activity = context as MainActivity
     val schedule = activity.schedule
-    Log.d("Tudou", "Azp")
     schedule.addCourse(course)
-    templateList.clear()
-    course = CourseInfo("Name", 0, 0, templateList, "Prompt", "Location")
 }
 
 fun addTemplateToList(){
@@ -252,6 +259,12 @@ fun addTemplateToList(){
     templateList.add(template)
 }
 
-fun removeTemplateFromList(Number:String){
-    templateList.removeAt(Number.toInt())
+fun removeTemplateFromList(Number:Int){
+    try {
+        templateList.removeAt(Number)
+    }
+    finally {
+
+    }
+
 }
