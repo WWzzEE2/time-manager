@@ -94,6 +94,7 @@ fun DailyList(screenState: ScreenState, weekIndex: Int,dayIndex: Int)
         var i:Long = 0
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
+        println("regenerate")
         while(i<12)
         {
             var course:CourseTemplate?= schedule.getTemplate(i,dayIndex.toLong(),weekIndex.toLong())
@@ -108,7 +109,10 @@ fun DailyList(screenState: ScreenState, weekIndex: Int,dayIndex: Int)
             else {
                 len = (course.EndingTime - course.StartingTime).toInt()
                 ClassBlock(screenState, MaterialTheme.colorScheme.secondary, len, width) {
-                    Text(text = "course 1")
+                    Column() {
+                        CenterText( width = 150.dp,text = course.info.Name)
+                        CenterText( width = 150.dp,text = course.info.Location)
+                    }
                 }
             }
             i = (i + len).toLong()
