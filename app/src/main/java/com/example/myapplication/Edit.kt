@@ -241,8 +241,8 @@ fun changeData(type: String, content: String) {
     when (operate) {
         "Name" -> course.Name = content
         "Location" -> course.Location = content
-        "StartingTime" -> templateList[num].StartingTime = content.toShort()
-        "EndingTime" -> templateList[num].EndingTime = content.toShort()
+        "StartingTime" -> templateList[num].StartingTime = content.toLong()
+        "EndingTime" -> templateList[num].EndingTime = content.toLong()
         "Column" -> templateList[num].Column = content.toLong()
     }
 
