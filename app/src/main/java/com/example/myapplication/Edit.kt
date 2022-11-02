@@ -251,6 +251,8 @@ fun saveData(context: Context) {
     val activity = context as MainActivity
     val schedule = activity.schedule
     schedule.addCourse(course)
+    templateList.clear()
+    course = CourseInfo("Name", 0, 0, templateList, "Prompt", "Location")
 }
 
 fun addTemplateToList(){
