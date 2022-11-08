@@ -32,19 +32,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
 import com.example.myapplication.backstage.CourseTemplate
+import com.example.myapplication.backstage.DDlInfo
 import com.example.myapplication.backstage.Schedule
 import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
-val weekday = arrayListOf<String>("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
+val weekday = arrayListOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage(weekIndex:Int = 0) {
+fun CalendarPage(weekIndex: Int = 0) {
     var week = weekidx(remember { mutableStateOf(weekIndex) })
     Scaffold(
-        topBar = {TopBar(week)},
-    ){
+        topBar = { TopBar(week) },
+    ) {
         Column() {
             CalendarGrid(week.index.value)
             println("regenerate")
@@ -56,20 +57,16 @@ private class weekidx(var index: MutableState<Int>)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TopBar(week:weekidx) {
-    
-    NavigationBar() {
-        
-    }
-    
+private fun TopBar(week: weekidx) {
+
     SmallTopAppBar(
         title = {
-                //WeekSelector()
+            //WeekSelector()
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Week ${week.index.value}",
                     modifier = Modifier.combinedClickable(
                         onClick = { println(" i clicked a button") },
-                        onLongClick = {println(" i pressed a button")}
+                        onLongClick = { println(" i pressed a button") }
                     ))
                 WeekSelector(week)
             }
@@ -86,8 +83,7 @@ private fun TopBar(week:weekidx) {
 }
 
 @Composable
-private fun WeekSelector(week:weekidx)
-{
+private fun WeekSelector(week: weekidx) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = Modifier) {
         IconButton(onClick = { expanded = true }) {
@@ -100,11 +96,10 @@ private fun WeekSelector(week:weekidx)
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .heightIn(max = 140.dp)
-                .width(width)
-            ,
-            offset = DpOffset(x=20.dp,y=0.dp)
+                .width(width),
+            offset = DpOffset(x = 20.dp, y = 0.dp)
         ) {
-            for(i in 0..100) {
+            for (i in 0..100) {
                 DropdownMenuItem(
                     modifier = Modifier
                         .height(50.dp),
@@ -112,17 +107,18 @@ private fun WeekSelector(week:weekidx)
                     onClick = {
                         week.index.value = i
                         expanded = false
-                              },
-                    )
+                    },
+                )
             }
         }
     }
 }
+
 @Composable
-fun CalendarGrid(weekIndex:Int) {
+fun CalendarGrid(weekIndex: Int) {
     println(weekIndex)
     LazyRow(
-        modifier = Modifier.padding(5.dp,0.dp),
+        modifier = Modifier.padding(5.dp, 0.dp),
         horizontalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         item {
@@ -130,9 +126,11 @@ fun CalendarGrid(weekIndex:Int) {
                 val width = 100.dp
                 Row() {
                     for (i in 0..6) {
-                        CenterText(modifier = Modifier
-                            .padding(5.dp, 0.dp)
-                            .width(width), text = weekday[i])
+                        CenterText(
+                            modifier = Modifier
+                                .padding(5.dp, 0.dp)
+                                .width(width), text = weekday[i]
+                        )
                     }
                 }
                 LazyColumn(
@@ -143,11 +141,11 @@ fun CalendarGrid(weekIndex:Int) {
                         Row()
                         {
                             for (i in 0..6) {
-                                DailyList(Modifier.padding(5.dp,5.dp),weekIndex, i,width = width)
+                                DailyList(Modifier.padding(5.dp, 5.dp), weekIndex, i, width = width)
                             }
                         }
                     }
-                    item{
+                    item {
                         Spacer(modifier = Modifier.padding(50.dp))
                     }
                 }
@@ -157,13 +155,11 @@ fun CalendarGrid(weekIndex:Int) {
 }
 
 @Composable
-fun TimeList()
-{
-    Column(modifier = Modifier.width(20.dp)){
+fun TimeList() {
+    Column(modifier = Modifier.width(20.dp)) {
         Text(text = "")
         Spacer(modifier = Modifier.padding(10.dp))
-        for(i in 0..11)
-        {
+        for (i in 0..11) {
 
         }
     }
@@ -171,8 +167,7 @@ fun TimeList()
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp = 100.dp )
-{
+fun DailyList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, width: Dp = 100.dp) {
 
     Column(
         modifier = modifier,
@@ -180,85 +175,53 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
     ) {
 
         // get class info
-        var i:Short = 0
+        var i: Short = 0
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
 
         //render classBlock
         println(weekIndex)
-        while(i<12)
-        {
-            var show_deletebutton by remember { mutableStateOf(false) }
-            var course:CourseTemplate?= schedule.getTemplate(i,dayIndex.toShort(),weekIndex.toShort())
-            var len:Int
-            if(course == null) {
+        while (i <= 12) {
+            var course: CourseTemplate? =
+                schedule.getTemplate(i, dayIndex.toShort(), weekIndex.toShort())
+            var ddl :DDlInfo
+            var len: Int
+            if (course == null) {
                 len = 1
-                ClassBlock( MaterialTheme.colorScheme.background,
+                ClassBlock(
+                    MaterialTheme.colorScheme.background,
                     len,
                     {/*
                         TODO: your function here
                         Triggered when clicking an empty button. You should navigate to the "course add" page with necessary arguments
-                     */},
+                     */
+                    },
                     Modifier.width(width)
-                ){ Text(text = "") }
-            }
-            else {
+                ) { Text(text = "") }
+            } else {
                 var coursename = course.info.Name
                 var courselocation = course.info.Location
                 len = course?.EndingTime!! - course?.StartingTime!!
-//                var interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-//                val isPressed by interactionSource.collectIsPressedAsState()
 
-                Box() {
-                    ClassBlock(
-                        MaterialTheme.colorScheme.secondary,
-                        len, MultiClick(
-                            onClick = {
-                                if(show_deletebutton) {
-                                    println(course.info.Name)
-                                    show_deletebutton = false;
-                                }else{
-                                /*
+                ClassBlock(
+                    MaterialTheme.colorScheme.secondary,
+                    len,
+                    MultiClick(
+                        onClick = {},
+                        doubleClick = {
+                            /*
                                 * TODO: your function here
-                                * Triggered when clicking a course button. You can edit it into whatever you like
-                                * */} },
-                            doubleClick = {
-                                if(!show_deletebutton) {
-                                    println(course.info.Name)
-                                    show_deletebutton = true;
-                                }
-                            }
-                        ),
-                        Modifier.width(width),
-//                        interactionSource
-                    ) {
-                        LazyColumn() {
-                            item {
-                                CenterText(modifier = Modifier.width(width), text = coursename)
-                                CenterText(modifier = Modifier.width(width), text = courselocation)
-                            }
-                        }
-                    }
-//                    if(isPressed)
-//                        show_deletebutton = true;
-                    if(show_deletebutton) {
-                        FloatingActionButton(
-                            onClick = {
-                                println(course.info.Name)
-                                show_deletebutton = false
-                                /*
-                                * TODO: your function here
-                                * Triggered when clicking an "edit" button. You should navigate to the "course edit" page with necessary arguments
+                                * Triggered when doubleclicking a course button. turn to edit page with course info
                                 * */
-                                      },
-                            modifier = Modifier
-                                .width(35.dp)
-                                .height(35.dp)
-                                .padding(5.dp, 5.dp),
-                        ) {
-                            Icon(Icons.Outlined.Edit,modifier = Modifier
-                                .width(20.dp)
-                                .height(20.dp),  tint = MaterialTheme.colorScheme.secondary,contentDescription = "Localized description")
+                        }
+                    ),
+                    Modifier.width(width),
+//                        interactionSource
+                ) {
+                    LazyColumn() {
+                        item {
+                            CenterText(modifier = Modifier.width(width), text = coursename)
+                            CenterText(modifier = Modifier.width(width), text = courselocation)
                         }
                     }
                 }
@@ -270,8 +233,7 @@ fun DailyList(modifier:Modifier = Modifier,weekIndex: Int,dayIndex: Int,width:Dp
 }
 
 @Composable
-fun CenterText(modifier: Modifier = Modifier,text:String, fontsize: TextUnit = 13.sp)
-{
+fun CenterText(modifier: Modifier = Modifier, text: String, fontsize: TextUnit = 13.sp) {
     Text(
         text = text,
         modifier = modifier,
@@ -282,27 +244,37 @@ fun CenterText(modifier: Modifier = Modifier,text:String, fontsize: TextUnit = 1
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ClassBlock(color:Color,len:Int,onclick :()->Unit = {} ,modifier: Modifier = Modifier,interactionSource: MutableInteractionSource = MutableInteractionSource(),content:@Composable ()->Unit)
-{
-        Button(
-            onClick = onclick,
-            shape = RoundedCornerShape(10.dp),
-            modifier = modifier
-                .height(len * 60.dp + (len - 1) * 5.dp),
-            interactionSource = interactionSource,
-            colors = ButtonDefaults.buttonColors(containerColor = color),
-            contentPadding = PaddingValues(10.dp),
-            elevation = ButtonDefaults.buttonElevation(2.dp, 1.dp, 2.dp)
+fun ClassBlock(
+    color: Color,
+    len: Int,
+    onclick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource = MutableInteractionSource(),
+    content: @Composable () -> Unit
+) {
+    Button(
+        onClick = onclick,
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier
+            .height(len * 60.dp + (len - 1) * 5.dp),
+        interactionSource = interactionSource,
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        contentPadding = PaddingValues(10.dp),
+        elevation = ButtonDefaults.buttonElevation(2.dp, 1.dp, 2.dp)
 
-        ) {
-            content()
-        }
+    ) {
+        content()
+    }
 }
+
 @Preview
 @Composable
-fun previewclassblock()
-{
-    ClassBlock(color = Color.LightGray, len = 1, modifier = Modifier.width(100.dp)){Text(text = "114514")}
+fun previewclassblock() {
+    ClassBlock(
+        color = Color.LightGray,
+        len = 1,
+        modifier = Modifier.width(100.dp)
+    ) { Text(text = "114514") }
 }
 
 @Composable
@@ -317,8 +289,7 @@ inline fun MultiClick(
         if (currentTimeMillis - lastClickTime <= time) {//判断点击间隔,如果在间隔内则不回调
             println("double click")
             doubleClick()
-        }
-        else {
+        } else {
             println("click")
             onClick()
         }
