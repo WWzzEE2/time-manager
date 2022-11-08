@@ -236,7 +236,6 @@ fun changeData(type: String, content: String) {
         "EndingTime" -> templateList[num].EndingTime = content.toLong()
         "Column" -> templateList[num].Column = content.toLong()
     }
-
 }
 
 fun saveData(context: Context) {
