@@ -23,7 +23,11 @@ class courseBlockColor {
                 Color(0xFFB1D8DF),
             )
 
-        fun getColor(): Color {
+        fun getColor(select:Int = 0): Color {
+            if(select>=0)
+            {
+                return colors[select.mod(colors.size)];
+            }
             return colors.random();
         }
     }
