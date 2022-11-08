@@ -26,7 +26,7 @@ val Yellow_Rem = Color(0xFFffdd9a)
 val Yellow_Light = Color(0xFFffcb66)
 val Yellow_Deep = Color(0xFFff973c)
 
-val Red_T = Color(0x9EFF4D4D)
+val Red_T = Color(0x70FF1F1F)
 
 class courseBlockColor {
     companion object Obj {

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,13 +35,12 @@ import androidx.compose.ui.window.PopupProperties
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.DDlInfo
 import com.example.myapplication.backstage.Schedule
-import com.example.myapplication.ui.theme.Purple40
-import com.example.myapplication.ui.theme.Red_T
-import com.example.myapplication.ui.theme.courseBlockColor
+import com.example.myapplication.backstage.getPastMin
+import com.example.myapplication.ui.theme.*
 import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
-val weekday = arrayListOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 private class WeekIdx(
     var index: MutableState<Int>,
@@ -51,7 +51,9 @@ private class WeekIdx(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
-    var week = WeekIdx(remember { mutableStateOf(weekIndex) }, remember { mutableStateOf(true) },remember { mutableStateOf(false)})
+    var week = WeekIdx(remember { mutableStateOf(weekIndex) },
+        remember { mutableStateOf(true) },
+        remember { mutableStateOf(false) })
     Scaffold(
         topBar = { TopBar(screenState, week) },
     ) {
@@ -76,8 +78,10 @@ private fun TopBar(screenState: ScreenState, week: WeekIdx) {
                         onClick = { println(" i clicked a button") },
                         onLongClick = { println(" i pressed a button") }
                     ))
-                IconButton(onClick = { week.showWeekSelector.value = true }) {
-                    Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                IconButton(onClick = {
+                    week.showWeekSelector.value = !week.showWeekSelector.value
+                }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "Localized description")
                 }
             }
         },
@@ -127,7 +131,9 @@ private fun CalendarSetting(week: WeekIdx) {
 private fun WeekSelector(week: WeekIdx) {
     if (week.showWeekSelector.value) {
         val maxWeek = 100;
-        ScrollableTabRow(selectedTabIndex = week.index.value) {
+        ScrollableTabRow(
+            selectedTabIndex = week.index.value,
+        ) {
             for (i in 0..maxWeek) {
                 Tab(
                     modifier = Modifier
@@ -138,43 +144,15 @@ private fun WeekSelector(week: WeekIdx) {
                         week.index.value = i;
                         week.showWeekSelector.value = false;
                     },
-                ){
+                    selectedContentColor = Color.Black,
+                    unselectedContentColor = Color.LightGray
+                ) {
                     Text("week$i")
                 }
 
             }
         }
     }
-
-
-//        val width = 120.dp
-//        //var offset by remember { mutableStateOf(0f) }
-//        DropdownMenu(
-//            expanded = expanded,
-//            onDismissRequest = { expanded = false },
-//            modifier = Modifier
-//                .heightIn(max = 140.dp)
-//                .width(width),
-//            offset = DpOffset(x = 20.dp, y = 0.dp)
-//        ) {
-//            Button(onClick = {
-//                expanded = false;
-//            })
-//            {
-//
-//            }
-//            for (i in 0..100) {
-//                DropdownMenuItem(
-//                    modifier = Modifier
-//                        .height(50.dp),
-//                    text = { CenterText(text = "week $i", modifier = Modifier.width(width)) },
-//                    onClick = {
-//                        week.index.value = i
-//                        expanded = false
-//                    },
-//                )
-//            }
-//        }
 }
 
 
@@ -214,12 +192,13 @@ fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean 
                                         i,
                                         width = width
                                     )
+
                                     if (showDdllist) {
                                         DdlLineList(
-                                            Modifier.padding(5.dp, 5.dp),
+                                            Modifier.padding(10.dp, 0.dp),
                                             weekIndex,
                                             i,
-                                            width = width
+                                            width = width - 10.dp
                                         )
                                     }
                                 }
@@ -362,15 +341,23 @@ fun ClassBlock(
 @Composable
 fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, width: Dp = 100.dp) {
 
-    Column(
+    Box(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {
-
+        var activity = LocalContext.current as MainActivity
+        var schedule = activity.schedule
+        var ddllist = schedule.getDDl(weekIndex, dayIndex)
+        var lastminute: Long = 0
+        for (ddl in ddllist) {
+            val pastminute = getPastMin(ddl.EndingTime)
+            val parse: Int = (pastminute - lastminute).toInt()
+            Column() {
+                Spacer(modifier = modifier.height(parse * 1.dp))
+                DdlLine(color = Red_T, modifier = Modifier.width(width))
+            }
+            lastminute = pastminute;
+        }
         // get ddl info
-        Spacer(modifier = modifier.height(100.dp))
-        DdlLine(color = Red_T, modifier = Modifier.width(width))
-
     }
 }
 
@@ -388,11 +375,9 @@ fun DdlLine(
 ) {
     Button(
         onClick = onclick,
-        modifier = modifier.height(5.dp),
+        modifier = modifier.height(3.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color)
-    ) {
-
-    }
+    ) {}
 }
 
 @Preview
