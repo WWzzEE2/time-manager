@@ -155,7 +155,8 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
             val weekSec = 1000 * 3600 * 24 * 7
             for (i in 0 until testData.ddlCnt)
                 addDDl(DDlInfo("Test ddl$i", i.toLong(),
-                    abs(rand.nextLong()) % (weekSec * testData.totWeek)+termStartTime, "This is DDL $i", termStartTime))
+                    abs(rand.nextLong()) % (weekSec * testData.totWeek)+termStartTime, "This is DDL $i balabalawalawala\n" +
+                            "bababababababa", termStartTime))
             for (i in 0 until testData.courseTryCnt) {
                 val course = CourseInfo("Test Course$i", termStartTime, weekSec * testData.totWeek+termStartTime, ArrayList(), "This is Course $i", "Classroom $i")
                 val strTime = (rand.nextInt(testData.maxTime.toInt())).toLong()

@@ -26,7 +26,7 @@ val Yellow_Rem = Color(0xFFffdd9a)
 val Yellow_Light = Color(0xFFffcb66)
 val Yellow_Deep = Color(0xFFff973c)
 
-val Red_T = Color(0x70FF1F1F)
+val Red_T = Color(0x9FFF1F1F)
 
 class courseBlockColor {
     companion object Obj {
@@ -46,5 +46,25 @@ class courseBlockColor {
             return colors.random();
         }
     }
-
 }
+
+class ddlBlockColor {
+    companion object Obj {
+        private val colors: List<Color> =
+            mutableListOf(
+                Color(0xFFDD6161),
+                Color(0xFFFA6B6B),
+                Color(0xFF7A3838),
+                Color(0xFFB93E3E),
+            )
+
+        fun getColor(select:Int = 0): Color {
+            if(select>=0)
+            {
+                return colors[select.mod(colors.size)];
+            }
+            return colors.random();
+        }
+    }
+}
+

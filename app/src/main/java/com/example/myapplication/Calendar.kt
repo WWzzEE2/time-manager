@@ -133,6 +133,16 @@ private fun WeekSelector(week: WeekIdx) {
         val maxWeek = 100;
         ScrollableTabRow(
             selectedTabIndex = week.index.value,
+            indicator = { tabPositions: List<TabPosition> ->
+                TabRowDefaults.Indicator(
+                    Modifier
+                        .tabIndicatorOffset(
+                            tabPositions[week.index.value]
+                        )
+                        .height(2.dp),
+                    color = Color.Gray
+                )
+            },
         ) {
             for (i in 0..maxWeek) {
                 Tab(
@@ -142,7 +152,7 @@ private fun WeekSelector(week: WeekIdx) {
                     selected = i == week.index.value,
                     onClick = {
                         week.index.value = i;
-                        week.showWeekSelector.value = false;
+//                        week.showWeekSelector.value = false;
                     },
                     selectedContentColor = Color.Black,
                     unselectedContentColor = Color.LightGray
