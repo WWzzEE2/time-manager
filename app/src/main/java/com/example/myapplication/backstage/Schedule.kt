@@ -2,6 +2,7 @@ package com.example.myapplication.backstage
 
 
 import android.content.Context
+import android.util.Log
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
@@ -236,11 +237,12 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     fun addCourse(course: CourseInfo) : Boolean {
 
         for (template in course.TimeInfo)
-            if(courseMap[template.Column.toInt()].conflictCheck(template))
+            if (courseMap[template.Column.toInt()].conflictCheck(template))
                 return false
 
         for (template in course.TimeInfo)
             courseMap[template.Column.toInt()].addTemplate(template, false)
+
 
         courseSet.add(course)
 
