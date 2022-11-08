@@ -4,13 +4,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabPosition
+import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,7 +21,7 @@ import com.example.myapplication.ui.theme.Yellow
 
 
 @Composable
-fun  JetLaggedHeaderTabs(
+fun JetLaggedHeaderTabs(
     onTabSelected: (WeekTab) -> Unit,
     selectedTab: WeekTab,
     modifier: Modifier = Modifier,
@@ -32,17 +30,16 @@ fun  JetLaggedHeaderTabs(
         modifier = modifier,
         edgePadding = 12.dp,
         selectedTabIndex = selectedTab.ordinal,
-        containerColor = White,
         indicator = { tabPositions: List<TabPosition> ->
-            Box(
+            TabRowDefaults.Indicator(
                 Modifier
-                    .tabIndicatorOffset(tabPositions[selectedTab.ordinal])
-                    .fillMaxSize()
-                    .padding(horizontal = 2.dp)
-                    //.border(BorderStroke(2.dp, Yellow), RoundedCornerShape(10.dp))
+                    .tabIndicatorOffset(
+                        tabPositions[selectedTab.ordinal]
+                    )
+                    .height(2.dp),
+                color = Color.Gray
             )
         },
-        divider = { }
     ) {
         WeekTab.values().forEachIndexed { index, weekTab ->
             val selected = index == selectedTab.ordinal
@@ -57,7 +54,7 @@ fun  JetLaggedHeaderTabs(
 }
 
 @Composable
-fun  JetLaggedHeaderTabs(
+fun JetLaggedHeaderTabs(
     onTabSelected: (MoonTab) -> Unit,
     selectedTab: MoonTab,
     modifier: Modifier = Modifier,
@@ -66,17 +63,17 @@ fun  JetLaggedHeaderTabs(
         modifier = modifier,
         edgePadding = 12.dp,
         selectedTabIndex = selectedTab.ordinal,
-        containerColor = White,
         indicator = { tabPositions: List<TabPosition> ->
-            Box(
+            TabRowDefaults.Indicator(
                 Modifier
-                    .tabIndicatorOffset(tabPositions[selectedTab.ordinal])
-                    .fillMaxSize()
-                    .padding(horizontal = 2.dp)
-                    .border(BorderStroke(2.dp, Yellow), RoundedCornerShape(10.dp))
+                    .tabIndicatorOffset(
+                        tabPositions[selectedTab.ordinal]
+                    )
+                    .height(2.dp),
+                color = Color.Gray
             )
         },
-        divider = { }
+        divider = {}
     ) {
         MoonTab.values().forEachIndexed { index, weekTab ->
             val selected = index == selectedTab.ordinal
@@ -92,6 +89,7 @@ fun  JetLaggedHeaderTabs(
 
 private val textModifier = Modifier
     .padding(vertical = 6.dp, horizontal = 4.dp)
+
 @Composable
 private fun DDLTabText(
     weekTab: WeekTab,
@@ -104,7 +102,7 @@ private fun DDLTabText(
             .padding(horizontal = 2.dp)
             .clip(RoundedCornerShape(16.dp)),
         selected = selected,
-        unselectedContentColor = Color.Black,
+        unselectedContentColor = Color.LightGray,
         selectedContentColor = Color.Black,
         onClick = {
             onTabSelected(WeekTab.values()[index])
@@ -130,7 +128,7 @@ private fun DDLTabText(
             .padding(horizontal = 2.dp)
             .clip(RoundedCornerShape(16.dp)),
         selected = selected,
-        unselectedContentColor = Color.Black,
+        unselectedContentColor = Color.LightGray,
         selectedContentColor = Color.Black,
         onClick = {
             onTabSelected(MoonTab.values()[index])
