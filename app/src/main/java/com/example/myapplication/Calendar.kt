@@ -42,17 +42,23 @@ import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-private class WeekIdx(var index: MutableState<Int>)
+private class WeekIdx(
+    var index: MutableState<Int>,
+    var showDdl: MutableState<Boolean>,
+    var showWeekSelector: MutableState<Boolean>
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
-    var week = WeekIdx(remember { mutableStateOf(weekIndex) })
+    var week = WeekIdx(remember { mutableStateOf(weekIndex) }, remember { mutableStateOf(true) },remember { mutableStateOf(false)})
     Scaffold(
         topBar = { TopBar(screenState, week) },
     ) {
         Column() {
-            CalendarGrid(screenState, week.index.value)
+            WeekSelector(week)
+            Spacer(modifier = Modifier.height(5.dp))
+            CalendarGrid(screenState, week.index.value, week.showDdl.value)
             println("regenerate")
         }
     }
@@ -70,14 +76,14 @@ private fun TopBar(screenState: ScreenState, week: WeekIdx) {
                         onClick = { println(" i clicked a button") },
                         onLongClick = { println(" i pressed a button") }
                     ))
-                WeekSelector(week)
+                IconButton(onClick = { week.showWeekSelector.value = true }) {
+                    Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                }
             }
         },
         actions = {
             // RowScope here, so these icons will be placed horizontally
-            IconButton(onClick = { /* doSomething() */ }) {
-                Icon(Icons.Filled.Menu, contentDescription = "Localized description")
-            }
+            CalendarSetting(week)
             IconButton(
                 onClick = {
                     screenState.goToEdit()
@@ -90,36 +96,87 @@ private fun TopBar(screenState: ScreenState, week: WeekIdx) {
 }
 
 @Composable
-private fun WeekSelector(week: WeekIdx) {
+private fun CalendarSetting(week: WeekIdx) {
     var expanded by remember { mutableStateOf(false) }
-    Box(modifier = Modifier) {
+    Box()
+    {
         IconButton(onClick = { expanded = true }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "Localized description")
+            Icon(Icons.Filled.Menu, contentDescription = "Localized description")
         }
-        val width = 120.dp
-        //var offset by remember { mutableStateOf(0f) }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .heightIn(max = 140.dp)
-                .width(width),
+            modifier = Modifier,
             offset = DpOffset(x = 20.dp, y = 0.dp)
         ) {
-            for (i in 0..100) {
-                DropdownMenuItem(
-                    modifier = Modifier
-                        .height(50.dp),
-                    text = { CenterText(text = "week $i", modifier = Modifier.width(width)) },
-                    onClick = {
-                        week.index.value = i
-                        expanded = false
-                    },
-                )
-            }
+            DropdownMenuItem(
+                modifier = Modifier
+                    .height(50.dp),
+                text = { CenterText(text = "show ddl") },
+                onClick = {
+                    week.showDdl.value = !week.showDdl.value
+                    expanded = false
+                },
+            )
+
         }
     }
 }
+
+@Composable
+private fun WeekSelector(week: WeekIdx) {
+    if (week.showWeekSelector.value) {
+        val maxWeek = 100;
+        ScrollableTabRow(selectedTabIndex = week.index.value) {
+            for (i in 0..maxWeek) {
+                Tab(
+                    modifier = Modifier
+                        .height(60.dp)
+                        .padding(5.dp),
+                    selected = i == week.index.value,
+                    onClick = {
+                        week.index.value = i;
+                        week.showWeekSelector.value = false;
+                    },
+                ){
+                    Text("week$i")
+                }
+
+            }
+        }
+    }
+
+
+//        val width = 120.dp
+//        //var offset by remember { mutableStateOf(0f) }
+//        DropdownMenu(
+//            expanded = expanded,
+//            onDismissRequest = { expanded = false },
+//            modifier = Modifier
+//                .heightIn(max = 140.dp)
+//                .width(width),
+//            offset = DpOffset(x = 20.dp, y = 0.dp)
+//        ) {
+//            Button(onClick = {
+//                expanded = false;
+//            })
+//            {
+//
+//            }
+//            for (i in 0..100) {
+//                DropdownMenuItem(
+//                    modifier = Modifier
+//                        .height(50.dp),
+//                    text = { CenterText(text = "week $i", modifier = Modifier.width(width)) },
+//                    onClick = {
+//                        week.index.value = i
+//                        expanded = false
+//                    },
+//                )
+//            }
+//        }
+}
+
 
 @Composable
 fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean = true) {
@@ -214,7 +271,7 @@ fun DailyList(
         while (i <= 12) {
             var course: CourseTemplate? =
                 schedule.getTemplate(i.toLong(), dayIndex.toLong(), weekIndex.toLong())
-            var ddl :DDlInfo
+            var ddl: DDlInfo
             var len: Int
             if (course == null) {
                 len = 1
@@ -237,7 +294,7 @@ fun DailyList(
 
                 ClassBlock(
                     screenState,
-                    courseBlockColor.getColor(),
+                    courseBlockColor.getColor(i * (weekIndex + 1) + dayIndex),
                     len,
                     MultiClick(
                         onClick = {},
