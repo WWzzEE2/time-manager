@@ -34,6 +34,9 @@ import androidx.compose.ui.window.PopupProperties
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.DDlInfo
 import com.example.myapplication.backstage.Schedule
+import com.example.myapplication.ui.theme.Purple40
+import com.example.myapplication.ui.theme.Red_T
+import com.example.myapplication.ui.theme.courseBlockColor
 import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
@@ -115,7 +118,7 @@ private fun WeekSelector(week: weekidx) {
 }
 
 @Composable
-fun CalendarGrid(weekIndex: Int) {
+fun CalendarGrid(weekIndex: Int, showDdllist: Boolean = true) {
     println(weekIndex)
     LazyRow(
         modifier = Modifier.padding(5.dp, 0.dp),
@@ -123,7 +126,7 @@ fun CalendarGrid(weekIndex: Int) {
     ) {
         item {
             Column() {
-                val width = 100.dp
+                val width = 100.dp//width of each column
                 Row() {
                     for (i in 0..6) {
                         CenterText(
@@ -141,7 +144,23 @@ fun CalendarGrid(weekIndex: Int) {
                         Row()
                         {
                             for (i in 0..6) {
-                                DailyList(Modifier.padding(5.dp, 5.dp), weekIndex, i, width = width)
+                                Box()
+                                {
+                                    DailyList(
+                                        Modifier.padding(5.dp, 5.dp),
+                                        weekIndex,
+                                        i,
+                                        width = width
+                                    )
+                                    if (showDdllist) {
+                                        DdlLineList(
+                                            Modifier.padding(5.dp, 5.dp),
+                                            weekIndex,
+                                            i,
+                                            width = width
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -184,7 +203,6 @@ fun DailyList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, widt
         while (i <= 12) {
             var course: CourseTemplate? =
                 schedule.getTemplate(i, dayIndex.toShort(), weekIndex.toShort())
-            var ddl :DDlInfo
             var len: Int
             if (course == null) {
                 len = 1
@@ -204,7 +222,7 @@ fun DailyList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, widt
                 len = course?.EndingTime!! - course?.StartingTime!!
 
                 ClassBlock(
-                    MaterialTheme.colorScheme.secondary,
+                    courseBlockColor.getColor(),
                     len,
                     MultiClick(
                         onClick = {},
@@ -249,7 +267,6 @@ fun ClassBlock(
     len: Int,
     onclick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    interactionSource: MutableInteractionSource = MutableInteractionSource(),
     content: @Composable () -> Unit
 ) {
     Button(
@@ -257,13 +274,48 @@ fun ClassBlock(
         shape = RoundedCornerShape(10.dp),
         modifier = modifier
             .height(len * 60.dp + (len - 1) * 5.dp),
-        interactionSource = interactionSource,
         colors = ButtonDefaults.buttonColors(containerColor = color),
         contentPadding = PaddingValues(10.dp),
         elevation = ButtonDefaults.buttonElevation(2.dp, 1.dp, 2.dp)
 
     ) {
         content()
+    }
+}
+
+@Composable
+fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, width: Dp = 100.dp) {
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+
+        // get ddl info
+        Spacer(modifier = modifier.height(100.dp))
+        DdlLine(color = Red_T, modifier = Modifier.width(width))
+
+    }
+}
+
+@Preview
+@Composable
+fun previewddllinelist() {
+    DdlLineList(modifier = Modifier, weekIndex = 0, dayIndex = 0, width = 100.dp);
+}
+
+@Composable
+fun DdlLine(
+    color: Color,
+    onclick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    Button(
+        onClick = onclick,
+        modifier = modifier.height(5.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = color)
+    ) {
+
     }
 }
 
