@@ -1,61 +1,49 @@
 package com.example.myapplication
 
-import android.annotation.SuppressLint
-import android.app.TimePickerDialog
 import android.content.Context
 import android.util.Log
-import android.widget.TimePicker
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.*
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.window.Dialog
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import kotlin.collections.ArrayList
 
 
-private var templateList = mutableListOf<CourseTemplate>()
-private var course = CourseInfo("Name", 0, 0, templateList, "Prompt", "Location")
+private var templateList = mutableStateListOf<CourseTemplate>()
+private var course = CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditPage(screenState:ScreenState){
-    Scaffold(topBar = {ChangeStat(screenState)}) {
+fun EditPage(screenState: ScreenState) {
+    Scaffold(topBar = { ChangeStat(screenState) }) {
         EditDetail()
     }
 }
 
 @Composable
-fun ChangeStat(screenState:ScreenState){
+fun ChangeStat(screenState: ScreenState) {
     val context = LocalContext.current
     SmallTopAppBar(
         navigationIcon = {
-            IconButton(onClick = { screenState.goToCalendar() }) {
+            IconButton(onClick = {
+                templateList.clear()
+                course = CourseInfo("Name", 0, 0,  emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
+                screenState.goToCalendar() }) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },
-        title = { Text("Edit")},
+        title = { Text("Edit") },
         actions = {
             IconButton(onClick = {
                 saveData(context)
@@ -68,7 +56,7 @@ fun ChangeStat(screenState:ScreenState){
 }
 
 @Composable
-fun EditDetail(){
+fun EditDetail() {
     Column(
         modifier = Modifier.padding(65.dp, 10.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -81,72 +69,74 @@ fun EditDetail(){
 }
 
 @Composable
-fun SimpleOutlinedTextField(Label:String, content:String) {
+fun SimpleOutlinedTextField(Label: String, content: String) {
     var text by rememberSaveable { mutableStateOf(content) }
     if (Regex("[A-Za-z]+[0-9]").containsMatchIn(Label))
-    Column() {
-        OutlinedTextField(
-            value = text,
-            onValueChange = {
-                if (Regex("Column[0-9]").containsMatchIn(Label))
-                    if (it.toInt() in 1..7) {
-                        text = it
-                        //changeData(Label, text)
-                    }
-                else
-                    if (it.toInt() in 1..13) {
-                        text = it
-                        //changeData(Label,text)
-                    }
-            },
+        Column() {
+            OutlinedTextField(
+                value = text,
+                onValueChange = {
+                    if (Regex("Column[0-9]").containsMatchIn(Label))
+                        if (it.toInt() in 1..7) {
+                            text = it
+                            //changeData(Label, text)
+                        } else
+                            if (it.toInt() in 1..13) {
+                                text = it
+                                //changeData(Label,text)
+                            }
+                },
                 label = { Text(Label) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-    }
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
     else
         Column() {
             OutlinedTextField(
                 value = text,
                 onValueChange = {
-                        text = it
-                        changeData(Label, text) },
+                    text = it
+                    changeData(Label, text)
+                },
                 label = { Text(Label) },
             )
         }
 }
 
 @Composable
-fun SelectTime(Label:String, Index: Int){
-    var valueList  = mutableListOf(1,2,3,4,5,6,7)
-    var expanded by rememberSaveable{ mutableStateOf(false) }
-    var selectValue by rememberSaveable{ mutableStateOf<Long>(1) }
+fun SelectTime(Label: String, Index: Int) {
+    var valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7)
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var selectValue by rememberSaveable { mutableStateOf<Long>(1) }
     if (Label != "Column")
-        valueList = mutableListOf(1,2,3,4,5,6,7,8,9,10,11,12,13)
-    selectValue = when(Label) {
+        valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+    if (Label == "EndingTime")
+        valueList.add(14)
+    selectValue = when (Label) {
         "Column" -> templateList[Index].Column
         "StartingTime" -> templateList[Index].StartingTime
         else -> templateList[Index].EndingTime
-    }
+    } + 1
     Box() {
-        Text(text = selectValue.toString(),
-            modifier = Modifier.clickable { expanded = !expanded }
-        )
+        TextButton(onClick = { expanded = !expanded }) {
+            Text(text = selectValue.toString())
+        }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+            modifier = Modifier.heightIn(max = 200.dp),
             content = {
-            valueList.forEach(){
-                DropdownMenuItem( text = { Text(text = it.toString())},  onClick = {
-                    expanded = !expanded
-                    selectValue = it.toLong()
-                    changeData(Label, it.toString())
-                })
+                valueList.forEach() {
+                    DropdownMenuItem(text = { Text(text = it.toString()) }, onClick = {
+                        expanded = !expanded
+                            selectValue = it
+                            changeData(Label + "$Index", it.toString())
+                    })
                 }
             })
-        }
     }
-
+}
 
 @Composable
-fun EditName(){
+fun EditName() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -156,55 +146,53 @@ fun EditName(){
             modifier = Modifier
                 .width(35.dp)
                 .height(35.dp),
-            contentDescription = "Name")
+            contentDescription = "Name"
+        )
         SimpleOutlinedTextField(Label = "Name", content = "software")
-        }
+    }
 }
 
 
-
 @Composable
-fun EditTimeChunk(){
+fun EditTimeChunk() {
     addTemplateToList()
-    var length by rememberSaveable{
-        mutableStateOf(templateList.size)
-    }
     LazyColumn(
-            modifier = Modifier.heightIn(0.dp,380.dp)
-       ) {
-        for (i in 1..length) {
-             EditColumn(i)
-             EditStartingTime(i)
-             EditEndingTime(i)
-            Log.d("timechunkid", i.toString())
-            IconButton(
+        modifier = Modifier.heightIn(0.dp, 380.dp)
+    ) {
+        templateList.forEachIndexed() { index, _ ->
+            item {
+                EditColumn(index)
+                EditStartingTime(index)
+                EditEndingTime(index)
+            }
+            item {
+                IconButton(
                     onClick = {
-                        if (expandTimeChunk.size > 1) {
-                            removeTemplateFromList(expandTimeChunk.indexOf(i))
-                            expandTimeChunk.remove(i)
-                            LatestInt-=1
+                        if (templateList.size > 1) {
+                            removeTemplateFromList(index)
                         }
                     },
+                ) {
+                    Icon(Icons.Filled.Delete, contentDescription = "DeleteTimeChunk")
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
+        item {
+            IconButton(
+                onClick = {
+                    addTemplateToList()
+                },
             ) {
-                Icon(Icons.Filled.Delete, contentDescription ="DeleteTimeChunk")
+                Icon(Icons.Outlined.Add, contentDescription = "AddTimeChunk")
             }
-
-            Spacer(modifier = Modifier.height(10.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(10.dp))
-            }
-        }
-        IconButton(
-            onClick = {
-                if (expandTimeChunk.size < 10) {
-                expandTimeChunk.add(LatestInt)
-                LatestInt+=1
-                addTemplateToList() } },
-        ) {
-            Icon(Icons.Outlined.Add, contentDescription ="AddTimeChunk")
-        }
         }
     }
+}
 //    val expandTimeChunk = remember {
 //        mutableStateListOf<Int>(1)
 //    }
@@ -249,12 +237,10 @@ fun EditTimeChunk(){
 //        }
 //
 //   }
-}
 
 
 @Composable
-fun EditColumn(Number:Int = 0){
-    val valueList = mutableListOf(1,2,3,4,5,6,7)
+fun EditColumn(Number: Int = 0) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -264,15 +250,15 @@ fun EditColumn(Number:Int = 0){
             modifier = Modifier
                 .width(35.dp)
                 .height(35.dp),
-            contentDescription = "Column")
+            contentDescription = "Column"
+        )
         //SimpleOutlinedTextField(Label = "Column$Number", content = "")
         SelectTime(Label = "Column", Number)
     }
 }
 
 @Composable
-fun EditStartingTime(Number: Int = 0){
-    val valueList = mutableListOf(1,2,3,4,5,6,7,8,9,10,11,12,13)
+fun EditStartingTime(Number: Int = 0) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -282,29 +268,31 @@ fun EditStartingTime(Number: Int = 0){
             modifier = Modifier
                 .width(35.dp)
                 .height(35.dp),
-            contentDescription = "StartingTime")
+            contentDescription = "StartingTime"
+        )
         //SimpleOutlinedTextField(Label = "StartingTime$Number", content = "")
         SelectTime(Label = "StartingTime", Number)
     }
 }
 
 @Composable
-fun EditEndingTime(Number: Int = 0){
-    val valueList = mutableListOf(1,2,3,4,5,6,7,8,9,10,11,12,13)
+fun EditEndingTime(Number: Int = 0) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Spacer(modifier = Modifier
-            .width(35.dp)
-            .height(35.dp),)
+        Spacer(
+            modifier = Modifier
+                .width(35.dp)
+                .height(35.dp),
+        )
         //SimpleOutlinedTextField(Label = "EndingTime$Number", content = "")
-        SelectTime(Label = "EndingTIme", Number)
+        SelectTime(Label = "EndingTime", Number)
     }
 }
 
 @Composable
-fun EditLocation(){
+fun EditLocation() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -314,54 +302,69 @@ fun EditLocation(){
             modifier = Modifier
                 .width(35.dp)
                 .height(35.dp),
-            contentDescription = "Location")
+            contentDescription = "Location"
+        )
         SimpleOutlinedTextField(Label = "Location", content = "")
     }
 }
 
 
 fun changeData(type: String, content: String) {
-    val operate : String
+    val operate: String
     var num = 0
 
     if (Regex("[A-Za-z]+[0-9]").containsMatchIn(type)) {
         num = type.last().code - 48
         operate = type.take(type.length - 1)
-    }
-    else
+    } else
         operate = type
 
-    Log.d("message1", operate.toString())
-    Log.d("message2", content.toString())
-    Log.d("message3", num.toString())
-//    when (operate) {
-//        "Name" -> course.Name = content
-//        "Location" -> course.Location = content
-//        "StartingTime" -> templateList[num].StartingTime = content.toLong() - 1
-//        "EndingTime" -> templateList[num].EndingTime = content.toLong() - 1
-//        "Column" -> templateList[num].Column = content.toLong() - 1
-//    }
+    when (operate) {
+        "Name" -> course.Name = content
+        "Location" -> course.Location = content
+        "StartingTime" -> {
+            templateList[num].StartingTime = content.toLong() - 1
+            if (templateList[num].EndingTime <= templateList[num].StartingTime)
+                templateList[num].EndingTime = templateList[num].StartingTime + 1
+        }
+        "EndingTime" -> {
+            templateList[num].EndingTime = content.toLong() - 1
+            if (templateList[num].EndingTime <= templateList[num].StartingTime)
+                templateList[num].EndingTime = templateList[num].StartingTime + 1
+        }
+        "Column" -> templateList[num].Column = content.toLong() - 1
+    }
 }
 
 fun saveData(context: Context) {
+    course.TimeInfo = templateList.toMutableList()
     val activity = context as MainActivity
     val schedule = activity.schedule
+    Log.d("in addcourse","111")
     schedule.addCourse(course)
+    Log.d("course", course.Name)
+    Log.d("course", course.Location)
+    Log.d("course", course.Prompt)
+    course.TimeInfo.forEachIndexed(){index, _->
+        Log.d("index", index.toString())
+        Log.d("Column", course.TimeInfo[index].Column.toString())
+        Log.d("Start", course.TimeInfo[index].StartingTime.toString())
+        Log.d("End", course.TimeInfo[index].EndingTime.toString())
+    }
     templateList.clear()
-    course = CourseInfo("Name", 0, 0, templateList, "Prompt", "Location")
+    course = CourseInfo("Name", 0, 0,  emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
 }
 
-fun addTemplateToList(){
-    val template = CourseTemplate(0, 0, 0, 1)
+fun addTemplateToList() {
+    val template = CourseTemplate(0, 0, 1, 1)
     template.info = course
     templateList.add(template)
 }
 
-fun removeTemplateFromList(Number:Int){
+fun removeTemplateFromList(Number: Int) {
     try {
         templateList.removeAt(Number)
-    }
-    finally {
+    } finally {
     }
 }
 
