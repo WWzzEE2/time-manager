@@ -2,6 +2,7 @@ package com.example.myapplication.backstage
 
 
 import android.content.Context
+import androidx.compose.foundation.interaction.DragInteraction
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
@@ -47,7 +48,7 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
         for ((k, v) in this) {
             if (k > time) break
             for (t in v) {
-                if (t.EndingTime > time && bindSchedule.templateAvailable(t, week)) return t
+                if (t.EndingTime > time && bindSchedule.templateAvailable(t, week.toShort())) return t
             }
         }
         return null
@@ -124,7 +125,6 @@ private class DDLMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<DDlInfo
             res.addAll(set)
         return res
     }
-
 }
 
 /**
@@ -206,7 +206,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
         for ((k, v) in dayMap) {
             if (res.isNotEmpty() && k < res.last().EndingTime) continue
             for (template in v) {
-                if (templateAvailable(template, week)) {
+                if (templateAvailable(template, week.toShort())) {
                     res.add(template)
                     break
                 }
@@ -287,7 +287,11 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
     fun getAllCourse() : List<CourseInfo> = courseSet.toList()
 
-    internal fun templateAvailable(template: CourseTemplate, week: Long) : Boolean = getWeek(template.info.StartingTime).let {
-        return week >= it && (week - it) % template.Period == 0L
+
+    internal fun templateAvailable(template: CourseTemplate, week: Short) : Boolean {
+        val startTime = getWeek(template.info.StartingTime)
+        val endTime = getWeek(template.info.EndingTime)
+        return week in startTime until endTime && (week - startTime) % template.Period == 0L
+
     }
 }
