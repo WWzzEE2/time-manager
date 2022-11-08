@@ -42,26 +42,25 @@ import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
+private class WeekIdx(var index: MutableState<Int>)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage(weekIndex: Int = 0) {
-    var week = weekidx(remember { mutableStateOf(weekIndex) })
+fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
+    var week = WeekIdx(remember { mutableStateOf(weekIndex) })
     Scaffold(
-        topBar = { TopBar(week) },
+        topBar = { TopBar(screenState, week) },
     ) {
         Column() {
-            CalendarGrid(week.index.value)
+            CalendarGrid(screenState, week.index.value)
             println("regenerate")
         }
     }
 }
 
-private class weekidx(var index: MutableState<Int>)
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TopBar(week: weekidx) {
-
+private fun TopBar(screenState: ScreenState, week: WeekIdx) {
     SmallTopAppBar(
         title = {
             //WeekSelector()
@@ -79,14 +78,19 @@ private fun TopBar(week: weekidx) {
             IconButton(onClick = { /* doSomething() */ }) {
                 Icon(Icons.Filled.Menu, contentDescription = "Localized description")
             }
-            IconButton(onClick = { /* doSomething() */ }) {
+            IconButton(
+                onClick = {
+                    screenState.goToEdit()
+                }
+            ) {
                 Icon(Icons.Filled.Add, contentDescription = "Localized description")
             }
-        })
+        }
+    )
 }
 
 @Composable
-private fun WeekSelector(week: weekidx) {
+private fun WeekSelector(week: WeekIdx) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = Modifier) {
         IconButton(onClick = { expanded = true }) {
@@ -118,7 +122,7 @@ private fun WeekSelector(week: weekidx) {
 }
 
 @Composable
-fun CalendarGrid(weekIndex: Int, showDdllist: Boolean = true) {
+fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean = true) {
     println(weekIndex)
     LazyRow(
         modifier = Modifier.padding(5.dp, 0.dp),
@@ -147,6 +151,7 @@ fun CalendarGrid(weekIndex: Int, showDdllist: Boolean = true) {
                                 Box()
                                 {
                                     DailyList(
+                                        screenState,
                                         Modifier.padding(5.dp, 5.dp),
                                         weekIndex,
                                         i,
@@ -186,7 +191,13 @@ fun TimeList() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DailyList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, width: Dp = 100.dp) {
+fun DailyList(
+    screenState: ScreenState,
+    modifier: Modifier = Modifier,
+    weekIndex: Int,
+    dayIndex: Int,
+    width: Dp = 100.dp
+) {
 
     Column(
         modifier = modifier,
@@ -202,26 +213,30 @@ fun DailyList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, widt
         println(weekIndex)
         while (i <= 12) {
             var course: CourseTemplate? =
-                schedule.getTemplate(i, dayIndex.toShort(), weekIndex.toShort())
+                schedule.getTemplate(i.toLong(), dayIndex.toLong(), weekIndex.toLong())
+            var ddl :DDlInfo
             var len: Int
             if (course == null) {
                 len = 1
                 ClassBlock(
+                    screenState,
                     MaterialTheme.colorScheme.background,
                     len,
                     {/*
                         TODO: your function here
                         Triggered when clicking an empty button. You should navigate to the "course add" page with necessary arguments
                      */
+                        screenState.goToEdit()
                     },
                     Modifier.width(width)
                 ) { Text(text = "") }
             } else {
                 var coursename = course.info.Name
                 var courselocation = course.info.Location
-                len = course?.EndingTime!! - course?.StartingTime!!
+                len = (course.EndingTime - course.StartingTime).toInt()
 
                 ClassBlock(
+                    screenState,
                     courseBlockColor.getColor(),
                     len,
                     MultiClick(
@@ -231,6 +246,7 @@ fun DailyList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, widt
                                 * TODO: your function here
                                 * Triggered when doubleclicking a course button. turn to edit page with course info
                                 * */
+                            screenState.goToEdit()
                         }
                     ),
                     Modifier.width(width),
@@ -263,10 +279,12 @@ fun CenterText(modifier: Modifier = Modifier, text: String, fontsize: TextUnit =
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ClassBlock(
+    screenState: ScreenState,
     color: Color,
     len: Int,
     onclick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource = MutableInteractionSource(),
     content: @Composable () -> Unit
 ) {
     Button(
@@ -274,6 +292,7 @@ fun ClassBlock(
         shape = RoundedCornerShape(10.dp),
         modifier = modifier
             .height(len * 60.dp + (len - 1) * 5.dp),
+        interactionSource = interactionSource,
         colors = ButtonDefaults.buttonColors(containerColor = color),
         contentPadding = PaddingValues(10.dp),
         elevation = ButtonDefaults.buttonElevation(2.dp, 1.dp, 2.dp)
@@ -323,6 +342,7 @@ fun DdlLine(
 @Composable
 fun previewclassblock() {
     ClassBlock(
+        ScreenState("Calendar"),
         color = Color.LightGray,
         len = 1,
         modifier = Modifier.width(100.dp)
