@@ -28,7 +28,7 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
         val set = this[template.StartingTime]?: HashSet()
         set.add(template)
         this[template.StartingTime] = set
-        template.info.TimeInfo.add(template)
+        //template.info.TimeInfo.add(template)
         return true
     }
 

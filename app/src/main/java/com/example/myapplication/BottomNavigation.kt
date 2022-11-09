@@ -12,9 +12,15 @@ import com.example.myapplication.backstage.*
 
 class ScreenState (private val inPage: String) {
     var page by mutableStateOf(inPage)
+    var editType = "";
+    lateinit var myCourse: CourseTemplate
     fun goToCalendar() { page = "Calendar"}
     fun goToDeadline() { page = "Deadline"}
-    fun goToEdit(){ page = "Edit"}
+    fun goToEdit(myCourse_: CourseTemplate, editType_: String) {
+        page = "Edit"
+        myCourse = myCourse_
+        editType = editType_
+    }
 }
 
 
@@ -48,7 +54,11 @@ fun BottomNavigation() {
         when(currentState.page) {
             "Calendar" -> CalendarPage(currentState)
             "Deadline" -> DDLScreen()
-            "Edit" ->  EditPage(currentState)
+            "Edit" ->  EditPage(
+                currentState,
+                currentState.myCourse,
+                currentState.editType
+            )
             "Setting" -> SettingsPage()
         }
     }

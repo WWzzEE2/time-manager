@@ -18,24 +18,32 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
+import com.example.myapplication.backstage.getWeekDay
+import com.example.myapplication.backstage.termInfo
 
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
 private var templateList = mutableStateListOf<CourseTemplate>()
 private var course =
     CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditPage(screenState: ScreenState) {
-    Scaffold(topBar = { ChangeStat(screenState) }) {
+fun EditPage(
+    screenState: ScreenState,
+    myCourseTemplate: CourseTemplate,
+    editType: String
+) {
+    Scaffold(topBar = { ChangeStat(screenState, myCourseTemplate, editType) }) {
         EditDetail()
     }
 }
 
 //顶部状态栏，包括back和done按钮
 @Composable
-fun ChangeStat(screenState: ScreenState) {
+fun ChangeStat(screenState: ScreenState, myCourseTemplate: CourseTemplate, editType: String) {
     val context = LocalContext.current
+    initData(myCourseTemplate, editType, context)
     SmallTopAppBar(
         navigationIcon = {
             IconButton(onClick = {
@@ -56,7 +64,7 @@ fun ChangeStat(screenState: ScreenState) {
         title = { Text("Edit") },
         actions = {
             IconButton(onClick = {
-                saveData(context)
+                saveData(context, editType, myCourseTemplate)
                 screenState.goToCalendar()
             }) {
                 Icon(Icons.Filled.Done, contentDescription = "Save")
@@ -121,6 +129,7 @@ fun SelectTime(Label: String, Index: Int) {
     var valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7)
     var expanded by rememberSaveable { mutableStateOf(false) }
     var selectValue by rememberSaveable { mutableStateOf<Long>(1) }
+    val days = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     if (Label != "Column")
         valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
     if (Label == "EndingTime")
@@ -133,9 +142,9 @@ fun SelectTime(Label: String, Index: Int) {
     Box() {
         TextButton(onClick = { expanded = !expanded }) {
             if (Label == "Column")
-                Text(text = "周$selectValue")
+                Text(text = days[selectValue.toInt() - 1])
             else
-                Text(text = "第${selectValue}节")
+                Text(text = "Course${selectValue}")
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
             modifier = Modifier.heightIn(max = 200.dp),
@@ -143,9 +152,9 @@ fun SelectTime(Label: String, Index: Int) {
                 valueList.forEach() {
                     DropdownMenuItem(text = {
                         if (Label == "Column")
-                            Text(text = "周$it")
+                            Text(text = days[it.toInt() - 1])
                         else
-                            Text(text = "第${it}节")
+                            Text(text = "Course${it}")
                     }, onClick = {
                         expanded = !expanded
                         selectValue = it
@@ -195,7 +204,6 @@ fun EditLocation() {
 //边界时间信息
 @Composable
 fun EditTimeChunk() {
-    addTemplateToList()
     LazyColumn(
         modifier = Modifier.heightIn(0.dp, 380.dp)
     ) {
@@ -292,7 +300,6 @@ fun EditColumn(Number: Int = 0) {
                 .height(35.dp),
             contentDescription = "Column"
         )
-        //SimpleOutlinedTextField(Label = "Column$Number", content = "")
         SelectTime(Label = "Column", Number)
     }
 }
@@ -311,7 +318,6 @@ fun EditStartingTime(Number: Int = 0) {
                 .height(35.dp),
             contentDescription = "StartingTime"
         )
-        //SimpleOutlinedTextField(Label = "StartingTime$Number", content = "")
         SelectTime(Label = "StartingTime", Number)
     }
 }
@@ -328,11 +334,27 @@ fun EditEndingTime(Number: Int = 0) {
                 .width(35.dp)
                 .height(35.dp),
         )
-        //SimpleOutlinedTextField(Label = "EndingTime$Number", content = "")
         SelectTime(Label = "EndingTime", Number)
     }
 }
 
+fun initData(myCourseTemplate: CourseTemplate, editType: String, context: Context) {
+    val activity = context as MainActivity
+    val schedule = activity.schedule
+    if (editType != "click_course") {
+        course.StartingTime = schedule.termStartTime
+        course.EndingTime = schedule.termStartTime + 1000L * 3600 * 24 * 7 * 20
+    }
+    if (editType == "click_null")
+        addTemplateToList(myCourseTemplate)
+    else if (editType == "click_course") {
+        course = myCourseTemplate.info
+        templateList = course.TimeInfo.toMutableStateList()
+    } else
+        addTemplateToList()
+
+
+}
 
 
 //将编辑的信息同步到缓存中
@@ -364,31 +386,35 @@ fun changeData(type: String, content: String) {
 }
 
 //保存信息
-fun saveData(context: Context) {
-    course.TimeInfo = templateList.toMutableList()
+fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplate): Boolean {
     val activity = context as MainActivity
     val schedule = activity.schedule
-    Log.d("in addcourse", "111")
-    Log.d("course", course.Name)
-    Log.d("course", course.Location)
-    Log.d("course", course.Prompt)
-    if (schedule.addCourse(course))
-        Log.d("lalal", "lalala")
-    course.TimeInfo.forEachIndexed() { index, _ ->
-        Log.d("index", index.toString())
-        Log.d("Column", course.TimeInfo[index].Column.toString())
-        Log.d("Start", course.TimeInfo[index].StartingTime.toString())
-        Log.d("End", course.TimeInfo[index].EndingTime.toString())
+    if (editType == "click_course")
+        schedule.removeCourse(myCourseTemplate.info)
+    templateList.forEach(){
+        it.info = course
     }
+    course.TimeInfo = templateList.toMutableList()
+//    Log.d("courseinfo", course.Name)
+//    Log.d("courseinfo", course.Location)
+//    Log.d("courseinfo", course.StartingTime.toString())
+//    Log.d("courseinfo", course.EndingTime.toString())
+//    course.TimeInfo.forEachIndexed(){index, _->
+//        Log.d("course", index.toString())
+//        Log.d("course", course.TimeInfo[index].Column.toString())
+//        Log.d("course", course.TimeInfo[index].StartingTime.toString())
+//        Log.d("course", course.TimeInfo[index].EndingTime.toString())
+//    }
+    if (!schedule.addCourse(course))
+        return false
     templateList.clear()
     course =
         CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
+    return true
 }
 
 //向缓存列表中加入新的template
-fun addTemplateToList() {
-    val template = CourseTemplate(0, 0, 1, 1)
-    template.info = course
+fun addTemplateToList(template: CourseTemplate = CourseTemplate(0, 0, 1, 1)) {
     templateList.add(template)
 }
 
