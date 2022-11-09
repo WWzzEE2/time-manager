@@ -30,6 +30,7 @@ import com.example.myapplication.ui.theme.courseBlockColor
 import com.example.myapplication.ui.theme.ddlBlockColor
 import org.xml.sax.Parser
 
+import com.example.myapplication.front.*
 
 typealias DeadLine = DDlInfo
 

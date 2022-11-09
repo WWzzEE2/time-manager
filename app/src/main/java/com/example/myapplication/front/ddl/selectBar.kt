@@ -19,6 +19,7 @@ import com.example.myapplication.ui.theme.SmallHeadingStyle
 import com.example.myapplication.ui.theme.White
 import com.example.myapplication.ui.theme.Yellow
 
+import com.example.myapplication.front.*
 
 @Composable
 fun JetLaggedHeaderTabs(

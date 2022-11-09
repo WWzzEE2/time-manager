@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.backstage.*
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.front.*
 
 class MainActivity : ComponentActivity() {
     lateinit var schedule:Schedule
