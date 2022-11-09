@@ -58,11 +58,10 @@ enum class DayTab(val title: Int) {
 }
 
 enum class WeekTab {
-    Week0,Week1, Week2, Week3, Week4, Week5, Week6, Week7, Week8, Week9, Week10, Week11, Week12, Week13, Week14, Week15, Week16, Week17;
+    Week1, Week2, Week3, Week4, Week5, Week6, Week7, Week8, Week9, Week10, Week11, Week12, Week13, Week14, Week15, Week16, Week17;
 
     fun getWeek(Week: Int): WeekTab =
         when (Week) {
-            0 -> Week0
             1 -> Week1
             2 -> Week2
             3 -> Week3
@@ -80,7 +79,7 @@ enum class WeekTab {
             15 -> Week15
             16 -> Week16
             17 -> Week17
-            else -> Week0
+            else -> Week1
         }
 }
 
@@ -206,10 +205,7 @@ fun DDLScreen(
                 mutableStateOf(WeekTab.Week1.getWeek(screenState.getCurWeek().toInt()))
             }
             JetLaggedHeaderTabs(
-                screenState,
-                onTabSelected = {
-                    selectedWeekTab = it;
-                    screenState.setCurWeek(it.ordinal.toLong()) },
+                onTabSelected = { selectedWeekTab = it },
                 selectedTab = selectedWeekTab,
             )
 
@@ -217,9 +213,7 @@ fun DDLScreen(
                 mutableStateOf(DayTab.Monday.getDay(screenState.getCurDay().toInt()))
             }
             JetLaggedHeaderTabs(
-                screenState,
-                onTabSelected = { selectedDayTab = it;
-                                screenState.setCurDay(it.ordinal.toLong()) },
+                onTabSelected = { selectedDayTab = it },
                 selectedTab = selectedDayTab,
             )
 
@@ -227,10 +221,7 @@ fun DDLScreen(
                 .toMutableStateList()
             DeadLineList(
                 list = list,
-                onCloseTask = {
-                        task -> list.remove(task)
-                        schedule.removeDDl(task)
-                }
+                onCloseTask = { task -> list.remove(task) }
             )
             Spacer(Modifier.height(16.dp))
         }

@@ -23,7 +23,6 @@ import com.example.myapplication.front.*
 
 @Composable
 fun JetLaggedHeaderTabs(
-    screenState: ScreenState,
     onTabSelected: (DayTab) -> Unit,
     selectedTab: DayTab,
     modifier: Modifier = Modifier,
@@ -49,11 +48,7 @@ fun JetLaggedHeaderTabs(
                 dayTab = dayTab,
                 selected = selected,
                 onTabSelected = onTabSelected,
-                index = index,
-                unSelectedColor = when(index.toLong() == screenState.getRealDay()) {
-                    true -> Color.Gray
-                    false -> Color.LightGray
-                }
+                index = index
             )
         }
     }
@@ -61,7 +56,6 @@ fun JetLaggedHeaderTabs(
 
 @Composable
 fun JetLaggedHeaderTabs(
-    screenState: ScreenState,
     onTabSelected: (WeekTab) -> Unit,
     selectedTab: WeekTab,
     modifier: Modifier = Modifier,
@@ -88,11 +82,7 @@ fun JetLaggedHeaderTabs(
                 weekTab = weekTab,
                 selected = selected,
                 onTabSelected = onTabSelected,
-                index = index,
-                unSelectedColor = when(index.toLong() == screenState.getRealWeek()) {
-                    true -> Color.Gray
-                    false -> Color.LightGray
-                }
+                index = index
             )
         }
     }
@@ -106,7 +96,6 @@ private fun DDLTabText(
     dayTab: DayTab,
     selected: Boolean,
     index: Int,
-    unSelectedColor: Color,
     onTabSelected: (DayTab) -> Unit,
 ) {
     Tab(
@@ -114,7 +103,7 @@ private fun DDLTabText(
             .padding(horizontal = 2.dp)
             .clip(RoundedCornerShape(16.dp)),
         selected = selected,
-        unselectedContentColor = unSelectedColor,
+        unselectedContentColor = Color.LightGray,
         selectedContentColor = Color.Black,
         onClick = {
             onTabSelected(DayTab.values()[index])
@@ -133,7 +122,6 @@ private fun DDLTabText(
     weekTab: WeekTab,
     selected: Boolean,
     index: Int,
-    unSelectedColor: Color,
     onTabSelected: (WeekTab) -> Unit,
 ) {
     Tab(
@@ -141,7 +129,7 @@ private fun DDLTabText(
             .padding(horizontal = 2.dp)
             .clip(RoundedCornerShape(16.dp)),
         selected = selected,
-        unselectedContentColor = unSelectedColor,
+        unselectedContentColor = Color.LightGray,
         selectedContentColor = Color.Black,
         onClick = {
             onTabSelected(WeekTab.values()[index])

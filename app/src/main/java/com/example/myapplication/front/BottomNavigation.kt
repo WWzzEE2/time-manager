@@ -63,8 +63,8 @@ fun BottomNavigation() {
         schedule.termStartTime.toLong(),
         Calendar.getInstance().timeInMillis
     )
-    currentState.setCurWeekDay(curWeekDay.copy())
-    currentState.setRealWeekDay(curWeekDay.copy())
+    currentState.setCurWeekDay(curWeekDay)
+    currentState.setRealWeekDay(curWeekDay)
 
     val items = listOf("Calendar", "Deadline", "Setting")
     val icons = listOf(
