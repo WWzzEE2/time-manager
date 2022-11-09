@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.graphics.Paint.Align
 import android.widget.DatePicker
+import android.widget.GridLayout.Spec
 import android.widget.TextView
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -24,6 +25,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -32,15 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
-import com.example.myapplication.backstage.CourseTemplate
-import com.example.myapplication.backstage.DDlInfo
-import com.example.myapplication.backstage.Schedule
-import com.example.myapplication.backstage.getPastMin
+import com.example.myapplication.backstage.*
 import com.example.myapplication.ui.theme.*
 import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+lateinit var curWeekDay_global: WeekDay
 
 private class WeekIdx(
     var index: MutableState<Int>,
@@ -50,7 +50,15 @@ private class WeekIdx(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
+fun CalendarPage(
+    screenState: ScreenState,
+    weekIndex: Int = 0,
+    dayIndex: Int = 0
+) {
+    curWeekDay_global = WeekDay(
+        weekIndex.toLong(),
+        dayIndex.toLong()
+    )
     var week = WeekIdx(remember { mutableStateOf(weekIndex) },
         remember { mutableStateOf(true) },
         remember { mutableStateOf(false) })
@@ -60,7 +68,12 @@ fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
         Column() {
             WeekSelector(week)
             Spacer(modifier = Modifier.height(5.dp))
-            CalendarGrid(screenState, week.index.value, week.showDdl.value)
+            CalendarGrid(
+                screenState,
+                week.index.value,
+                dayIndex,
+                week.showDdl.value
+            )
             println("regenerate")
         }
     }
@@ -171,7 +184,12 @@ private fun WeekSelector(week: WeekIdx) {
 
 
 @Composable
-fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean = true) {
+fun CalendarGrid(
+    screenState: ScreenState,
+    weekIndex: Int,
+    dayIndex: Int,
+    showDDLlist: Boolean = true
+) {
     println(weekIndex)
     LazyRow(
         modifier = Modifier.padding(5.dp, 0.dp),
@@ -182,11 +200,26 @@ fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean 
                 val width = 100.dp//width of each column
                 Row() {
                     for (i in 0..6) {
-                        CenterText(
-                            modifier = Modifier
-                                .padding(5.dp, 0.dp)
-                                .width(width), text = weekday[i]
-                        )
+                        if(i.toLong() == curWeekDay_global.day
+                            && weekIndex.toLong() == curWeekDay_global.week) {
+                            SpecialCenterText(
+                                modifier = Modifier
+                                    .padding(5.dp, 0.dp)
+                                    .width(width)
+                                    .background(
+                                        color = courseBlockColor
+                                            .getColor(3)
+                                    ),
+                                text = weekday[i]
+                            )
+                        } else {
+                            CenterText(
+                                modifier = Modifier
+                                    .padding(5.dp, 0.dp)
+                                    .width(width),
+                                text = weekday[i]
+                            )
+                        }
                     }
                 }
                 LazyColumn(
@@ -207,7 +240,7 @@ fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean 
                                         width = width
                                     )
 
-                                    if (showDdllist) {
+                                    if (showDDLlist) {
                                         DdlLineList(
                                             Modifier.padding(10.dp, 0.dp),
                                             weekIndex,
@@ -333,12 +366,30 @@ fun DailyList(
 }
 
 @Composable
-fun CenterText(modifier: Modifier = Modifier, text: String, fontsize: TextUnit = 13.sp) {
+fun SpecialCenterText(
+    modifier: Modifier = Modifier,
+    text: String,
+    fontSize: TextUnit = 13.sp
+) {
     Text(
         text = text,
         modifier = modifier,
         textAlign = TextAlign.Center,
-        fontSize = fontsize
+        fontSize = fontSize
+    )
+}
+
+@Composable
+fun CenterText(
+    modifier: Modifier = Modifier,
+    text: String,
+    fontSize: TextUnit = 13.sp
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        textAlign = TextAlign.Center,
+        fontSize = fontSize
     )
 }
 

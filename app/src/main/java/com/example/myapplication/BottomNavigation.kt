@@ -37,6 +37,10 @@ fun BottomNavigation() {
     var currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
     var activity = LocalContext.current as MainActivity
     var schedule = activity.schedule
+    var curWeekDay = getWeekDay(
+        schedule.termStartTime.toLong(),
+        Calendar.getInstance().timeInMillis
+    )
 
     val items = listOf("Calendar", "Deadline", "Setting")
     val icons = listOf(
@@ -62,10 +66,8 @@ fun BottomNavigation() {
         when(currentState.page) {
             "Calendar" -> CalendarPage(
                 currentState,
-                getWeekDay(
-                    schedule.termStartTime.toLong(),
-                    Calendar.getInstance().timeInMillis
-                ).week.toInt()
+                curWeekDay.week.toInt(),
+                curWeekDay.day.toInt()
             )
             "Deadline" -> DDLScreen()
             "Edit" ->  EditPage(
