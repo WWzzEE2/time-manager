@@ -439,13 +439,6 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
         // get ddl info
     }
 }
-
-@Preview
-@Composable
-fun previewddllinelist() {
-    DdlLineList(modifier = Modifier, weekIndex = 0, dayIndex = 0, width = 100.dp);
-}
-
 @Composable
 fun DdlLine(
     color: Color,
@@ -457,17 +450,6 @@ fun DdlLine(
         modifier = modifier.height(3.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color)
     ) {}
-}
-
-@Preview
-@Composable
-fun previewclassblock() {
-    ClassBlock(
-        ScreenState("Calendar"),
-        color = Color.LightGray,
-        len = 1,
-        modifier = Modifier.width(100.dp)
-    ) { Text(text = "114514") }
 }
 
 @Composable
@@ -489,4 +471,25 @@ inline fun MultiClick(
         lastClickTime = currentTimeMillis
     }
 }
+
+@Preview
+@Composable
+fun previewddllinelist() {
+    DdlLineList(modifier = Modifier, weekIndex = 0, dayIndex = 0, width = 100.dp);
+}
+
+
+
+@Preview
+@Composable
+fun previewclassblock() {
+    ClassBlock(
+        ScreenState("Calendar"),
+        color = Color.LightGray,
+        len = 1,
+        modifier = Modifier.width(100.dp)
+    ) { Text(text = "114514") }
+}
+
+
 
