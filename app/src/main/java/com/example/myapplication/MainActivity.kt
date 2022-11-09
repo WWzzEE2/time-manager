@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var config = TestDataConfig(20,100,5,12)
+        var config = TestDataConfig(20,40,5,12)
 
         schedule = Schedule(this, config)
         setContent {
