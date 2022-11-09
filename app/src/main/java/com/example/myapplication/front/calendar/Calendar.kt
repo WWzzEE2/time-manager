@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.front.calendar
 
 import android.graphics.Paint.Align
 import android.widget.DatePicker
@@ -34,11 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
+import com.example.myapplication.MainActivity
 import com.example.myapplication.backstage.*
 import com.example.myapplication.ui.theme.*
 import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
+import com.example.myapplication.front.*
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 private class WeekIdx(

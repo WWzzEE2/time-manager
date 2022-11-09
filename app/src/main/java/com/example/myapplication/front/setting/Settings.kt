@@ -14,6 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import com.example.myapplication.front.*
+import com.example.myapplication.front.calendar.CenterText
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPage() {

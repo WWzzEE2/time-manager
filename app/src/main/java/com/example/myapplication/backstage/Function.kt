@@ -1,6 +1,5 @@
 package com.example.myapplication.backstage
 
-import com.example.myapplication.weekday
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs

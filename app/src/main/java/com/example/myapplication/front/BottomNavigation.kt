@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.front
 
 import android.icu.text.MessageFormat.format
 import androidx.compose.foundation.*
@@ -10,7 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.*
+import com.example.myapplication.DDLScreen
+import com.example.myapplication.EditPage
+import com.example.myapplication.MainActivity
+import com.example.myapplication.SettingsPage
 import com.example.myapplication.backstage.*
+import com.example.myapplication.front.calendar.CalendarPage
 import java.lang.String.format
 import java.text.MessageFormat.format
 import java.text.SimpleDateFormat
