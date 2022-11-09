@@ -22,6 +22,39 @@ import com.example.myapplication.ui.theme.Yellow
 
 @Composable
 fun JetLaggedHeaderTabs(
+    onTabSelected: (DayTab) -> Unit,
+    selectedTab: DayTab,
+    modifier: Modifier = Modifier,
+) {
+    ScrollableTabRow(
+        modifier = modifier,
+        edgePadding = 12.dp,
+        selectedTabIndex = selectedTab.ordinal,
+        indicator = { tabPositions: List<TabPosition> ->
+            TabRowDefaults.Indicator(
+                Modifier
+                    .tabIndicatorOffset(
+                        tabPositions[selectedTab.ordinal]
+                    )
+                    .height(2.dp),
+                color = Color.Gray
+            )
+        },
+    ) {
+        DayTab.values().forEachIndexed { index, dayTab ->
+            val selected = index == selectedTab.ordinal
+            DDLTabText(
+                dayTab = dayTab,
+                selected = selected,
+                onTabSelected = onTabSelected,
+                index = index
+            )
+        }
+    }
+}
+
+@Composable
+fun JetLaggedHeaderTabs(
     onTabSelected: (WeekTab) -> Unit,
     selectedTab: WeekTab,
     modifier: Modifier = Modifier,
@@ -40,6 +73,7 @@ fun JetLaggedHeaderTabs(
                 color = Color.Gray
             )
         },
+        divider = {}
     ) {
         WeekTab.values().forEachIndexed { index, weekTab ->
             val selected = index == selectedTab.ordinal
@@ -53,42 +87,34 @@ fun JetLaggedHeaderTabs(
     }
 }
 
-@Composable
-fun JetLaggedHeaderTabs(
-    onTabSelected: (MoonTab) -> Unit,
-    selectedTab: MoonTab,
-    modifier: Modifier = Modifier,
-) {
-    ScrollableTabRow(
-        modifier = modifier,
-        edgePadding = 12.dp,
-        selectedTabIndex = selectedTab.ordinal,
-        indicator = { tabPositions: List<TabPosition> ->
-            TabRowDefaults.Indicator(
-                Modifier
-                    .tabIndicatorOffset(
-                        tabPositions[selectedTab.ordinal]
-                    )
-                    .height(2.dp),
-                color = Color.Gray
-            )
-        },
-        divider = {}
-    ) {
-        MoonTab.values().forEachIndexed { index, weekTab ->
-            val selected = index == selectedTab.ordinal
-            DDLTabText(
-                weekTab = weekTab,
-                selected = selected,
-                onTabSelected = onTabSelected,
-                index = index
-            )
-        }
-    }
-}
-
 private val textModifier = Modifier
     .padding(vertical = 6.dp, horizontal = 4.dp)
+
+@Composable
+private fun DDLTabText(
+    dayTab: DayTab,
+    selected: Boolean,
+    index: Int,
+    onTabSelected: (DayTab) -> Unit,
+) {
+    Tab(
+        modifier = Modifier
+            .padding(horizontal = 2.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        selected = selected,
+        unselectedContentColor = Color.LightGray,
+        selectedContentColor = Color.Black,
+        onClick = {
+            onTabSelected(DayTab.values()[index])
+        }
+    ) {
+        Text(
+            modifier = textModifier,
+            text = stringResource(id = dayTab.title),
+            style = SmallHeadingStyle
+        )
+    }
+}
 
 @Composable
 private fun DDLTabText(
@@ -106,32 +132,6 @@ private fun DDLTabText(
         selectedContentColor = Color.Black,
         onClick = {
             onTabSelected(WeekTab.values()[index])
-        }
-    ) {
-        Text(
-            modifier = textModifier,
-            text = stringResource(id = weekTab.title),
-            style = SmallHeadingStyle
-        )
-    }
-}
-
-@Composable
-private fun DDLTabText(
-    weekTab: MoonTab,
-    selected: Boolean,
-    index: Int,
-    onTabSelected: (MoonTab) -> Unit,
-) {
-    Tab(
-        modifier = Modifier
-            .padding(horizontal = 2.dp)
-            .clip(RoundedCornerShape(16.dp)),
-        selected = selected,
-        unselectedContentColor = Color.LightGray,
-        selectedContentColor = Color.Black,
-        onClick = {
-            onTabSelected(MoonTab.values()[index])
         }
     ) {
         Text(
