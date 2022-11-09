@@ -19,9 +19,10 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 
-
+// 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
 private var templateList = mutableStateListOf<CourseTemplate>()
-private var course = CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
+private var course =
+    CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +32,7 @@ fun EditPage(screenState: ScreenState) {
     }
 }
 
+//顶部状态栏，包括back和done按钮
 @Composable
 fun ChangeStat(screenState: ScreenState) {
     val context = LocalContext.current
@@ -38,8 +40,16 @@ fun ChangeStat(screenState: ScreenState) {
         navigationIcon = {
             IconButton(onClick = {
                 templateList.clear()
-                course = CourseInfo("Name", 0, 0,  emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
-                screenState.goToCalendar() }) {
+                course = CourseInfo(
+                    "Name",
+                    0,
+                    0,
+                    emptyList<CourseTemplate>().toMutableList(),
+                    "Prompt",
+                    "Location"
+                )
+                screenState.goToCalendar()
+            }) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
             }
         },
@@ -55,6 +65,7 @@ fun ChangeStat(screenState: ScreenState) {
     )
 }
 
+//编辑相关信息
 @Composable
 fun EditDetail() {
     Column(
@@ -68,6 +79,7 @@ fun EditDetail() {
     }
 }
 
+//编辑时的文本框
 @Composable
 fun SimpleOutlinedTextField(Label: String, content: String) {
     var text by rememberSaveable { mutableStateOf(content) }
@@ -103,6 +115,7 @@ fun SimpleOutlinedTextField(Label: String, content: String) {
         }
 }
 
+//编辑时间信息时选择时间
 @Composable
 fun SelectTime(Label: String, Index: Int) {
     var valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7)
@@ -119,22 +132,31 @@ fun SelectTime(Label: String, Index: Int) {
     } + 1
     Box() {
         TextButton(onClick = { expanded = !expanded }) {
-            Text(text = selectValue.toString())
+            if (Label == "Column")
+                Text(text = "周$selectValue")
+            else
+                Text(text = "第${selectValue}节")
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
             modifier = Modifier.heightIn(max = 200.dp),
             content = {
                 valueList.forEach() {
-                    DropdownMenuItem(text = { Text(text = it.toString()) }, onClick = {
+                    DropdownMenuItem(text = {
+                        if (Label == "Column")
+                            Text(text = "周$it")
+                        else
+                            Text(text = "第${it}节")
+                    }, onClick = {
                         expanded = !expanded
-                            selectValue = it
-                            changeData(Label + "$Index", it.toString())
+                        selectValue = it
+                        changeData(Label + "$Index", it.toString())
                     })
                 }
             })
     }
 }
 
+//编辑课程名
 @Composable
 fun EditName() {
     Row(
@@ -148,11 +170,29 @@ fun EditName() {
                 .height(35.dp),
             contentDescription = "Name"
         )
-        SimpleOutlinedTextField(Label = "Name", content = "software")
+        SimpleOutlinedTextField(Label = "Name", content = course.Name)
     }
 }
 
+//编辑上课地点
+@Composable
+fun EditLocation() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Icon(
+            Icons.Filled.LocationOn,
+            modifier = Modifier
+                .width(35.dp)
+                .height(35.dp),
+            contentDescription = "Location"
+        )
+        SimpleOutlinedTextField(Label = "Location", content = course.Location)
+    }
+}
 
+//边界时间信息
 @Composable
 fun EditTimeChunk() {
     addTemplateToList()
@@ -238,7 +278,7 @@ fun EditTimeChunk() {
 //
 //   }
 
-
+//编辑上课是一周中的哪一天
 @Composable
 fun EditColumn(Number: Int = 0) {
     Row(
@@ -257,6 +297,7 @@ fun EditColumn(Number: Int = 0) {
     }
 }
 
+//编辑课程开始时间
 @Composable
 fun EditStartingTime(Number: Int = 0) {
     Row(
@@ -275,6 +316,7 @@ fun EditStartingTime(Number: Int = 0) {
     }
 }
 
+//编辑课程结束时间
 @Composable
 fun EditEndingTime(Number: Int = 0) {
     Row(
@@ -291,24 +333,9 @@ fun EditEndingTime(Number: Int = 0) {
     }
 }
 
-@Composable
-fun EditLocation() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Icon(
-            Icons.Filled.LocationOn,
-            modifier = Modifier
-                .width(35.dp)
-                .height(35.dp),
-            contentDescription = "Location"
-        )
-        SimpleOutlinedTextField(Label = "Location", content = "")
-    }
-}
 
 
+//将编辑的信息同步到缓存中
 fun changeData(type: String, content: String) {
     val operate: String
     var num = 0
@@ -336,31 +363,36 @@ fun changeData(type: String, content: String) {
     }
 }
 
+//保存信息
 fun saveData(context: Context) {
     course.TimeInfo = templateList.toMutableList()
     val activity = context as MainActivity
     val schedule = activity.schedule
-    Log.d("in addcourse","111")
-    schedule.addCourse(course)
+    Log.d("in addcourse", "111")
     Log.d("course", course.Name)
     Log.d("course", course.Location)
     Log.d("course", course.Prompt)
-    course.TimeInfo.forEachIndexed(){index, _->
+    if (schedule.addCourse(course))
+        Log.d("lalal", "lalala")
+    course.TimeInfo.forEachIndexed() { index, _ ->
         Log.d("index", index.toString())
         Log.d("Column", course.TimeInfo[index].Column.toString())
         Log.d("Start", course.TimeInfo[index].StartingTime.toString())
         Log.d("End", course.TimeInfo[index].EndingTime.toString())
     }
     templateList.clear()
-    course = CourseInfo("Name", 0, 0,  emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
+    course =
+        CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
 }
 
+//向缓存列表中加入新的template
 fun addTemplateToList() {
     val template = CourseTemplate(0, 0, 1, 1)
     template.info = course
     templateList.add(template)
 }
 
+//从缓存列表中删除template
 fun removeTemplateFromList(Number: Int) {
     try {
         templateList.removeAt(Number)
