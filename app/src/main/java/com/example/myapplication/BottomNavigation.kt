@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.icu.text.MessageFormat.format
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
@@ -7,8 +8,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.*
 import com.example.myapplication.backstage.*
+import java.lang.String.format
+import java.text.MessageFormat.format
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ScreenState (private val inPage: String) {
     var page by mutableStateOf(inPage)
@@ -29,6 +35,8 @@ class ScreenState (private val inPage: String) {
 fun BottomNavigation() {
 
     var currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
+    var activity = LocalContext.current as MainActivity
+    var schedule = activity.schedule
 
     val items = listOf("Calendar", "Deadline", "Setting")
     val icons = listOf(
@@ -52,7 +60,13 @@ fun BottomNavigation() {
         }
     ) {
         when(currentState.page) {
-            "Calendar" -> CalendarPage(currentState)
+            "Calendar" -> CalendarPage(
+                currentState,
+                getWeekDay(
+                    schedule.termStartTime.toLong(),
+                    Calendar.getInstance().timeInMillis
+                ).week.toInt()
+            )
             "Deadline" -> DDLScreen()
             "Edit" ->  EditPage(
                 currentState,
