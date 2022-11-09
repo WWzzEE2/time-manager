@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,13 +14,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.getWeekDay
 import com.example.myapplication.backstage.termInfo
+import com.example.myapplication.ui.theme.ddlBlockColor
 
 import com.example.myapplication.front.*
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
@@ -81,6 +85,21 @@ fun EditDetail() {
         modifier = Modifier.padding(65.dp, 10.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+//        Button(
+//            onClick = {},
+//            modifier = Modifier.padding(0.dp,0.dp),
+//            shape = RoundedCornerShape(10.dp),
+//            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background,),
+//            contentPadding = PaddingValues(0.dp),
+//            elevation = ButtonDefaults.buttonElevation(2.dp, 1.dp, 2.dp)
+//
+//        ) {
+//            Column()
+//            {
+//                EditName()
+//                EditLocation()
+//            }
+//        }
         EditName()
         EditLocation()
         EditTimeChunk()
@@ -392,7 +411,7 @@ fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplat
     val schedule = activity.schedule
     if (editType == "click_course")
         schedule.removeCourse(myCourseTemplate.info)
-    templateList.forEach(){
+    templateList.forEach() {
         it.info = course
     }
     course.TimeInfo = templateList.toMutableList()

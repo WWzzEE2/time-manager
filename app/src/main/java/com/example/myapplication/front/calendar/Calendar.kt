@@ -450,7 +450,7 @@ fun DdlLine(
 ) {
     Button(
         onClick = onclick,
-        modifier = modifier.height(3.dp),
+        modifier = modifier.height(10.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color)
     ) {}
 }
