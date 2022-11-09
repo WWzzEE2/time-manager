@@ -23,6 +23,7 @@ import com.example.myapplication.backstage.getWeekDay
 import com.example.myapplication.backstage.termInfo
 import java.lang.ref.WeakReference
 
+import com.example.myapplication.front.*
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
 private var templateList = mutableStateListOf<CourseTemplate>()
 private var course =

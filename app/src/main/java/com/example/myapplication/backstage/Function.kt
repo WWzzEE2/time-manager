@@ -1,6 +1,5 @@
 package com.example.myapplication.backstage
 
-import com.example.myapplication.weekday
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
@@ -14,8 +13,8 @@ internal fun crossover(s1: Int, e1: Int, s2: Int, e2: Int) = max(s1, s2) < min(e
 internal fun crossover(s1: Long, e1: Long, s2: Long, e2: Long) = max(s1, s2) < min(e1, e2)
 
 data class WeekDay (
-    val week: Long,
-    val day:Long
+    var week: Long,
+    var day:Long
 )
 
 internal fun getWeekDay(termStart: Long, timeStamp: Long) : WeekDay {
@@ -61,10 +60,10 @@ fun getPastMin(hour: Short, min:Short):Long{
     return past_min
 }
 
-fun getTimeStamp(year: Long,month: Long,day: Long): Long {
+fun getTimeStamp(year: Long, month: Long, day: Long): Long {
     var dateTime:String = ""
     dateTime += year.toString()
-    dateTime+=("-")
+    dateTime += ("-")
     if(month<10)
         dateTime+=("0")
     dateTime+=(month.toString())

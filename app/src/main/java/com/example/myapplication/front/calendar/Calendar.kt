@@ -1,7 +1,8 @@
-package com.example.myapplication
+package com.example.myapplication.front.calendar
 
 import android.graphics.Paint.Align
 import android.widget.DatePicker
+import android.widget.GridLayout.Spec
 import android.widget.TextView
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
@@ -24,6 +25,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -32,14 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
-import com.example.myapplication.backstage.CourseTemplate
-import com.example.myapplication.backstage.DDlInfo
-import com.example.myapplication.backstage.Schedule
-import com.example.myapplication.backstage.getPastMin
+import com.example.myapplication.MainActivity
+import com.example.myapplication.backstage.*
 import com.example.myapplication.ui.theme.*
 import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
+import com.example.myapplication.front.*
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 private class WeekIdx(
@@ -50,17 +51,24 @@ private class WeekIdx(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
-    var week = WeekIdx(remember { mutableStateOf(weekIndex) },
+fun CalendarPage(
+    screenState: ScreenState
+) {
+
+    var week = WeekIdx(remember { mutableStateOf(screenState.getCurWeek().toInt()) },
         remember { mutableStateOf(true) },
         remember { mutableStateOf(false) })
     Scaffold(
         topBar = { TopBar(screenState, week) },
     ) {
         Column() {
-            WeekSelector(week)
+            WeekSelector(screenState, week)
             Spacer(modifier = Modifier.height(5.dp))
-            CalendarGrid(screenState, week.index.value, week.showDdl.value)
+            CalendarGrid(
+                screenState,
+                week.index.value,
+                week.showDdl.value
+            )
             println("regenerate")
         }
     }
@@ -132,7 +140,10 @@ private fun CalendarSetting(week: WeekIdx) {
 }
 
 @Composable
-private fun WeekSelector(week: WeekIdx) {
+private fun WeekSelector(
+    screenState: ScreenState,
+    week: WeekIdx
+) {
     if (week.showWeekSelector.value) {
         val maxWeek = 100;
         ScrollableTabRow(
@@ -155,11 +166,15 @@ private fun WeekSelector(week: WeekIdx) {
                         .padding(5.dp),
                     selected = i == week.index.value,
                     onClick = {
-                        week.index.value = i;
-//                        week.showWeekSelector.value = false;
+                        week.index.value = i
+                        screenState.setCurWeek(i.toLong())
+//                        week.showWeekSelector.value = false
                     },
                     selectedContentColor = Color.Black,
-                    unselectedContentColor = Color.LightGray
+                    unselectedContentColor = when(i.toLong() == screenState.getRealWeek()) {
+                        true -> Color.Gray
+                        false -> Color.LightGray
+                    }
                 ) {
                     Text("week$i")
                 }
@@ -171,7 +186,11 @@ private fun WeekSelector(week: WeekIdx) {
 
 
 @Composable
-fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean = true) {
+fun CalendarGrid(
+    screenState: ScreenState,
+    weekIndex: Int,
+    showDDLlist: Boolean = true
+) {
     println(weekIndex)
     LazyRow(
         modifier = Modifier.padding(5.dp, 0.dp),
@@ -182,11 +201,26 @@ fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean 
                 val width = 100.dp//width of each column
                 Row() {
                     for (i in 0..6) {
-                        CenterText(
-                            modifier = Modifier
-                                .padding(5.dp, 0.dp)
-                                .width(width), text = weekday[i]
-                        )
+                        if(i.toLong() == screenState.getRealDay()
+                            && weekIndex.toLong() == screenState.getRealWeek()) {
+                            SpecialCenterText(
+                                modifier = Modifier
+                                    .padding(5.dp, 0.dp)
+                                    .width(width)
+                                    .background(
+                                        color = courseBlockColor
+                                            .getColor(3)
+                                    ),
+                                text = weekday[i]
+                            )
+                        } else {
+                            CenterText(
+                                modifier = Modifier
+                                    .padding(5.dp, 0.dp)
+                                    .width(width),
+                                text = weekday[i]
+                            )
+                        }
                     }
                 }
                 LazyColumn(
@@ -207,7 +241,7 @@ fun CalendarGrid(screenState: ScreenState, weekIndex: Int, showDdllist: Boolean 
                                         width = width
                                     )
 
-                                    if (showDdllist) {
+                                    if (showDDLlist) {
                                         DdlLineList(
                                             Modifier.padding(10.dp, 0.dp),
                                             weekIndex,
@@ -333,12 +367,30 @@ fun DailyList(
 }
 
 @Composable
-fun CenterText(modifier: Modifier = Modifier, text: String, fontsize: TextUnit = 13.sp) {
+fun SpecialCenterText(
+    modifier: Modifier = Modifier,
+    text: String,
+    fontSize: TextUnit = 13.sp
+) {
     Text(
         text = text,
         modifier = modifier,
         textAlign = TextAlign.Center,
-        fontSize = fontsize
+        fontSize = fontSize
+    )
+}
+
+@Composable
+fun CenterText(
+    modifier: Modifier = Modifier,
+    text: String,
+    fontSize: TextUnit = 13.sp
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        textAlign = TextAlign.Center,
+        fontSize = fontSize
     )
 }
 
@@ -390,13 +442,6 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
         // get ddl info
     }
 }
-
-@Preview
-@Composable
-fun previewddllinelist() {
-    DdlLineList(modifier = Modifier, weekIndex = 0, dayIndex = 0, width = 100.dp);
-}
-
 @Composable
 fun DdlLine(
     color: Color,
@@ -408,17 +453,6 @@ fun DdlLine(
         modifier = modifier.height(3.dp),
         colors = ButtonDefaults.buttonColors(containerColor = color)
     ) {}
-}
-
-@Preview
-@Composable
-fun previewclassblock() {
-    ClassBlock(
-        ScreenState("Calendar"),
-        color = Color.LightGray,
-        len = 1,
-        modifier = Modifier.width(100.dp)
-    ) { Text(text = "114514") }
 }
 
 @Composable
@@ -440,4 +474,25 @@ inline fun MultiClick(
         lastClickTime = currentTimeMillis
     }
 }
+
+@Preview
+@Composable
+fun previewddllinelist() {
+    DdlLineList(modifier = Modifier, weekIndex = 0, dayIndex = 0, width = 100.dp);
+}
+
+
+
+@Preview
+@Composable
+fun previewclassblock() {
+    ClassBlock(
+        ScreenState("Calendar"),
+        color = Color.LightGray,
+        len = 1,
+        modifier = Modifier.width(100.dp)
+    ) { Text(text = "114514") }
+}
+
+
 

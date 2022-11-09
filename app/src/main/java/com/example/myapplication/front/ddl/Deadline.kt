@@ -30,10 +30,11 @@ import com.example.myapplication.ui.theme.courseBlockColor
 import com.example.myapplication.ui.theme.ddlBlockColor
 import org.xml.sax.Parser
 
+import com.example.myapplication.front.*
 
 typealias DeadLine = DDlInfo
 
-enum class WeekTab(val title: Int) {
+enum class DayTab(val title: Int) {
     Monday(R.string.Monday),
     Tuesday(R.string.Tuesday),
     Wednesday(R.string.Wednesday),
@@ -42,7 +43,7 @@ enum class WeekTab(val title: Int) {
     Saturday(R.string.Saturday),
     Sunday(R.string.Sunday);
 
-    fun GetWeek(Day: Int): WeekTab =
+    fun getDay(Day: Int): DayTab =
         when (Day) {
             0 -> Monday
             1 -> Tuesday
@@ -56,10 +57,10 @@ enum class WeekTab(val title: Int) {
 
 }
 
-enum class MoonTab {
+enum class WeekTab {
     Week1, Week2, Week3, Week4, Week5, Week6, Week7, Week8, Week9, Week10, Week11, Week12, Week13, Week14, Week15, Week16, Week17;
 
-    fun GetMoon(Week: Int): MoonTab =
+    fun getWeek(Week: Int): WeekTab =
         when (Week) {
             1 -> Week1
             2 -> Week2
@@ -186,29 +187,42 @@ val CurrentTime = System.currentTimeMillis()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DDLScreen(modifier: Modifier = Modifier) {
+fun DDLScreen(
+    screenState: ScreenState,
+    modifier: Modifier = Modifier
+) {
     var activity = LocalContext.current as MainActivity
     var schedule = activity.schedule
-    val Cur: WeekDay = getWeekDay(termInfo.StartingTime, CurrentTime)
-    var list = remember { schedule.getDDl(Cur.week.toInt(), Cur.day.toInt()).toMutableStateList() }
+    var list = remember {
+        schedule.getDDl(screenState.getCurWeek().toInt(), screenState.getCurDay().toInt()).toMutableStateList()
+    }
     Scaffold(
         topBar = { DDLTopBar() },
     ) {
         Column(modifier) {
 
-            var selectedMoonTab by remember { mutableStateOf(MoonTab.Week1.GetMoon(Cur.week.toInt())) }
+            var selectedWeekTab by remember {
+                mutableStateOf(WeekTab.Week1.getWeek(screenState.getCurWeek().toInt()))
+            }
             JetLaggedHeaderTabs(
-                onTabSelected = { selectedMoonTab = it },
-                selectedTab = selectedMoonTab,
-            )
-
-            var selectedWeekTab by remember { mutableStateOf(WeekTab.Monday.GetWeek(Cur.day.toInt())) }
-            JetLaggedHeaderTabs(
-                onTabSelected = { selectedWeekTab = it },
+                screenState,
+                onTabSelected = {
+                    selectedWeekTab = it;
+                    screenState.setCurWeek(it.ordinal.toLong()) },
                 selectedTab = selectedWeekTab,
             )
 
-            list = schedule.getDDl(selectedMoonTab.ordinal, selectedWeekTab.ordinal)
+            var selectedDayTab by remember {
+                mutableStateOf(DayTab.Monday.getDay(screenState.getCurDay().toInt()))
+            }
+            JetLaggedHeaderTabs(
+                screenState,
+                onTabSelected = { selectedDayTab = it;
+                                screenState.setCurDay(it.ordinal.toLong()) },
+                selectedTab = selectedDayTab,
+            )
+
+            list = schedule.getDDl(selectedWeekTab.ordinal, selectedDayTab.ordinal)
                 .toMutableStateList()
             DeadLineList(
                 list = list,
