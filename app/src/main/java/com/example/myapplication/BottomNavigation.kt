@@ -18,7 +18,8 @@ import java.util.*
 
 class ScreenState (private val inPage: String) {
     var page by mutableStateOf(inPage)
-    var editType = "";
+    var editType = ""
+
     lateinit var myCourse: CourseTemplate
     fun goToCalendar() { page = "Calendar"}
     fun goToDeadline() { page = "Deadline"}
@@ -27,6 +28,22 @@ class ScreenState (private val inPage: String) {
         myCourse = myCourse_
         editType = editType_
     }
+
+    private lateinit var curWeekDay: WeekDay
+    private lateinit var realWeekDay: WeekDay
+
+    fun getCurWeek(): Long { return curWeekDay.week}
+    fun getCurDay(): Long { return curWeekDay.day}
+    fun setCurWeekDay(wd: WeekDay) {curWeekDay = wd}
+    fun setCurWeek(w: Long) { curWeekDay.week = w}
+    fun setCurDay(d: Long) { curWeekDay.day = d}
+
+    fun getRealWeek(): Long { return realWeekDay.week}
+    fun getRealDay(): Long { return realWeekDay.day}
+    fun setRealWeekDay(wd: WeekDay) {realWeekDay = wd}
+    fun setRealWeek(w: Long) { realWeekDay.week = w}
+    fun setRealDay(d: Long) { realWeekDay.day = d}
+
 }
 
 
@@ -41,6 +58,8 @@ fun BottomNavigation() {
         schedule.termStartTime.toLong(),
         Calendar.getInstance().timeInMillis
     )
+    currentState.setCurWeekDay(curWeekDay)
+    currentState.setRealWeekDay(curWeekDay)
 
     val items = listOf("Calendar", "Deadline", "Setting")
     val icons = listOf(
@@ -65,9 +84,7 @@ fun BottomNavigation() {
     ) {
         when(currentState.page) {
             "Calendar" -> CalendarPage(
-                currentState,
-                curWeekDay.week.toInt(),
-                curWeekDay.day.toInt()
+                currentState
             )
             "Deadline" -> DDLScreen()
             "Edit" ->  EditPage(
