@@ -87,10 +87,14 @@ private fun TopBar(screenState: ScreenState, week: WeekIdx) {
         },
         actions = {
             // RowScope here, so these icons will be placed horizontally
+
             CalendarSetting(week)
             IconButton(
                 onClick = {
-                    screenState.goToEdit()
+                    screenState.goToEdit(
+                        CourseTemplate(0, 0, 1, 0),
+                        "add"
+                    )
                 }
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Localized description")
@@ -259,9 +263,14 @@ fun DailyList(
         println(weekIndex)
         while (i <= 12) {
             var course: CourseTemplate? =
-                schedule.getTemplate(i.toLong(), dayIndex.toLong(), weekIndex.toLong())
+                schedule.getTemplate(
+                    i.toLong(),
+                    dayIndex.toLong(),
+                    weekIndex.toLong()
+                )
             var ddl: DDlInfo
             var len: Int
+            var startTime = i
             if (course == null) {
                 len = 1
                 ClassBlock(
@@ -272,7 +281,15 @@ fun DailyList(
                         TODO: your function here
                         Triggered when clicking an empty button. You should navigate to the "course add" page with necessary arguments
                      */
-                        screenState.goToEdit()
+                        screenState.goToEdit(
+                            CourseTemplate(
+                                dayIndex.toLong(),
+                                startTime.toLong(),
+                                (startTime+1).toLong(),
+                                1
+                            ),
+                            "click_null"
+                        )
                     },
                     Modifier.width(width)
                 ) { Text(text = "") }
@@ -292,7 +309,10 @@ fun DailyList(
                                 * TODO: your function here
                                 * Triggered when doubleclicking a course button. turn to edit page with course info
                                 * */
-                            screenState.goToEdit()
+                            screenState.goToEdit(
+                                course,
+                                "click_course"
+                            )
                         }
                     ),
                     Modifier.width(width),
