@@ -171,7 +171,10 @@ private fun WeekSelector(
 //                        week.showWeekSelector.value = false
                     },
                     selectedContentColor = Color.Black,
-                    unselectedContentColor = Color.LightGray
+                    unselectedContentColor = when(i.toLong() == screenState.getRealWeek()) {
+                        true -> Color.Gray
+                        false -> Color.LightGray
+                    }
                 ) {
                     Text("week$i")
                 }
