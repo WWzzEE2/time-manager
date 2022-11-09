@@ -24,7 +24,7 @@ fun BottomNavigation() {
 
     var currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
 
-    val items = listOf("Calendar", "Deadline", "C")
+    val items = listOf("Calendar", "Deadline", "Setting")
     val icons = listOf(
         Icons.Default.Home,
         Icons.Default.Notifications,
@@ -49,6 +49,7 @@ fun BottomNavigation() {
             "Calendar" -> CalendarPage(currentState)
             "Deadline" -> DDLScreen()
             "Edit" ->  EditPage(currentState)
+            "Setting" -> SettingsPage()
         }
     }
 }
