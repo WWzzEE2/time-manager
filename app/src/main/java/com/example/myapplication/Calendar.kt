@@ -1,44 +1,27 @@
 package com.example.myapplication
 
-import android.graphics.Paint.Align
-import android.widget.DatePicker
-import android.widget.TextView
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.PopupProperties
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.DDlInfo
-import com.example.myapplication.backstage.Schedule
 import com.example.myapplication.backstage.getPastMin
 import com.example.myapplication.ui.theme.*
-import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
-import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
@@ -277,9 +260,9 @@ fun DailyList(
                     Modifier.width(width)
                 ) { Text(text = "") }
             } else {
-                var coursename = course.info.Name
-                var courselocation = course.info.Location
-                len = (course.EndingTime - course.StartingTime).toInt()
+                var coursename = course.info.name
+                var courselocation = course.info.location
+                len = (course.endingTime - course.startingTime).toInt()
 
                 ClassBlock(
                     screenState,
@@ -356,10 +339,10 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
     ) {
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
-        var ddllist = schedule.getDDl(weekIndex, dayIndex)
+        var ddllist = schedule.getDDl(weekIndex.toLong(), dayIndex.toLong())
         var lastminute: Long = 0
         for (ddl in ddllist) {
-            val pastminute = getPastMin(ddl.EndingTime)
+            val pastminute = getPastMin(ddl.endingTime, schedule.termInfo)
             val parse: Int = (pastminute - lastminute).toInt()
             Column() {
                 Spacer(modifier = modifier.height(parse * 1.dp))

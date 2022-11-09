@@ -1,6 +1,5 @@
 package com.example.myapplication.backstage
 
-import com.example.myapplication.weekday
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
@@ -31,38 +30,39 @@ fun getDay(timeStamp: Long) = Calendar.getInstance().let {
     (it[Calendar.DAY_OF_WEEK]-1).toLong()
 }
 
-fun getHour(timeStamp: Long) :Long{
-    val pasthour=((timeStamp- termInfo.StartingTime)/1000/3600)%24
+fun getHour(timeStamp: Long, termInfo: TermInfo) :Long{
+    val pasthour=((timeStamp- termInfo.startingTime)/1000/3600)%24
     return pasthour
 }
 
-fun getPastMin(timeStamp: Long): Long {
+fun getPastMin(timeStamp: Long, termInfo: TermInfo): Long {
     //输入时间戳，返回位于一天中的第几分钟
-    val past_min=((timeStamp- termInfo.StartingTime)/1000/60)%(24*60)
+    val past_min=((timeStamp- termInfo.startingTime)/1000/60)%(24*60)
     return past_min
 }
 
-fun getRow(timeStamp: Long):Short{
-    //输入时间戳，返回属于哪一列
-    val past_min=getPastMin(timeStamp)
-    var column=-1
-    for(index in 1..termInfo.RowStart.size)
-        if(past_min>= termInfo.RowStart.get(index)!!&&past_min< termInfo.RowEnd.get(index)!!)
-        {
-            column=index
+/**
+ *  输入时间戳，返回属于哪一列
+ */
+fun getRow(timeStamp: Long, termInfo: TermInfo):Short{
+    var column = -1
+    val pastMin = getPastMin(timeStamp, termInfo)
+    for(index in 1..termInfo.rowStart.size) {
+        if (pastMin >= termInfo.rowStart[index] && pastMin < termInfo.rowEnd[index]) {
+            column = index
             break
         }
+    }
     return column.toShort()
 }
 
-fun getPastMin(hour: Short, min:Short):Long{
-    //输入小时和分钟，返回位于当天多少分钟
-    val past_min=(hour*60+min).toLong()
-    return past_min
-}
+/**
+ * 输入小时和分钟，返回位于当天多少分钟
+ */
+fun getPastMin(hour: Long, min: Long): Long = (hour * 60 + min)
 
 fun getTimeStamp(year: Long,month: Long,day: Long): Long {
-    var dateTime:String = ""
+    var dateTime = ""
     dateTime += year.toString()
     dateTime+=("-")
     if(month<10)

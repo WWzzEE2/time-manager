@@ -113,9 +113,9 @@ fun SelectTime(Label: String, Index: Int) {
     if (Label == "EndingTime")
         valueList.add(14)
     selectValue = when (Label) {
-        "Column" -> templateList[Index].Column
-        "StartingTime" -> templateList[Index].StartingTime
-        else -> templateList[Index].EndingTime
+        "Column" -> templateList[Index].column
+        "StartingTime" -> templateList[Index].startingTime
+        else -> templateList[Index].endingTime
     } + 1
     Box() {
         TextButton(onClick = { expanded = !expanded }) {
@@ -320,36 +320,36 @@ fun changeData(type: String, content: String) {
         operate = type
 
     when (operate) {
-        "Name" -> course.Name = content
-        "Location" -> course.Location = content
+        "Name" -> course.name = content
+        "Location" -> course.location = content
         "StartingTime" -> {
-            templateList[num].StartingTime = content.toLong() - 1
-            if (templateList[num].EndingTime <= templateList[num].StartingTime)
-                templateList[num].EndingTime = templateList[num].StartingTime + 1
+            templateList[num].startingTime = content.toLong() - 1
+            if (templateList[num].endingTime <= templateList[num].startingTime)
+                templateList[num].endingTime = templateList[num].startingTime + 1
         }
         "EndingTime" -> {
-            templateList[num].EndingTime = content.toLong() - 1
-            if (templateList[num].EndingTime <= templateList[num].StartingTime)
-                templateList[num].EndingTime = templateList[num].StartingTime + 1
+            templateList[num].endingTime = content.toLong() - 1
+            if (templateList[num].endingTime <= templateList[num].startingTime)
+                templateList[num].endingTime = templateList[num].startingTime + 1
         }
-        "Column" -> templateList[num].Column = content.toLong() - 1
+        "Column" -> templateList[num].column = content.toLong() - 1
     }
 }
 
 fun saveData(context: Context) {
-    course.TimeInfo = templateList.toMutableList()
+    course.timeInfo = templateList.toMutableList()
     val activity = context as MainActivity
     val schedule = activity.schedule
     Log.d("in addcourse","111")
     schedule.addCourse(course)
-    Log.d("course", course.Name)
-    Log.d("course", course.Location)
-    Log.d("course", course.Prompt)
-    course.TimeInfo.forEachIndexed(){index, _->
+    Log.d("course", course.name)
+    Log.d("course", course.location)
+    Log.d("course", course.prompt)
+    course.timeInfo.forEachIndexed(){ index, _->
         Log.d("index", index.toString())
-        Log.d("Column", course.TimeInfo[index].Column.toString())
-        Log.d("Start", course.TimeInfo[index].StartingTime.toString())
-        Log.d("End", course.TimeInfo[index].EndingTime.toString())
+        Log.d("Column", course.timeInfo[index].column.toString())
+        Log.d("Start", course.timeInfo[index].startingTime.toString())
+        Log.d("End", course.timeInfo[index].endingTime.toString())
     }
     templateList.clear()
     course = CourseInfo("Name", 0, 0,  emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")

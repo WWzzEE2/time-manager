@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,23 +11,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import com.example.myapplication.backstage.DDlInfo
 import com.example.myapplication.backstage.WeekDay
 import com.example.myapplication.backstage.getWeekDay
-import com.example.myapplication.backstage.termInfo
-import com.example.myapplication.ui.theme.courseBlockColor
 import com.example.myapplication.ui.theme.ddlBlockColor
-import org.xml.sax.Parser
 
 
 typealias DeadLine = DDlInfo
@@ -107,7 +96,7 @@ fun DeadLineCard(
                 .padding(all = 8.dp)
         ) {
             Text(
-                text = ddl.getString(),
+                text = ddl.getString((LocalContext.current as MainActivity).schedule.termInfo),
                 style = MaterialTheme.typography.headlineLarge,
             )
             Spacer(modifier = Modifier.width(10.dp))
@@ -117,7 +106,7 @@ fun DeadLineCard(
                 .weight(1f)
             ) {
                 Text(
-                    text = ddl.Name,
+                    text = ddl.name,
                     style = MaterialTheme.typography.titleSmall,
                 )
                 // Add a vertical space between the author and message texts
@@ -133,7 +122,7 @@ fun DeadLineCard(
                         .padding(1.dp)
                 ) {
                     Text(
-                        text = ddl.Prompt,
+                        text = ddl.prompt,
                         modifier = Modifier.padding(all = 4.dp),
                         maxLines = if (isExpanded) Int.MAX_VALUE else 1,
                         style = MaterialTheme.typography.bodyMedium
@@ -157,7 +146,7 @@ fun DeadLineList(
         item { Spacer(modifier = Modifier.height(20.dp)) }
         items(
             items = list,
-            key = { task -> task.EndingTime + 1.0 / task.Id }
+            key = { task -> task.endingTime + 1.0 / task.id }
         )
         { message ->
             DeadLineCard(
@@ -189,8 +178,8 @@ val CurrentTime = System.currentTimeMillis()
 fun DDLScreen(modifier: Modifier = Modifier) {
     var activity = LocalContext.current as MainActivity
     var schedule = activity.schedule
-    val Cur: WeekDay = getWeekDay(termInfo.StartingTime, CurrentTime)
-    var list = remember { schedule.getDDl(Cur.week.toInt(), Cur.day.toInt()).toMutableStateList() }
+    val Cur: WeekDay = getWeekDay(schedule.termInfo.startingTime, CurrentTime)
+    var list = remember { schedule.getDDl(Cur.week, Cur.day).toMutableStateList() }
     Scaffold(
         topBar = { DDLTopBar() },
     ) {
@@ -208,7 +197,7 @@ fun DDLScreen(modifier: Modifier = Modifier) {
                 selectedTab = selectedWeekTab,
             )
 
-            list = schedule.getDDl(selectedMoonTab.ordinal, selectedWeekTab.ordinal)
+            list = schedule.getDDl(selectedMoonTab.ordinal.toLong(), selectedWeekTab.ordinal.toLong())
                 .toMutableStateList()
             DeadLineList(
                 list = list,
