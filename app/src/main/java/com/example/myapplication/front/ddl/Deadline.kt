@@ -205,6 +205,7 @@ fun DDLScreen(
                 mutableStateOf(WeekTab.Week1.getWeek(screenState.getCurWeek().toInt()))
             }
             JetLaggedHeaderTabs(
+                screenState,
                 onTabSelected = {
                     selectedWeekTab = it;
                     screenState.setCurWeek(it.ordinal.toLong()) },
@@ -215,6 +216,7 @@ fun DDLScreen(
                 mutableStateOf(DayTab.Monday.getDay(screenState.getCurDay().toInt()))
             }
             JetLaggedHeaderTabs(
+                screenState,
                 onTabSelected = { selectedDayTab = it;
                                 screenState.setCurDay(it.ordinal.toLong()) },
                 selectedTab = selectedDayTab,
