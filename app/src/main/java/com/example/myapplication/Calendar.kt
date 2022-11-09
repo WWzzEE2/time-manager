@@ -40,7 +40,6 @@ import org.intellij.lang.annotations.JdkConstants.BoxLayoutAxis
 import org.intellij.lang.annotations.JdkConstants.TitledBorderTitlePosition
 
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-lateinit var curWeekDay_global: WeekDay
 
 private class WeekIdx(
     var index: MutableState<Int>,
@@ -51,27 +50,21 @@ private class WeekIdx(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarPage(
-    screenState: ScreenState,
-    weekIndex: Int = 0,
-    dayIndex: Int = 0
+    screenState: ScreenState
 ) {
-    curWeekDay_global = WeekDay(
-        weekIndex.toLong(),
-        dayIndex.toLong()
-    )
-    var week = WeekIdx(remember { mutableStateOf(weekIndex) },
+
+    var week = WeekIdx(remember { mutableStateOf(screenState.getCurWeek().toInt()) },
         remember { mutableStateOf(true) },
         remember { mutableStateOf(false) })
     Scaffold(
         topBar = { TopBar(screenState, week) },
     ) {
         Column() {
-            WeekSelector(week)
+            WeekSelector(screenState, week)
             Spacer(modifier = Modifier.height(5.dp))
             CalendarGrid(
                 screenState,
                 week.index.value,
-                dayIndex,
                 week.showDdl.value
             )
             println("regenerate")
@@ -145,7 +138,10 @@ private fun CalendarSetting(week: WeekIdx) {
 }
 
 @Composable
-private fun WeekSelector(week: WeekIdx) {
+private fun WeekSelector(
+    screenState: ScreenState,
+    week: WeekIdx
+) {
     if (week.showWeekSelector.value) {
         val maxWeek = 100;
         ScrollableTabRow(
@@ -168,8 +164,9 @@ private fun WeekSelector(week: WeekIdx) {
                         .padding(5.dp),
                     selected = i == week.index.value,
                     onClick = {
-                        week.index.value = i;
-//                        week.showWeekSelector.value = false;
+                        week.index.value = i
+                        screenState.setCurWeek(i.toLong())
+//                        week.showWeekSelector.value = false
                     },
                     selectedContentColor = Color.Black,
                     unselectedContentColor = Color.LightGray
@@ -187,7 +184,6 @@ private fun WeekSelector(week: WeekIdx) {
 fun CalendarGrid(
     screenState: ScreenState,
     weekIndex: Int,
-    dayIndex: Int,
     showDDLlist: Boolean = true
 ) {
     println(weekIndex)
@@ -200,8 +196,8 @@ fun CalendarGrid(
                 val width = 100.dp//width of each column
                 Row() {
                     for (i in 0..6) {
-                        if(i.toLong() == curWeekDay_global.day
-                            && weekIndex.toLong() == curWeekDay_global.week) {
+                        if(i.toLong() == screenState.getRealDay()
+                            && weekIndex.toLong() == screenState.getRealWeek()) {
                             SpecialCenterText(
                                 modifier = Modifier
                                     .padding(5.dp, 0.dp)
