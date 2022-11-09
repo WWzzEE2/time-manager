@@ -86,7 +86,9 @@ fun BottomNavigation() {
             "Calendar" -> CalendarPage(
                 currentState
             )
-            "Deadline" -> DDLScreen()
+            "Deadline" -> DDLScreen(
+                currentState
+            )
             "Edit" ->  EditPage(
                 currentState,
                 currentState.myCourse,
