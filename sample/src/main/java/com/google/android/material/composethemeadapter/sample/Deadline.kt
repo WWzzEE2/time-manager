@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -29,8 +30,8 @@ import com.example.myapplication.backstage.getWeekDay
 import com.example.myapplication.backstage.termInfo
 import java.util.*
 import com.google.android.material.datepicker.MaterialDatePicker
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
+import com.google.android.material.composethemeadapter.sample.R
 
 enum class WeekTab(val title: Int) {
     Monday(R.string.Monday),
@@ -158,6 +159,7 @@ fun DeadLineList(
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DDLTopBar(
     DateAction: () -> Unit
@@ -201,10 +203,11 @@ private fun showDatePicker(activity: AppCompatActivity) {
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 public fun DDLScreen(modifier: Modifier = Modifier) {
-    val activity = LocalContext.current as MainActivity
+    val activity = LocalContext.current as Material3IntegrationActivity
     val schedule = activity.schedule
     var list = remember { schedule.getDDl(Cur.week.toInt(),Cur.day.toInt()).toMutableStateList() }
     Scaffold(
