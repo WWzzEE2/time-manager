@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.em
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
 import kotlin.collections.ArrayList
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -252,7 +253,7 @@ fun changeData(type: String, content: String) {
 }
 
 fun saveData(context: Context) {
-    val activity = context as MainActivity
+    val activity = context as Material3IntegrationActivity
     val schedule = activity.schedule
     schedule.addCourse(course)
     templateList.clear()
