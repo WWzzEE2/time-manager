@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,16 +13,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.window.Dialog
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.getWeekDay
 import com.example.myapplication.backstage.termInfo
-import com.example.myapplication.ui.theme.ddlBlockColor
+import java.lang.ref.WeakReference
 
 import com.example.myapplication.front.*
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
@@ -48,6 +46,7 @@ fun EditPage(
 @Composable
 fun ChangeStat(screenState: ScreenState, myCourseTemplate: CourseTemplate, editType: String) {
     val context = LocalContext.current
+    var timeConflict by rememberSaveable { mutableStateOf(false) }
     initData(myCourseTemplate, editType, context)
     SmallTopAppBar(
         navigationIcon = {
@@ -69,13 +68,28 @@ fun ChangeStat(screenState: ScreenState, myCourseTemplate: CourseTemplate, editT
         title = { Text("Edit") },
         actions = {
             IconButton(onClick = {
-                saveData(context, editType, myCourseTemplate)
-                screenState.goToCalendar()
+                timeConflict = !saveData(context, editType, myCourseTemplate)
+                if (!timeConflict)
+                    screenState.goToCalendar()
             }) {
                 Icon(Icons.Filled.Done, contentDescription = "Save")
             }
         },
     )
+    if (timeConflict) {
+        AlertDialog(
+            onDismissRequest = {
+                timeConflict = false},
+            title = { Text(text = "Warning!") },
+            text = { Text(text = "Courses' time conflict!") },
+            confirmButton = {
+                TextButton(onClick = {
+                    timeConflict = false
+                }) {
+                    Text(text = "Ok")
+                }
+            })
+    }
 }
 
 //编辑相关信息
@@ -85,21 +99,6 @@ fun EditDetail() {
         modifier = Modifier.padding(65.dp, 10.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-//        Button(
-//            onClick = {},
-//            modifier = Modifier.padding(0.dp,0.dp),
-//            shape = RoundedCornerShape(10.dp),
-//            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background,),
-//            contentPadding = PaddingValues(0.dp),
-//            elevation = ButtonDefaults.buttonElevation(2.dp, 1.dp, 2.dp)
-//
-//        ) {
-//            Column()
-//            {
-//                EditName()
-//                EditLocation()
-//            }
-//        }
         EditName()
         EditLocation()
         EditTimeChunk()
@@ -178,6 +177,7 @@ fun SelectTime(Label: String, Index: Int) {
                     }, onClick = {
                         expanded = !expanded
                         selectValue = it
+
                         changeData(Label + "$Index", it.toString())
                     })
                 }
@@ -261,50 +261,6 @@ fun EditTimeChunk() {
         }
     }
 }
-//    val expandTimeChunk = remember {
-//        mutableStateListOf<Int>(1)
-//    }
-//    var LatestInt=2
-//    Column(
-//        modifier = Modifier
-//    ) {
-//        addTemplateToList()
-//        LazyColumn(
-//            modifier = Modifier.heightIn(0.dp,380.dp)
-//        ) {
-//            items(expandTimeChunk){i->
-//             EditColumn(i)
-//             EditStartingTime(i)
-//             EditEndingTime(i)
-//            Log.d("timechunkid", i.toString())
-//            IconButton(
-//                    onClick = {
-//                        if (expandTimeChunk.size > 1) {
-//                            removeTemplateFromList(expandTimeChunk.indexOf(i))
-//                            expandTimeChunk.remove(i)
-//                            LatestInt-=1
-//                        }
-//                    },
-//            ) {
-//                Icon(Icons.Filled.Delete, contentDescription ="DeleteTimeChunk")
-//            }
-//
-//            Spacer(modifier = Modifier.height(10.dp))
-//            Divider()
-//            Spacer(modifier = Modifier.height(10.dp))
-//            }
-//        }
-//        IconButton(
-//            onClick = {
-//                if (expandTimeChunk.size < 10) {
-//                expandTimeChunk.add(LatestInt)
-//                LatestInt+=1
-//                addTemplateToList() } },
-//        ) {
-//            Icon(Icons.Outlined.Add, contentDescription ="AddTimeChunk")
-//        }
-//
-//   }
 
 //编辑上课是一周中的哪一天
 @Composable
@@ -368,12 +324,11 @@ fun initData(myCourseTemplate: CourseTemplate, editType: String, context: Contex
     if (editType == "click_null")
         addTemplateToList(myCourseTemplate)
     else if (editType == "click_course") {
-        course = myCourseTemplate.info
-        templateList = course.TimeInfo.toMutableStateList()
+        course = myCourseTemplate.info.copy()
+        templateList = course.TimeInfo.map { it.copy() }.toMutableStateList()
     } else
-        addTemplateToList()
-
-
+        if (templateList.isEmpty())
+            addTemplateToList()
 }
 
 
@@ -415,18 +370,10 @@ fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplat
         it.info = course
     }
     course.TimeInfo = templateList.toMutableList()
-//    Log.d("courseinfo", course.Name)
-//    Log.d("courseinfo", course.Location)
-//    Log.d("courseinfo", course.StartingTime.toString())
-//    Log.d("courseinfo", course.EndingTime.toString())
-//    course.TimeInfo.forEachIndexed(){index, _->
-//        Log.d("course", index.toString())
-//        Log.d("course", course.TimeInfo[index].Column.toString())
-//        Log.d("course", course.TimeInfo[index].StartingTime.toString())
-//        Log.d("course", course.TimeInfo[index].EndingTime.toString())
-//    }
-    if (!schedule.addCourse(course))
+    if (!schedule.addCourse(course)) {
+        schedule.addCourse(myCourseTemplate.info)
         return false
+    }
     templateList.clear()
     course =
         CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")

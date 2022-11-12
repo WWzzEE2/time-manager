@@ -37,7 +37,7 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
      */
     fun removeTemplate(template: CourseTemplate) {
         this[template.StartingTime]?.remove(template)
-        template.info.TimeInfo.remove(template)
+        //template.info.TimeInfo.remove(template)
     }
 
     /**
