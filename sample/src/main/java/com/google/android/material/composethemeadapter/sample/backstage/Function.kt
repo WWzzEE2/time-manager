@@ -60,10 +60,10 @@ fun getPastMin(hour: Short, min:Short):Long{
     return past_min
 }
 
-fun getTimeStamp(year: Long,month: Long,day: Long): Long {
+fun getTimeStamp(year: Long, month: Long, day: Long): Long {
     var dateTime:String = ""
     dateTime += year.toString()
-    dateTime+=("-")
+    dateTime += ("-")
     if(month<10)
         dateTime+=("0")
     dateTime+=(month.toString())

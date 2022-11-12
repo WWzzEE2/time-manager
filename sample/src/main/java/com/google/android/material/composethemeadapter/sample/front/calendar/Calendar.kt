@@ -42,8 +42,7 @@ fun CalendarPage(
         remember { mutableStateOf(false) })
     Scaffold(
         topBar = { TopBar(screenState, week) },
-    ) {
-        padding->
+    ) { padding->
         Column(modifier = Modifier.padding(padding)) {
             WeekSelector(screenState, week)
             Spacer(modifier = Modifier.height(5.dp))
@@ -476,3 +475,6 @@ fun previewclassblock() {
         modifier = Modifier.width(100.dp)
     ) { Text(text = "114514") }
 }
+
+
+
