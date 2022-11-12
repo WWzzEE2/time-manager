@@ -20,6 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import com.example.myapplication.backstage.CourseTemplate
 import com.example.myapplication.backstage.DDlInfo
+import com.example.myapplication.front.ScreenState
+import com.example.myapplication.ui.theme.Red_T
+import com.example.myapplication.ui.theme.courseBlockColor
 import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
 
 val weekday = arrayListOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
@@ -37,8 +40,8 @@ fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
     var week = WeekIdx(remember { mutableStateOf(weekIndex) }, remember { mutableStateOf(true) },remember { mutableStateOf(false)})
     Scaffold(
         topBar = { TopBar(screenState, week) },
-    ) {
-        Column() {
+    ) {padding ->
+        Column(Modifier.padding(padding)){
             WeekSelector(week)
             Spacer(modifier = Modifier.height(5.dp))
             CalendarGrid(screenState, week.index.value, week.showDdl.value)
@@ -50,7 +53,7 @@ fun CalendarPage(screenState: ScreenState, weekIndex: Int = 0) {
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(screenState: ScreenState, week: WeekIdx) {
-    SmallTopAppBar(
+    TopAppBar(
         title = {
             //WeekSelector()
             Row(verticalAlignment = Alignment.CenterVertically) {

@@ -28,12 +28,13 @@ import com.example.myapplication.backstage.DDlInfo
 import com.example.myapplication.backstage.WeekDay
 import com.example.myapplication.backstage.getWeekDay
 import com.example.myapplication.backstage.termInfo
+import com.example.myapplication.front.ScreenState
 import java.util.*
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
 import com.google.android.material.composethemeadapter.sample.R
 
-enum class WeekTab(val title: Int) {
+enum class DayTab(val title: Int) {
     Monday(R.string.Monday),
     Tuesday(R.string.Tuesday),
     Wednesday(R.string.Wednesday),
@@ -41,7 +42,7 @@ enum class WeekTab(val title: Int) {
     Friday(R.string.Friday),
     Saturday(R.string.Saturday),
     Sunday(R.string.Sunday);
-    fun GetWeek(Day:Int):WeekTab=
+    fun GetWeek(Day:Int):DayTab=
         when (Day){
             0->  Monday
             1->  Tuesday
@@ -55,9 +56,9 @@ enum class WeekTab(val title: Int) {
 
 }
 
-enum class MoonTab {
+enum class WeekTab {
     Week1,Week2,Week3,Week4,Week5,Week6,Week7,Week8,Week9,Week10,Week11,Week12,Week13,Week14,Week15,Week16,Week17;
-    fun GetMoon(Week:Int):MoonTab=
+    fun GetMoon(Week:Int):WeekTab=
         when (Week){
             1-> Week1
             2-> Week2
@@ -141,6 +142,7 @@ fun DeadLineCard(
 @Composable
 fun DeadLineList(
     list: List<DeadLine>,
+
     onCloseTask: (DeadLine) -> Unit,
 ) {
     LazyColumn {
@@ -165,7 +167,7 @@ fun DDLTopBar(
     DateAction: () -> Unit
 )
 {
-    SmallTopAppBar(
+    TopAppBar(
         title = { Text("DDL时间表") },
         actions = {
             // RowScope here, so these icons will be placed horizontally
@@ -188,7 +190,8 @@ fun getDefaultDateInMillis(): Long {
     return cal.timeInMillis
 }
 
-private fun showDatePicker(activity: AppCompatActivity) {
+private fun showDatePicker(
+    activity: AppCompatActivity) {
     val date = getDefaultDateInMillis()
     val picker = MaterialDatePicker.Builder.datePicker()
         .setSelection(date)
@@ -203,38 +206,64 @@ private fun showDatePicker(activity: AppCompatActivity) {
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-public fun DDLScreen(modifier: Modifier = Modifier) {
+public fun DDLScreen(
+    screenState: ScreenState,
+    modifier: Modifier = Modifier
+) {
     val activity = LocalContext.current as Material3IntegrationActivity
     val schedule = activity.schedule
-    var list = remember { schedule.getDDl(Cur.week.toInt(),Cur.day.toInt()).toMutableStateList() }
+    var list: MutableList<DDlInfo>
+    var selectedWeekTab by remember { mutableStateOf(WeekTab.Week1.GetMoon(Cur.week.toInt())) }
+    var selectedDayTab by remember { mutableStateOf(DayTab.Monday.GetWeek(Cur.day.toInt())) }
     Scaffold(
         topBar = {
             DDLTopBar(
-                DateAction ={showDatePicker(activity)}
+                DateAction ={
+                        val date = getDefaultDateInMillis()
+                        val picker = MaterialDatePicker.Builder.datePicker()
+                            .setSelection(date)
+                            .build()
+                        activity.let {
+                            picker.show(it.supportFragmentManager, picker.toString())
+                            picker.addOnPositiveButtonClickListener {
+                                picker.selection?.let { selectedDate ->
+                                    Cur= getWeekDay(termInfo.StartingTime,selectedDate)
+                                    selectedWeekTab=WeekTab.Week1.GetMoon(Cur.week.toInt())
+                                    selectedDayTab=DayTab.Monday.GetWeek(Cur.day.toInt())
+                                }
+                            }
+                        }
+                }
             )
         },
-    ){
-        Column(modifier) {
+    ){  padding ->
+        Column(modifier.padding(padding)) {
 
-            var selectedMoonTab by remember { mutableStateOf(MoonTab.Week1.GetMoon(Cur.week.toInt())) }
-            JetLaggedHeaderTabs(
-                onTabSelected = { selectedMoonTab = it },
-                selectedTab = selectedMoonTab,
-            )
 
-            var selectedWeekTab by remember { mutableStateOf(WeekTab.Monday.GetWeek(Cur.day.toInt())) }
             JetLaggedHeaderTabs(
-                onTabSelected = { selectedWeekTab = it },
+                screenState,
+                onTabSelected = {
+                    selectedWeekTab = it;
+                    screenState.setCurWeek(it.ordinal.toLong()) },
                 selectedTab = selectedWeekTab,
             )
 
-            list=schedule.getDDl(selectedMoonTab.ordinal,selectedWeekTab.ordinal).toMutableStateList()
+
+            JetLaggedHeaderTabs(
+                screenState,
+                onTabSelected = { selectedDayTab = it;
+                    screenState.setCurDay(it.ordinal.toLong()) },
+                selectedTab = selectedDayTab,
+            )
+
+            list = schedule.getDDl(selectedWeekTab.ordinal, selectedDayTab.ordinal)
+                .toMutableStateList()
             DeadLineList(
-                list=list,
-                onCloseTask={ task -> list.remove(task);schedule.removeDDl(task) }
+                list = list,
+                onCloseTask = { task -> list.remove(task) }
             )
             Spacer(Modifier.height(16.dp))
         }

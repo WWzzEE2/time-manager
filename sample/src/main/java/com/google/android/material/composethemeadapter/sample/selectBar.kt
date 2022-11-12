@@ -4,28 +4,64 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabPosition
+import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.myapplication.ui.theme.SmallHeadingStyle
+import com.example.myapplication.ui.theme.White
+import com.example.myapplication.ui.theme.Yellow
 
+import com.example.myapplication.front.*
 
 @Composable
-fun  JetLaggedHeaderTabs(
+fun JetLaggedHeaderTabs(
+    screenState: ScreenState,
+    onTabSelected: (DayTab) -> Unit,
+    selectedTab: DayTab,
+    modifier: Modifier = Modifier,
+) {
+    ScrollableTabRow(
+        modifier = modifier,
+        edgePadding = 12.dp,
+        selectedTabIndex = selectedTab.ordinal,
+        indicator = { tabPositions: List<TabPosition> ->
+            TabRowDefaults.Indicator(
+                Modifier
+                    .tabIndicatorOffset(
+                        tabPositions[selectedTab.ordinal]
+                    )
+                    .height(2.dp),
+                color = Color.Gray
+            )
+        },
+    ) {
+        DayTab.values().forEachIndexed { index, dayTab ->
+            val selected = index == selectedTab.ordinal
+            DDLTabText(
+                dayTab = dayTab,
+                selected = selected,
+                onTabSelected = onTabSelected,
+                index = index,
+                unSelectedColor = when(index.toLong() == screenState.getRealDay()) {
+                    true -> Color.Gray
+                    false -> Color.LightGray
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun JetLaggedHeaderTabs(
+    screenState: ScreenState,
     onTabSelected: (WeekTab) -> Unit,
     selectedTab: WeekTab,
     modifier: Modifier = Modifier,
@@ -34,17 +70,17 @@ fun  JetLaggedHeaderTabs(
         modifier = modifier,
         edgePadding = 12.dp,
         selectedTabIndex = selectedTab.ordinal,
-        containerColor = White,
         indicator = { tabPositions: List<TabPosition> ->
-            Box(
+            TabRowDefaults.Indicator(
                 Modifier
-                    .tabIndicatorOffset(tabPositions[selectedTab.ordinal])
-                    .fillMaxSize()
-                    .padding(horizontal = 2.dp)
-                    //.border(BorderStroke(2.dp, Yellow), RoundedCornerShape(10.dp))
+                    .tabIndicatorOffset(
+                        tabPositions[selectedTab.ordinal]
+                    )
+                    .height(2.dp),
+                color = Color.Gray
             )
         },
-        divider = { }
+        divider = {}
     ) {
         WeekTab.values().forEachIndexed { index, weekTab ->
             val selected = index == selectedTab.ordinal
@@ -52,74 +88,41 @@ fun  JetLaggedHeaderTabs(
                 weekTab = weekTab,
                 selected = selected,
                 onTabSelected = onTabSelected,
-                index = index
+                index = index,
+                unSelectedColor = when(index.toLong() == screenState.getRealWeek()) {
+                    true -> Color.Gray
+                    false -> Color.LightGray
+                }
             )
         }
     }
 }
 
-@Composable
-fun  JetLaggedHeaderTabs(
-    onTabSelected: (MoonTab) -> Unit,
-    selectedTab: MoonTab,
-    modifier: Modifier = Modifier,
-) {
-    ScrollableTabRow(
-        modifier = modifier,
-        edgePadding = 12.dp,
-        selectedTabIndex = selectedTab.ordinal,
-        containerColor = White,
-        indicator = { tabPositions: List<TabPosition> ->
-            Box(
-                Modifier
-                    .tabIndicatorOffset(tabPositions[selectedTab.ordinal])
-                    .fillMaxSize()
-                    .padding(horizontal = 2.dp)
-                    .border(BorderStroke(2.dp, Yellow), RoundedCornerShape(10.dp))
-            )
-        },
-        divider = { }
-    ) {
-        MoonTab.values().forEachIndexed { index, weekTab ->
-            val selected = index == selectedTab.ordinal
-            DDLTabText(
-                weekTab = weekTab,
-                selected = selected,
-                onTabSelected = onTabSelected,
-                index = index
-            )
-        }
-    }
-}
-
-val SmallHeadingStyle = TextStyle(
-    fontSize = 16.sp,
-    fontWeight = FontWeight(600),
-    letterSpacing = 0.5.sp,
-)
 private val textModifier = Modifier
     .padding(vertical = 6.dp, horizontal = 4.dp)
+
 @Composable
 private fun DDLTabText(
-    weekTab: WeekTab,
+    dayTab: DayTab,
     selected: Boolean,
     index: Int,
-    onTabSelected: (WeekTab) -> Unit,
+    unSelectedColor: Color,
+    onTabSelected: (DayTab) -> Unit,
 ) {
     Tab(
         modifier = Modifier
             .padding(horizontal = 2.dp)
             .clip(RoundedCornerShape(16.dp)),
         selected = selected,
-        unselectedContentColor = Color.Black,
+        unselectedContentColor = unSelectedColor,
         selectedContentColor = Color.Black,
         onClick = {
-            onTabSelected(WeekTab.values()[index])
+            onTabSelected(DayTab.values()[index])
         }
     ) {
         Text(
             modifier = textModifier,
-            text = stringResource(id = weekTab.title),
+            text = stringResource(id = dayTab.title),
             style = SmallHeadingStyle
         )
     }
@@ -127,20 +130,21 @@ private fun DDLTabText(
 
 @Composable
 private fun DDLTabText(
-    weekTab: MoonTab,
+    weekTab: WeekTab,
     selected: Boolean,
     index: Int,
-    onTabSelected: (MoonTab) -> Unit,
+    unSelectedColor: Color,
+    onTabSelected: (WeekTab) -> Unit,
 ) {
     Tab(
         modifier = Modifier
             .padding(horizontal = 2.dp)
             .clip(RoundedCornerShape(16.dp)),
         selected = selected,
-        unselectedContentColor = Color.Black,
+        unselectedContentColor = unSelectedColor,
         selectedContentColor = Color.Black,
         onClick = {
-            onTabSelected(MoonTab.values()[index])
+            onTabSelected(WeekTab.values()[index])
         }
     ) {
         Text(
