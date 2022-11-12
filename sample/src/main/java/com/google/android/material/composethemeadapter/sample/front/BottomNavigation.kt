@@ -1,7 +1,6 @@
 package com.example.myapplication.front
 
 import android.annotation.SuppressLint
-import android.icu.text.MessageFormat.format
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
@@ -11,13 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.*
-import com.example.myapplication.*
+import com.example.myapplication.DDLScreen
+import com.example.myapplication.EditPage
+import com.example.myapplication.SettingsPage
 import com.example.myapplication.backstage.*
 import com.example.myapplication.front.calendar.CalendarPage
 import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
-import java.lang.String.format
-import java.text.MessageFormat.format
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ScreenState (private val inPage: String) {
@@ -95,8 +93,11 @@ fun BottomNavigation() {
                 currentState
             )
             "Edit" ->  EditPage(
-                currentState
+                currentState,
+                currentState.myCourse,
+                currentState.editType
             )
+            "Setting" -> SettingsPage()
         }
     }
 }
