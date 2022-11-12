@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.*
 import com.example.myapplication.*
 import com.example.myapplication.backstage.*
+import com.example.myapplication.front.calendar.CalendarPage
 import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
 import java.lang.String.format
 import java.text.MessageFormat.format
