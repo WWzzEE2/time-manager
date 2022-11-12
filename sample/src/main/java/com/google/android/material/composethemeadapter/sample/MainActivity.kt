@@ -46,8 +46,7 @@ class MainActivity : ListActivity() {
             arrayOf("title"),
             intArrayOf(android.R.id.text1)
         )
-
-        listView.isTextFilterEnabled = true
+        //listView.isTextFilterEnabled = true
     }
 
     private fun getData(prefix: String?): List<Map<String, Any>> {

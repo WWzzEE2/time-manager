@@ -25,16 +25,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.myapplication.backstage.CourseInfo
 import com.example.myapplication.backstage.CourseTemplate
-import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.example.myapplication.front.ScreenState
 import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
 import kotlin.collections.ArrayList
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditPage(screenState:ScreenState){
-    Scaffold(topBar = {ChangeStat(screenState)}) {
-        EditDetail()
+fun EditPage(screenState: ScreenState){
+    Scaffold(topBar = {ChangeStat(screenState)})
+    {padding ->
+        EditDetail(Modifier.padding(padding))
     }
 }
 
@@ -42,7 +43,7 @@ fun EditPage(screenState:ScreenState){
 @Composable
 fun ChangeStat(screenState:ScreenState){
     val context = LocalContext.current
-    SmallTopAppBar(
+    TopAppBar(
         navigationIcon = {
             IconButton(onClick = { screenState.goToCalendar() }) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -61,15 +62,16 @@ fun ChangeStat(screenState:ScreenState){
 }
 
 @Composable
-fun EditDetail(){
+fun EditDetail(
+    modifier: Modifier = Modifier
+){
     Column(
-        modifier = Modifier.padding(65.dp, 10.dp),
+        modifier = modifier.padding(65.dp, 10.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         EditName()
         EditLocation()
         EditTimeChunk()
-
     }
 }
 

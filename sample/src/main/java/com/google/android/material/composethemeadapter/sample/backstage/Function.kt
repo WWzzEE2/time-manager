@@ -14,8 +14,8 @@ internal fun crossover(s1: Int, e1: Int, s2: Int, e2: Int) = max(s1, s2) < min(e
 internal fun crossover(s1: Long, e1: Long, s2: Long, e2: Long) = max(s1, s2) < min(e1, e2)
 
 data class WeekDay (
-    val week: Long,
-    val day:Long
+    var week: Long,
+    var day:Long
 )
 
 internal fun getWeekDay(termStart: Long, timeStamp: Long) : WeekDay {
