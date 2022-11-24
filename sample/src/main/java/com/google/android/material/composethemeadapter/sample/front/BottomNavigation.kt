@@ -15,7 +15,7 @@ import com.example.myapplication.EditPage
 import com.example.myapplication.SettingsPage
 import com.example.myapplication.backstage.*
 import com.example.myapplication.front.calendar.CalendarPage
-import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
+import com.google.android.material.composethemeadapter.sample.MainActivity
 import java.util.*
 
 class ScreenState (private val inPage: String) {
@@ -55,7 +55,7 @@ class ScreenState (private val inPage: String) {
 fun BottomNavigation() {
 
     var currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
-    var activity = LocalContext.current as Material3IntegrationActivity
+    var activity = LocalContext.current as MainActivity
     var schedule = activity.schedule
     var curWeekDay = getWeekDay(
         schedule.termStartTime.toLong(),
