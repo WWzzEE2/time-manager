@@ -27,7 +27,7 @@ import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.composethemeadapter3.Mdc3Theme
 
-class Material3IntegrationActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

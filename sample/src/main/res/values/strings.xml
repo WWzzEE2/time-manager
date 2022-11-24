@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name">Compose Theme Adapter Sample</string>
+    <string name="app_name">Time_Manager</string>
     <string name="material_integration">Material integration sample</string>
     <string name="material_3_integration">Material 3 integration sample</string>
     <string name="Monday">Monday</string>
@@ -25,4 +25,5 @@
     <string name="Friday">Friday</string>
     <string name="Saturday">Saturday</string>
     <string name="Sunday">Sunday</string>
+    <string name="empty_view_text">This is the empty view</string>
 </resources>

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.*
 import com.example.myapplication.backstage.*
 import com.example.myapplication.front.*
 import com.example.myapplication.ui.theme.*
-import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
+import com.google.android.material.composethemeadapter.sample.MainActivity
 
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
@@ -272,7 +272,7 @@ fun DailyList(
 
         // get class info
         var i: Short = 0
-        var activity = LocalContext.current as Material3IntegrationActivity
+        var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
 
         //render classBlock
@@ -408,7 +408,7 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
     Box(
         modifier = modifier,
     ) {
-        var activity = LocalContext.current as Material3IntegrationActivity
+        var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
         var ddllist = schedule.getDDl(weekIndex, dayIndex)
         var lastminute: Long = 0

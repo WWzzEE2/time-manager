@@ -24,7 +24,7 @@ import com.example.myapplication.backstage.termInfo
 import java.lang.ref.WeakReference
 
 import com.example.myapplication.front.*
-import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
+import com.google.android.material.composethemeadapter.sample.MainActivity
 
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
 private var templateList = mutableStateListOf<CourseTemplate>()
@@ -321,7 +321,7 @@ fun EditEndingTime(Number: Int = 0) {
 }
 
 fun initData(myCourseTemplate: CourseTemplate, editType: String, context: Context) {
-    val activity = context as Material3IntegrationActivity
+    val activity = context as MainActivity
     val schedule = activity.schedule
     if (editType != "click_course") {
         course.StartingTime = schedule.termStartTime
@@ -368,7 +368,7 @@ fun changeData(type: String, content: String) {
 
 //保存信息
 fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplate): Boolean {
-    val activity = context as Material3IntegrationActivity
+    val activity = context as MainActivity
     val schedule = activity.schedule
     if (editType == "click_course")
         schedule.removeCourse(myCourseTemplate.info)

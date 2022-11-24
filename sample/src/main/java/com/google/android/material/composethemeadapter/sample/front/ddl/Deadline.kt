@@ -33,7 +33,7 @@ import com.example.myapplication.ui.theme.ddlBlockColor
 import org.xml.sax.Parser
 
 import com.example.myapplication.front.*
-import com.google.android.material.composethemeadapter.sample.Material3IntegrationActivity
+import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.R
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.*
@@ -199,33 +199,6 @@ fun DDLTopBar(
         })
 }
 
-fun getDefaultDateInMillis(): Long {
-    val cal = Calendar.getInstance()
-    val year = cal.get(Calendar.YEAR)
-    val month = cal.get(Calendar.MONTH)
-    val date = cal.get(Calendar.DATE)
-    cal.clear()
-    cal.set(year, month, date)
-    return cal.timeInMillis
-}
-
-private fun showDatePicker(
-    activity: AppCompatActivity
-) {
-    val date = getDefaultDateInMillis()
-    val picker = MaterialDatePicker.Builder.datePicker()
-        .setSelection(date)
-        .build()
-    activity.let {
-        picker.show(it.supportFragmentManager, picker.toString())
-        picker.addOnPositiveButtonClickListener {
-            picker.selection?.let { selectedDate ->
-                Cur= getWeekDay(termInfo.StartingTime,selectedDate)
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -233,7 +206,7 @@ public fun DDLScreen(
     screenState: ScreenState,
     modifier: Modifier = Modifier
 ) {
-    val activity = LocalContext.current as Material3IntegrationActivity
+    val activity = LocalContext.current as MainActivity
     val schedule = activity.schedule
     var list: MutableList<DDlInfo>
     Cur.week= screenState.getCurWeek()
@@ -244,7 +217,7 @@ public fun DDLScreen(
         topBar = {
             DDLTopBar(
                 DateAction ={
-                    val date = getDefaultDateInMillis()
+                    val date = CurrentTime
                     val picker = MaterialDatePicker.Builder.datePicker()
                         .setSelection(date)
                         .build()
