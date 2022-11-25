@@ -410,7 +410,7 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
     ) {
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
-        var ddllist = schedule.getDDl(weekIndex, dayIndex)
+        var ddllist = schedule.getDDlFromRelativeTime(weekIndex, dayIndex)
         var lastminute: Long = 0
         for (ddl in ddllist) {
             val pastminute = getPastMin(ddl.EndingTime)
