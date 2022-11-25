@@ -2,6 +2,7 @@ package com.example.myapplication.backstage
 
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.interaction.DragInteraction
 import java.util.*
 import kotlin.collections.HashSet
@@ -280,7 +281,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     /**
      * Get all ddl in given day (day and week start from 0)
      */
-    fun getDDl(week: Int, day: Int):  List<DDlInfo> = (termStartTime + 1L * (week * 7 + day) * 24 * 3600 * 1000).let {
+    fun getDDlFromRelativeTime(week: Int, day: Int):  List<DDlInfo> = (termStartTime + 1L * (week * 7 + day) * 24 * 3600 * 1000).let {
         return getDDl(it, it + 24 * 3600 * 1000)
     }
 

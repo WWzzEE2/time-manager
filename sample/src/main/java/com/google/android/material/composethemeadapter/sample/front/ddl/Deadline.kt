@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -254,7 +255,7 @@ public fun DDLScreen(
                 selectedTab = selectedDayTab,
             )
 
-            list = schedule.getDDl(selectedWeekTab.ordinal, selectedDayTab.ordinal)
+            list = schedule.getDDlFromRelativeTime(selectedWeekTab.ordinal, selectedDayTab.ordinal)
                 .toMutableStateList()
             DeadLineList(
                 list = list,

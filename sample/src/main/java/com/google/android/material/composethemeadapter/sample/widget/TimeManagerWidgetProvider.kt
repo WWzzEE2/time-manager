@@ -8,6 +8,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import android.widget.Toast
@@ -30,6 +31,14 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
             pendingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(pendingIntent)
         }
+        else if(intent.action == BUTTON_ACTION){
+            val appWidgetId: Int = intent.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID
+            )
+            //Do whatever you want
+        }
+
         super.onReceive(context, intent)
     }
 
@@ -44,9 +53,9 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                 data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
             }
+
             val rv = RemoteViews(context.packageName, R.layout.widget_layout).apply {
                 setRemoteAdapter(R.id.stack_view, intent)
-
                 setEmptyView(R.id.stack_view, R.id.empty_view)
             }
 
@@ -60,7 +69,20 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
 
                 PendingIntent.getBroadcast(context, 0, this, PendingIntent.FLAG_UPDATE_CURRENT)
             }
+
+            val buttonPendingIntent: PendingIntent = Intent(
+                context,
+                TimeManagerWidgetProvider::class.java
+            ).run {
+                action = BUTTON_ACTION
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+
+                PendingIntent.getBroadcast(context, 0, this, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+
             rv.setPendingIntentTemplate(R.id.stack_view, toastPendingIntent)
+            rv.setOnClickPendingIntent(R.id.button, buttonPendingIntent)
 
             appWidgetManager.updateAppWidget(appWidgetId, rv)
         }

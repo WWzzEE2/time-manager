@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val contentView = ComposeView(this)
         setContentView(contentView)
 
-        var config = TestDataConfig(20,1,5,12)
+        var config = TestDataConfig(20,1000,20,12)
 
         schedule = Schedule(this, config)
         contentView.setContent {
