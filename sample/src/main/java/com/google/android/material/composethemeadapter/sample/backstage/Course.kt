@@ -53,11 +53,11 @@ data class DDlInfo(
 }
 
 data class CourseTemplate(              //模板，对应以周为单位的日历上的一块\
-    var Column: Long,                  //课程位于哪一列
-    var StartingTime : Long,           //课程开始于哪一行
-    var EndingTime : Long,             //课程结束于哪一行
+    var Column: Long,                   //课程位于哪一列
+    var StartingTime : Long,            //课程开始于哪一行
+    var EndingTime : Long,              //课程结束于哪一行
     var Period: Long                    //一周一次或两周一次(应该不存在三天一次的课吧，
-    // 一周两次的话就建立两个template)
+                                        // 一周两次的话就建立两个template)
 ) {
     lateinit var info: CourseInfo
 }
