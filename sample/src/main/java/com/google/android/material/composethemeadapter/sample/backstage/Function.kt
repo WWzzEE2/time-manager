@@ -35,14 +35,18 @@ fun getHour(timeStamp: Long) :Long{
     return pasthour
 }
 
+/**
+ * 输入时间戳，返回位于一天中的第几分钟
+ */
 fun getPastMin(timeStamp: Long): Long {
-    //输入时间戳，返回位于一天中的第几分钟
     val past_min=((timeStamp- termInfo.StartingTime)/1000/60)%(24*60)
     return past_min
 }
 
+/**
+ * 输入时间戳，返回属于哪一列
+ */
 fun getRow(timeStamp: Long):Short{
-    //输入时间戳，返回属于哪一列
     val past_min=getPastMin(timeStamp)
     var column=-1
     for(index in 1..termInfo.RowStart.size)
@@ -54,8 +58,10 @@ fun getRow(timeStamp: Long):Short{
     return column.toShort()
 }
 
+/**
+ * 输入小时和分钟，返回位于当天多少分钟
+ */
 fun getPastMin(hour: Short, min:Short):Long{
-    //输入小时和分钟，返回位于当天多少分钟
     val past_min=(hour*60+min).toLong()
     return past_min
 }
