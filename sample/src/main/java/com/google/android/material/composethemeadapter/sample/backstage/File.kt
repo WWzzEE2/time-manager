@@ -14,6 +14,8 @@ internal fun save(schedule: Schedule, context: Context) {
 
 internal fun load(schedule: Schedule, context: Context)  {
 
+    schedule.clear()
+
     val mapper = jacksonObjectMapper()
 
     loadJson(context.openFileInput("ddl.json"))?.let {
