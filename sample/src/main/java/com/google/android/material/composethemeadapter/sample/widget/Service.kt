@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.compose.runtime.toMutableStateList
@@ -22,6 +23,7 @@ const val EXTRA_ITEM = "com.example.android.stackwidget.EXTRA_ITEM"
 class StackWidgetService : RemoteViewsService() {
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
+        Log.d("ddllist", "222")
         return StackRemoteViewsFactory(this.applicationContext, intent)
     }
 }
@@ -39,15 +41,16 @@ class StackRemoteViewsFactory(
     )
 
     override fun onCreate() {
-
-        val config = TestDataConfig(20,1000,20,12)
+        Log.d("ddllist", "111")
+        val config = TestDataConfig(20, 1000, 20, 12)
         val schedule = Schedule(context, config)
         val curWeekDay = getWeekDay(
             schedule.termStartTime,
             Calendar.getInstance().timeInMillis
         )
-        list= schedule.getDDlFromRelativeTime(curWeekDay.week.toInt(),curWeekDay.day.toInt()).toMutableStateList()
-
+        list = schedule.getDDlFromRelativeTime(curWeekDay.week.toInt(), curWeekDay.day.toInt())
+            .toMutableStateList()
+        Log.d("ddllist", list.size.toString())
     }
 
     override fun onDataSetChanged() {
@@ -62,7 +65,8 @@ class StackRemoteViewsFactory(
 
     override fun getViewAt(position: Int): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_item).apply {
-            setTextViewText(R.id.widget_item, list[position].getString())
+            setTextViewText(R.id.timeView, list[position].getString())
+            setTextViewText(R.id.infoView, list[position].Name)
             val fillInIntent = Intent().apply {
                 Bundle().also { extras ->
                     extras.putInt(EXTRA_ITEM, position)
@@ -73,11 +77,11 @@ class StackRemoteViewsFactory(
         }
     }
 
-    override fun getLoadingView(): RemoteViews?=null
+    override fun getLoadingView(): RemoteViews? = null
 
 
     override fun getViewTypeCount(): Int {
-       return 1
+        return 1
     }
 
     override fun getItemId(position: Int): Long {

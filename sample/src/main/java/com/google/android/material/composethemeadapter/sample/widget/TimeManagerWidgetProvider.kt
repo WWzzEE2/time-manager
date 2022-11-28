@@ -48,6 +48,7 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        Log.d("ddllist","111")
         appWidgetIds.forEach { appWidgetId ->
             val intent = Intent(context, StackWidgetService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
