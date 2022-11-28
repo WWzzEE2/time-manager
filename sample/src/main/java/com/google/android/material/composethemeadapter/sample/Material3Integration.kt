@@ -13,7 +13,6 @@
  * limitations under the License.*/
 
 
-
 package com.google.android.material.composethemeadapter.sample
 
 import android.os.Bundle
@@ -23,17 +22,26 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import com.example.myapplication.backstage.Import
-import com.example.myapplication.backstage.Schedule
-import com.example.myapplication.backstage.TestDataConfig
-import com.example.myapplication.backstage.load
+import com.google.android.material.composethemeadapter.sample.backstage.Schedule
+import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
+import com.google.android.material.composethemeadapter.sample.backstage.load
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
+
+    object GlobalInformation {
+        @JvmStatic
+        lateinit var activity: MainActivity
+            internal set
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        GlobalInformation.activity = this
 
         DynamicColors.applyToActivityIfAvailable(this)
 
@@ -48,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 Greeting()
             }
         }
-        load(schedule,this)
+
         var test = Import()
         val testdata = """
             学生网上选课 >> 查看选课结果： 【信息科学技术学院 陈萧白】

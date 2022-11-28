@@ -10,13 +10,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.*
-import com.example.myapplication.DDLScreen
+import com.google.android.material.composethemeadapter.sample.front.ddl.DDLScreen
 import com.example.myapplication.EditPage
 import com.example.myapplication.SettingsPage
 import com.example.myapplication.backstage.*
 import com.example.myapplication.front.calendar.CalendarPage
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
+import com.google.android.material.composethemeadapter.sample.backstage.WeekDay
+import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
 import java.util.*
 
 class ScreenState (inPage: String) {
@@ -60,7 +62,7 @@ fun BottomNavigation() {
     val activity = LocalContext.current as MainActivity
     val schedule = activity.schedule
     val curWeekDay = getWeekDay(
-        schedule.termStartTime,
+        schedule.termInfo.startingTime,
         Calendar.getInstance().timeInMillis
     )
     currentState.setCurWeekDay(curWeekDay.copy())
