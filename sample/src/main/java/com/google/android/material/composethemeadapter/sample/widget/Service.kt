@@ -1,22 +1,16 @@
 package com.google.android.material.composethemeadapter.sample.widget
 
-import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.icu.text.IDNA.Info
 import android.os.Bundle
-import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.os.bundleOf
-import com.example.myapplication.backstage.DDlInfo
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.example.myapplication.backstage.Schedule
 import com.example.myapplication.backstage.TestDataConfig
 import com.example.myapplication.backstage.getWeekDay
-import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.R
 import java.util.*
 

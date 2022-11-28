@@ -1,7 +1,6 @@
 package com.example.myapplication
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,12 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import com.example.myapplication.backstage.CourseInfo
-import com.example.myapplication.backstage.CourseTemplate
-import com.example.myapplication.backstage.getWeekDay
-import com.example.myapplication.backstage.termInfo
-import java.lang.ref.WeakReference
+import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
+import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 
 import com.example.myapplication.front.*
 import com.google.android.material.composethemeadapter.sample.MainActivity

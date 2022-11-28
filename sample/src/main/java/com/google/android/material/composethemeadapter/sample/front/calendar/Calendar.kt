@@ -22,6 +22,8 @@ import com.example.myapplication.backstage.*
 import com.example.myapplication.front.*
 import com.example.myapplication.ui.theme.*
 import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 

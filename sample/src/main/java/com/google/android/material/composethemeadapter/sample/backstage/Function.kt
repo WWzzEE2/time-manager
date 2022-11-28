@@ -1,5 +1,6 @@
 package com.example.myapplication.backstage
 
+import com.google.android.material.composethemeadapter.sample.backstage.termInfo
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs

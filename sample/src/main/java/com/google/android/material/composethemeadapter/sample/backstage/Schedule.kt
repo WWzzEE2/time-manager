@@ -2,8 +2,10 @@ package com.example.myapplication.backstage
 
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.foundation.interaction.DragInteraction
+import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
+import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
+import com.google.android.material.composethemeadapter.sample.backstage.termInfo
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
@@ -155,9 +157,11 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
             val rand = Random()
             val weekSec = 1000 * 3600 * 24 * 7
             for (i in 0 until testData.ddlCnt)
-                addDDl(DDlInfo("Test ddl$i", i.toLong(),
+                addDDl(
+                    DDlInfo("Test ddl$i", i.toLong(),
                     abs(rand.nextLong()) % (weekSec * testData.totWeek)+termStartTime, "This is DDL $i balabalawalawala\n" +
-                            "bababababababa", termStartTime))
+                            "bababababababa", termStartTime)
+                )
             for (i in 0 until testData.courseTryCnt) {
                 val course = CourseInfo("Test Course$i", termStartTime, weekSec * testData.totWeek+termStartTime, ArrayList(), "This is Course $i", "Classroom $i")
                 val strTime = (rand.nextInt(testData.maxTime.toInt())).toLong()

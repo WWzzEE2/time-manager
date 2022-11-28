@@ -16,6 +16,7 @@ import com.example.myapplication.SettingsPage
 import com.example.myapplication.backstage.*
 import com.example.myapplication.front.calendar.CalendarPage
 import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 import java.util.*
 
 class ScreenState (private val inPage: String) {

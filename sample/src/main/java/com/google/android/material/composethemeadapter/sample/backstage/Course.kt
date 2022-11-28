@@ -1,9 +1,8 @@
-package com.example.myapplication.backstage
+package com.google.android.material.composethemeadapter.sample.backstage
 
-import java.text.SimpleDateFormat
-import java.time.Month
-import java.time.Year
-import java.util.*
+import com.example.myapplication.backstage.getHour
+import com.example.myapplication.backstage.getPastMin
+import com.example.myapplication.backstage.getTimeStamp
 
 data class TermInfo (
     var StartingTime: Long=0,
@@ -15,7 +14,7 @@ data class TermInfo (
         StartingTime= getTimeStamp(year, month, day)
     }
 }
-var termInfo:TermInfo=TermInfo()
+var termInfo: TermInfo = TermInfo()
 
 data class DDlInfo(
     val Name:  String,                  //DDL名字
@@ -44,7 +43,7 @@ data class DDlInfo(
         }
         output.plus(day_string)*/
         val hour= getHour(EndingTime)
-        val min= getPastMin(EndingTime)-hour*60
+        val min= getPastMin(EndingTime) -hour*60
         output+=wrapTime(hour)
         output+=":"
         output+=wrapTime(min)
@@ -70,7 +69,7 @@ data class CourseInfo(
     var Prompt : String,                //课程描述
     var Location: String,               //课程位置
 ){
-    fun addCourse(courseTime:CourseTemplate)
+    fun addCourse(courseTime: CourseTemplate)
     {
         courseTime.info= this
         TimeInfo.add(courseTime)
