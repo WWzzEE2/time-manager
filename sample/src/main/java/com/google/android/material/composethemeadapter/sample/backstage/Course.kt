@@ -45,22 +45,7 @@ data class DDlInfo(
 ) {
     fun wrapTime(time: Long): String = if (time < 10) "0$time" else time.toString()
     fun getString(termInfo: TermInfo): String {
-        //val weekDay= getWeekDay(termInfo.StartingTime,EndingTime)
         var output = ""
-        /*output.plus(weekDay.week.toString())
-        output.plus("周 ")
-        var day_string =""
-        when(weekDay.day)
-        {
-            1.toLong() -> day_string="周一"
-            2.toLong() -> day_string="周二"
-            3.toLong() -> day_string="周三"
-            4.toLong() -> day_string="周四"
-            5.toLong() -> day_string="周五"
-            6.toLong() -> day_string="周六"
-            7.toLong() -> day_string="周日"
-        }
-        output.plus(day_string)*/
         val hour = getHour(endingTime, termInfo)
         val min = getPastMin(endingTime, termInfo) - hour * 60
         output += wrapTime(hour)

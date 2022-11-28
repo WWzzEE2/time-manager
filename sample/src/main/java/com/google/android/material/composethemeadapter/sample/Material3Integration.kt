@@ -15,6 +15,7 @@
 
 package com.google.android.material.composethemeadapter.sample
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ import com.google.android.material.composethemeadapter.sample.backstage.load
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.composethemeadapter.sample.backstage.save
+import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
 import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         var config = TestDataConfig(20,1000,20,12)
         schedule = Schedule(this)
-
+        schedule.saveAll()
         contentView.setContent {
             Mdc3Theme {
                 Greeting()
@@ -91,6 +93,7 @@ class MainActivity : AppCompatActivity() {
         test.importFromElective(testdata, this)
         Log.d("Testdata","TestDone")
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

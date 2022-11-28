@@ -2,6 +2,8 @@ package com.google.android.material.composethemeadapter.sample.backstage
 
 
 import android.content.Context
+import android.content.Intent
+import android.util.Log
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
@@ -159,6 +161,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
     private val courseSet = HashSet<CourseInfo>()
 
+    private val scheduleContext=context
     var termInfo = TermInfo(getTimeStamp(2022, 9, 5), getTimeStamp(2023, 2, 10))
         internal set
 
@@ -381,5 +384,11 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
         courseSet.clear()
 
         termInfo = TermInfo(getTimeStamp(2022, 9, 5), getTimeStamp(2023, 2, 10))
+    }
+
+    fun updateWidget(){
+        val mWidgetIntent = Intent()
+        mWidgetIntent.action = "com.ideal.note.widget"
+        scheduleContext.sendBroadcast(mWidgetIntent)
     }
 }

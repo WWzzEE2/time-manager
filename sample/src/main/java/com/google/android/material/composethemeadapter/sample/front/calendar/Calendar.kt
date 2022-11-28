@@ -281,7 +281,6 @@ fun DailyList(
         //render classBlock
         println(weekIndex)
         while (i <= 12) {
-            schedule.getAllCourse()
             var course: CourseTemplate? =
                 schedule.getTemplate(
                     i.toLong(),
