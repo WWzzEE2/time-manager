@@ -1,10 +1,7 @@
 package com.example.myapplication
 
-import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,23 +12,14 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
-import com.example.myapplication.backstage.DDlInfo
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.example.myapplication.backstage.WeekDay
 import com.example.myapplication.backstage.getWeekDay
-import com.example.myapplication.backstage.termInfo
-import com.example.myapplication.ui.theme.courseBlockColor
+import com.google.android.material.composethemeadapter.sample.backstage.termInfo
 import com.example.myapplication.ui.theme.ddlBlockColor
-import org.xml.sax.Parser
 
 import com.example.myapplication.front.*
 import com.google.android.material.composethemeadapter.sample.MainActivity

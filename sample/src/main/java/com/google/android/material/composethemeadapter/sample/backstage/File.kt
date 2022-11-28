@@ -1,7 +1,8 @@
 package com.example.myapplication.backstage
 
 import android.content.Context
-import androidx.activity.ComponentActivity
+import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.FileInputStream
