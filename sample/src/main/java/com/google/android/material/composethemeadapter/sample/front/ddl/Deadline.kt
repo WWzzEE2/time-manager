@@ -83,7 +83,7 @@ enum class WeekTab {
 fun DeadLineCard(
     ddl: DeadLine,
     onCloseTask: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier.padding(15.dp,5.dp)
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val surfaceColor by animateColorAsState(

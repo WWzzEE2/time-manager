@@ -2,26 +2,59 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<TextView xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widget_item"
-    android:layout_width="360dp"
-    android:layout_height="120dp"
-    android:background="@drawable/widget_item_background"
-    android:gravity="center"
-    android:textColor="#ffffff"
-    android:textSize="44sp"
-    android:textStyle="bold" />
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_item_background">
+
+    <TextView
+        android:id="@+id/widget_item"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@drawable/widget_item_background"
+        android:gravity="center"
+        android:textColor="#E3F3FF"
+        android:textSize="44sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="44dp"
-        android:layout_height="wrap_content"
+        android:layout_width="43dp"
+        android:layout_height="43dp"
         android:layout_alignEnd="@+id/widget_item"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="33dp"
-        android:layout_marginEnd="5dp"
-        android:text="√" />
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="13dp"
+        android:background="@drawable/check"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <TextView
+        android:id="@+id/timeView"
+        android:layout_width="69dp"
+        android:layout_height="52dp"
+        android:layout_alignBottom="@+id/widget_item"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="14dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="Time"
+        android:textColor="#E3F3FF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/infoView"
+        android:layout_width="255dp"
+        android:layout_height="65dp"
+        android:layout_alignBottom="@+id/widget_item"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="11dp"
+        android:layout_marginBottom="13dp"
+        android:layout_toStartOf="@+id/button"
+        android:layout_toEndOf="@+id/timeView"
+        android:gravity="center"
+        android:text="info"
+        android:textColor="#E3F3FF"
+        android:textSize="15sp"
+        android:textStyle="bold" />
 
 
 </RelativeLayout>

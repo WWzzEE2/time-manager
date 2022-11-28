@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.ComposeView
 import com.example.myapplication.backstage.Import
 import com.example.myapplication.backstage.Schedule
 import com.example.myapplication.backstage.TestDataConfig
+import com.example.myapplication.backstage.load
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.composethemeadapter3.Mdc3Theme
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                 Greeting()
             }
         }
-
+        load(schedule,this)
         var test = Import()
         val testdata = """
             学生网上选课 >> 查看选课结果： 【信息科学技术学院 陈萧白】
