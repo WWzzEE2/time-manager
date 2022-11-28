@@ -8,8 +8,9 @@ import com.google.android.material.composethemeadapter.sample.backstage.CourseIn
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 
 
-data class account( // future to use
+data class UserAccount( // future to use
     var UserName: String,
+    var ID: String,
     var PassWord: String,
     // Login Status to add
 )

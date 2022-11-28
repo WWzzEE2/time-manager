@@ -20,6 +20,7 @@ import com.google.android.material.composethemeadapter.sample.backstage.CourseTe
 import com.google.android.material.composethemeadapter.sample.backstage.WeekDay
 import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
 import java.util.*
+import android.content.Context
 
 class ScreenState (inPage: String) {
     var page by mutableStateOf(inPage)
@@ -56,7 +57,7 @@ class ScreenState (inPage: String) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigation() {
+fun BottomNavigation(context: Context) {
 
     val currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
     val activity = LocalContext.current as MainActivity
@@ -101,7 +102,7 @@ fun BottomNavigation() {
                 currentState.myCourse,
                 currentState.editType
             )
-            "Setting" -> SettingsPage()
+            "Setting" -> SettingsPage(context)
         }
     }
 }

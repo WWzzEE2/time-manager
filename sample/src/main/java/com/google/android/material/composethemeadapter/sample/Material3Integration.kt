@@ -15,6 +15,7 @@
 
 package com.google.android.material.composethemeadapter.sample
 
+import android.accounts.Account
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import com.example.myapplication.backstage.Import
+import com.example.myapplication.backstage.UserAccount
 import com.google.android.material.composethemeadapter.sample.backstage.Schedule
 import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
 import com.google.android.material.composethemeadapter.sample.backstage.load
@@ -32,6 +34,11 @@ import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
+    var account = UserAccount(
+        "先輩",
+        "114514",
+        "1919180"
+    )
 
     object GlobalInformation {
         @JvmStatic
@@ -50,11 +57,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(contentView)
 
         var config = TestDataConfig(20,1000,20,12)
-        schedule = Schedule(this)
+        schedule = Schedule(this, config)
 
         contentView.setContent {
             Mdc3Theme {
-                Greeting()
+                BottomNavigation(this)
             }
         }
 
@@ -93,9 +100,5 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Greeting() {
-    BottomNavigation()
-}
+
 
