@@ -27,6 +27,7 @@ import com.google.android.material.composethemeadapter.sample.backstage.TestData
 import com.google.android.material.composethemeadapter.sample.backstage.load
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.composethemeadapter.sample.backstage.save
 import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
@@ -49,8 +50,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(contentView)
 
         var config = TestDataConfig(20,1000,20,12)
+        schedule = Schedule(this)
 
-        schedule = Schedule(this, config)
         contentView.setContent {
             Mdc3Theme {
                 Greeting()

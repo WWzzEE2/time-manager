@@ -20,6 +20,7 @@ import com.google.android.material.composethemeadapter.sample.backstage.CourseTe
 
 import com.example.myapplication.front.*
 import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.google.android.material.composethemeadapter.sample.backstage.save
 
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
 private var templateList = mutableStateListOf<CourseTemplate>()
@@ -378,6 +379,7 @@ fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplat
     templateList.clear()
     course =
         CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
+    schedule.saveAll()
     return true
 }
 
