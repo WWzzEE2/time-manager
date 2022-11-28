@@ -1,9 +1,5 @@
 package com.example.myapplication
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,10 +12,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.ui.theme.SmallHeadingStyle
-import com.example.myapplication.ui.theme.White
-import com.example.myapplication.ui.theme.Yellow
 
 import com.example.myapplication.front.*
+import com.google.android.material.composethemeadapter.sample.front.ddl.DayTab
+import com.google.android.material.composethemeadapter.sample.front.ddl.WeekTab
 
 @Composable
 fun JetLaggedHeaderTabs(

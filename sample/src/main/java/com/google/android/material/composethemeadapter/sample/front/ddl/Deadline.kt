@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.google.android.material.composethemeadapter.sample.front.ddl
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -15,15 +15,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.backstage.getWeekDay
+import com.example.myapplication.JetLaggedHeaderTabs
+import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
 import com.example.myapplication.front.*
 import com.example.myapplication.ui.theme.ddlBlockColor
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.R
 import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
-import com.google.android.material.composethemeadapter.sample.backstage.termInfo
 import com.google.android.material.datepicker.MaterialDatePicker
-import java.util.*
 
 typealias DeadLine = DDlInfo
 
@@ -103,7 +102,7 @@ fun DeadLineCard(
                 .padding(all = 8.dp)
         ) {
             Text(
-                text = ddl.getString(),
+                text = ddl.getString(MainActivity.GlobalInformation.activity.schedule.termInfo),
                 style = MaterialTheme.typography.headlineLarge,
             )
             Spacer(modifier = Modifier.width(10.dp))
@@ -113,7 +112,7 @@ fun DeadLineCard(
                 .weight(1f)
             ) {
                 Text(
-                    text = ddl.Name,
+                    text = ddl.name,
                     style = MaterialTheme.typography.titleSmall,
                 )
                 // Add a vertical space between the author and message texts
@@ -129,7 +128,7 @@ fun DeadLineCard(
                         .padding(1.dp)
                 ) {
                     Text(
-                        text = ddl.Prompt,
+                        text = ddl.prompt,
                         modifier = Modifier.padding(all = 4.dp),
                         maxLines = if (isExpanded) Int.MAX_VALUE else 1,
                         style = MaterialTheme.typography.bodyMedium
@@ -153,7 +152,7 @@ fun DeadLineList(
         item { Spacer(modifier = Modifier.height(20.dp)) }
         items(
             items = list,
-            key = { task -> task.EndingTime + 1.0 / task.Id }
+            key = { task -> task.endingTime + 1.0 / task.id }
         )
         { message ->
             DeadLineCard(
@@ -209,11 +208,11 @@ fun DDLScreen(
                         picker.show(it.supportFragmentManager, picker.toString())
                         picker.addOnPositiveButtonClickListener {
                             picker.selection?.let { selectedDate ->
-                                val Cur= getWeekDay(termInfo.StartingTime,selectedDate)
+                                val Cur= getWeekDay(schedule.termInfo.startingTime,selectedDate)
                                 screenState.setCurDay(Cur.day)
                                 screenState.setCurWeek(Cur.week)
-                                selectedWeekTab=WeekTab.Week1.getWeek(Cur.week.toInt())
-                                selectedDayTab=DayTab.Monday.getDay(Cur.day.toInt())
+                                selectedWeekTab= WeekTab.Week1.getWeek(Cur.week.toInt())
+                                selectedDayTab= DayTab.Monday.getDay(Cur.day.toInt())
                             }
                         }
                     }
@@ -240,7 +239,9 @@ fun DDLScreen(
                 selectedTab = selectedDayTab,
             )
 
-            list = schedule.getDDlFromRelativeTime(selectedWeekTab.ordinal, selectedDayTab.ordinal)
+            list = schedule.getDDlFromRelativeTime(selectedWeekTab.ordinal.toLong(),
+                selectedDayTab.ordinal.toLong()
+            )
                 .toMutableStateList()
             DeadLineList(
                 list = list,

@@ -1,14 +1,8 @@
-package com.example.myapplication.backstage
+package com.google.android.material.composethemeadapter.sample.backstage
 
 
 import android.content.Context
-import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
-import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
-import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
-import com.google.android.material.composethemeadapter.sample.backstage.termInfo
 import java.util.*
-import kotlin.collections.HashSet
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -28,10 +22,9 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
      */
     fun addTemplate(template: CourseTemplate, check: Boolean = true) : Boolean {
         if (check && conflictCheck(template)) return false
-        val set = this[template.StartingTime]?: HashSet()
+        val set = this[template.startingTime]?: HashSet()
         set.add(template)
-        this[template.StartingTime] = set
-        //template.info.TimeInfo.add(template)
+        this[template.startingTime] = set
         return true
     }
 
@@ -39,8 +32,7 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
      * Add a course
      */
     fun removeTemplate(template: CourseTemplate) {
-        this[template.StartingTime]?.remove(template)
-        //template.info.TimeInfo.remove(template)
+        this[template.startingTime]?.remove(template)
     }
 
     /**
@@ -51,7 +43,7 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
         for ((k, v) in this) {
             if (k > time) break
             for (t in v) {
-                if (t.EndingTime > time && bindSchedule.templateAvailable(t, week.toShort())) return t
+                if (t.endingTime > time && bindSchedule.templateAvailable(t, week.toShort())) return t
             }
         }
         return null
@@ -62,7 +54,7 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
      */
     fun conflictCheck(template: CourseTemplate) : Boolean {
         for ((k, v) in this) {
-            if (k > template.EndingTime) break
+            if (k > template.endingTime) break
             for (t in v) if (conflictCheck(t, template)) return true
         }
         return false
@@ -73,16 +65,16 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
      * @return True when conflict
      */
     fun conflictCheck(t1: CourseTemplate, t2: CourseTemplate) : Boolean {
-        if (crossover(t1.StartingTime.toInt(), t1.EndingTime.toInt(), t2.StartingTime.toInt(), t2.EndingTime.toInt()) &&
-            crossover(t1.info.StartingTime, t1.info.EndingTime, t2.info.StartingTime, t2.info.EndingTime)) {
+        if (crossover(t1.startingTime.toInt(), t1.endingTime.toInt(), t2.startingTime.toInt(), t2.endingTime.toInt()) &&
+            crossover(t1.info.startingTime, t1.info.endingTime, t2.info.startingTime, t2.info.endingTime)) {
 
-            val laterT = if(t1.info.StartingTime > t2.info.StartingTime) t1 else t2
+            val laterT = if(t1.info.startingTime > t2.info.startingTime) t1 else t2
             val otherT = if(laterT == t1) t2 else t1
-            val otherStart = bindSchedule.getWeek(otherT.info.StartingTime)
-            val endWeek = min(bindSchedule.getWeek(t1.info.EndingTime), bindSchedule.getWeek(t2.info.EndingTime))
+            val otherStart = bindSchedule.getWeek(otherT.info.startingTime)
+            val endWeek = min(bindSchedule.getWeek(t1.info.endingTime), bindSchedule.getWeek(t2.info.endingTime))
 
-            for (w in bindSchedule.getWeek(laterT.info.StartingTime)until endWeek step laterT.Period.toLong()) {
-                if ((w - otherStart) % otherT.Period == 0L) return true
+            for (w in bindSchedule.getWeek(laterT.info.startingTime)until endWeek step laterT.period) {
+                if ((w - otherStart) % otherT.period == 0L) return true
             }
         }
         return false
@@ -96,15 +88,15 @@ private class DDLMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<DDlInfo
      * @return False when ddl already exists
      */
     fun addDDl(ddl: DDlInfo) : Boolean {
-        val set = this[ddl.EndingTime]?: HashSet()
-        this[ddl.EndingTime] = set
+        val set = this[ddl.endingTime]?: HashSet()
+        this[ddl.endingTime] = set
         return set.add(ddl)
     }
 
     fun removeDDl(ddl: DDlInfo) =
-        this[ddl.EndingTime]?.let {
+        this[ddl.endingTime]?.let {
             it.remove(ddl)
-            if (it.isEmpty()) remove(ddl.EndingTime)
+            if (it.isEmpty()) remove(ddl.endingTime)
         }
 
     /**
@@ -143,50 +135,55 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
     private val courseSet = HashSet<CourseInfo>()
 
-    var termStartTime: Long = getTimeStamp(2022,9,5)
+    var termInfo = TermInfo(getTimeStamp(2022,9,5), getTimeStamp(2023, 2, 10))
+        internal set
 
-
-    /**
-     * Load all data from disk
-     * @see load
-     */
     init {
 
         if (testData != null) {
-            termInfo.StartingTime=termStartTime
-            val rand = Random()
-            val weekSec = 1000 * 3600 * 24 * 7
-            for (i in 0 until testData.ddlCnt)
-                addDDl(
-                    DDlInfo("Test ddl$i", i.toLong(),
-                    abs(rand.nextLong()) % (weekSec * testData.totWeek)+termStartTime, "This is DDL $i balabalawalawala\n" +
-                            "bababababababa", termStartTime)
-                )
-            for (i in 0 until testData.courseTryCnt) {
-                val course = CourseInfo("Test Course$i", termStartTime, weekSec * testData.totWeek+termStartTime, ArrayList(), "This is Course $i", "Classroom $i")
-                val strTime = (rand.nextInt(testData.maxTime.toInt())).toLong()
-                val template = CourseTemplate(rand.nextInt(7).toLong(),
-                    strTime,
-                    min((strTime + 2 + rand.nextInt(2)).toLong(), (testData.maxTime)),
-                    1
-                )
-                template.info = course
-                course.TimeInfo.add(template)
-                addCourse(course)
-            }
+            generateTestData(testData)
+//            val weekSec = 1000L * 3600 * 24 * 7
+//            val course = CourseInfo("Test Course", termInfo.startingTime, termInfo.startingTime + weekSec * testData.totWeek, ArrayList(), "test", "Void")
+//            course.timeInfo.add(CourseTemplate(0, 0 , 2, 1))
+//            course.timeInfo.add(CourseTemplate(1, 0, 1, 1))
+//            for (template in course.timeInfo)
+//                template.info = course
+//            addCourse(course)
+            saveAll()
         }
         else {
             load(this, context)
+        }
+    }
 
-            for (course in this.courseSet)
-                addCourse(course)
+    /**
+     * Generate test Data
+     */
+    fun generateTestData(testData: TestDataConfig) {
+        val rand = Random()
+        val weekSec = 1000 * 3600 * 24 * 7
+        for (i in 0 until testData.ddlCnt)
+            addDDl(DDlInfo("Test ddl$i", i.toLong(),
+                abs(rand.nextLong()) % (weekSec * testData.totWeek)+termInfo.startingTime, "This is DDL $i balabalawalawala\n" +
+                        "bababababababa", termInfo.startingTime))
+        for (i in 0 until testData.courseTryCnt) {
+            val course = CourseInfo("Test Course$i", termInfo.startingTime, weekSec * testData.totWeek+termInfo.startingTime, ArrayList(), "This is Course $i", "Classroom $i")
+            val strTime = (rand.nextInt(testData.maxTime.toInt())).toLong()
+            val template = CourseTemplate(rand.nextInt(7).toLong(),
+                strTime,
+                min((strTime + 2 + rand.nextInt(2)), (testData.maxTime)),
+                1
+            )
+            template.info = course
+            course.timeInfo.add(template)
+            addCourse(course)
         }
     }
 
     /**
      * @see com.example.myapplication.backstage.getWeek
      */
-    fun getWeek(time: Long) = getWeek(termStartTime, time)
+    fun getWeek(time: Long) = getWeek(termInfo.startingTime, time)
 
     /**
      * Save all data to disk
@@ -194,7 +191,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
      */
     fun saveAll() = save(this, context)
 
-    fun getTemplate(time: Long) : CourseTemplate? = getTemplate(getDay(time), getHour(time) , getWeek(time))
+    fun getTemplate(time: Long) : CourseTemplate? = getTemplate(getDay(time), getHour(time, termInfo) , getWeek(time))
 
     /**
      * @see TemplateMap.getTemplate
@@ -210,7 +207,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
         val dayMap = courseMap[colum.toInt()]
         val res = ArrayList<CourseTemplate>()
         for ((k, v) in dayMap) {
-            if (res.isNotEmpty() && k < res.last().EndingTime) continue
+            if (res.isNotEmpty() && k < res.last().endingTime) continue
             for (template in v) {
                 if (templateAvailable(template, week.toShort())) {
                     res.add(template)
@@ -225,14 +222,14 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
      * @see TemplateMap.addTemplate
      */
     fun addTemplate(courseTemplate: CourseTemplate) : Boolean {
-        return courseMap[courseTemplate.Column.toInt()].addTemplate(courseTemplate)
+        return courseMap[courseTemplate.column.toInt()].addTemplate(courseTemplate)
     }
 
     /**
      * @see TemplateMap.removeTemplate
      */
     fun removeTemplate(courseTemplate: CourseTemplate) {
-        courseMap[courseTemplate.Column.toInt()].removeTemplate(courseTemplate)
+        courseMap[courseTemplate.column.toInt()].removeTemplate(courseTemplate)
     }
 
     /**
@@ -241,12 +238,12 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
      */
     fun addCourse(course: CourseInfo) : Boolean {
 
-        for (template in course.TimeInfo)
-            if(courseMap[template.Column.toInt()].conflictCheck(template))
+        for (template in course.timeInfo)
+            if(courseMap[template.column.toInt()].conflictCheck(template))
                 return false
 
-        for (template in course.TimeInfo)
-            courseMap[template.Column.toInt()].addTemplate(template, false)
+        for (template in course.timeInfo)
+            courseMap[template.column.toInt()].addTemplate(template, false)
 
         courseSet.add(course)
 
@@ -257,8 +254,8 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
      * Remove a course from schedule
      */
     fun removeCourse(course: CourseInfo) {
-        for (template in course.TimeInfo)
-            courseMap[template.Column.toInt()].removeTemplate(template)
+        for (template in course.timeInfo)
+            courseMap[template.column.toInt()].removeTemplate(template)
 
         courseSet.remove(course)
     }
@@ -280,13 +277,13 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     /**
      * @see DDLMap.getDDl
      */
-    fun getDDl(fromTime: Long, toTime: Long) : List<DDlInfo> = ddlMap.getDDl(fromTime, toTime)
+    fun getDDlStamp(fromTime: Long, toTime: Long) : List<DDlInfo> = ddlMap.getDDl(fromTime, toTime)
 
     /**
      * Get all ddl in given day (day and week start from 0)
      */
-    fun getDDlFromRelativeTime(week: Int, day: Int):  List<DDlInfo> = (termStartTime + 1L * (week * 7 + day) * 24 * 3600 * 1000).let {
-        return getDDl(it, it + 24 * 3600 * 1000)
+    fun getDDlFromRelativeTime(week: Long, day: Long):  List<DDlInfo> = (termInfo.startingTime + 1L * (week * 7 + day) * 24 * 3600 * 1000).let {
+        return getDDlStamp(it, it + 24 * 3600 * 1000)
     }
 
     fun getAllDDl() : List<DDlInfo> = ddlMap.toList()
@@ -295,9 +292,8 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
 
     internal fun templateAvailable(template: CourseTemplate, week: Short) : Boolean {
-        val startTime = getWeek(template.info.StartingTime)
-        val endTime = getWeek(template.info.EndingTime)
-        return week in startTime until endTime && (week - startTime) % template.Period == 0L
-
+        val startTime = getWeek(template.info.startingTime)
+        val endTime = getWeek(template.info.endingTime)
+        return week in startTime until endTime && (week - startTime) % template.period == 0L
     }
 }

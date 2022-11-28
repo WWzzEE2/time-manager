@@ -155,9 +155,9 @@ fun SelectTime(Label: String, Index: Int) {
     if (Label == "EndingTime")
         valueList.add(14)
     selectValue = when (Label) {
-        "Column" -> templateList[Index].Column
-        "StartingTime" -> templateList[Index].StartingTime
-        else -> templateList[Index].EndingTime
+        "Column" -> templateList[Index].column
+        "StartingTime" -> templateList[Index].startingTime
+        else -> templateList[Index].endingTime
     } + 1
     Box() {
         TextButton(onClick = { expanded = !expanded }) {
@@ -200,7 +200,7 @@ fun EditName() {
                 .height(35.dp),
             contentDescription = "Name"
         )
-        SimpleOutlinedTextField(Label = "Name", content = course.Name)
+        SimpleOutlinedTextField(Label = "Name", content = course.name)
     }
 }
 
@@ -218,7 +218,7 @@ fun EditLocation() {
                 .height(35.dp),
             contentDescription = "Location"
         )
-        SimpleOutlinedTextField(Label = "Location", content = course.Location)
+        SimpleOutlinedTextField(Label = "Location", content = course.location)
     }
 }
 
@@ -319,14 +319,14 @@ fun initData(myCourseTemplate: CourseTemplate, editType: String, context: Contex
     val activity = context as MainActivity
     val schedule = activity.schedule
     if (editType != "click_course") {
-        course.StartingTime = schedule.termStartTime
-        course.EndingTime = schedule.termStartTime + 1000L * 3600 * 24 * 7 * 20
+        course.startingTime = schedule.termInfo.startingTime
+        course.endingTime = schedule.termInfo.startingTime + 1000L * 3600 * 24 * 7 * 20
     }
     if (editType == "click_null")
         addTemplateToList(myCourseTemplate)
     else if (editType == "click_course") {
         course = myCourseTemplate.info.copy()
-        templateList = course.TimeInfo.map { it.copy() }.toMutableStateList()
+        templateList = course.timeInfo.map { it.copy() }.toMutableStateList()
     } else
         if (templateList.isEmpty())
             addTemplateToList()
@@ -345,19 +345,19 @@ fun changeData(type: String, content: String) {
         operate = type
 
     when (operate) {
-        "Name" -> course.Name = content
-        "Location" -> course.Location = content
+        "Name" -> course.name = content
+        "Location" -> course.location = content
         "StartingTime" -> {
-            templateList[num].StartingTime = content.toLong() - 1
-            if (templateList[num].EndingTime <= templateList[num].StartingTime)
-                templateList[num].EndingTime = templateList[num].StartingTime + 1
+            templateList[num].startingTime = content.toLong() - 1
+            if (templateList[num].endingTime <= templateList[num].startingTime)
+                templateList[num].endingTime = templateList[num].startingTime + 1
         }
         "EndingTime" -> {
-            templateList[num].EndingTime = content.toLong() - 1
-            if (templateList[num].EndingTime <= templateList[num].StartingTime)
-                templateList[num].EndingTime = templateList[num].StartingTime + 1
+            templateList[num].endingTime = content.toLong() - 1
+            if (templateList[num].endingTime <= templateList[num].startingTime)
+                templateList[num].endingTime = templateList[num].startingTime + 1
         }
-        "Column" -> templateList[num].Column = content.toLong() - 1
+        "Column" -> templateList[num].column = content.toLong() - 1
     }
 }
 
@@ -370,7 +370,7 @@ fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplat
     templateList.forEach() {
         it.info = course
     }
-    course.TimeInfo = templateList.toMutableList()
+    course.timeInfo = templateList.toMutableList()
     if (!schedule.addCourse(course)) {
         schedule.addCourse(myCourseTemplate.info)
         return false

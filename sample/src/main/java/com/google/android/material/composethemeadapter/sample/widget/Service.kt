@@ -8,10 +8,11 @@ import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.compose.runtime.toMutableStateList
+import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
-import com.example.myapplication.backstage.Schedule
-import com.example.myapplication.backstage.TestDataConfig
-import com.example.myapplication.backstage.getWeekDay
+import com.google.android.material.composethemeadapter.sample.backstage.Schedule
+import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
+import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
 import com.google.android.material.composethemeadapter.sample.R
 import java.util.*
 
@@ -45,10 +46,10 @@ class StackRemoteViewsFactory(
         val config = TestDataConfig(20, 1000, 20, 12)
         val schedule = Schedule(context, config)
         val curWeekDay = getWeekDay(
-            schedule.termStartTime,
+            schedule.termInfo.startingTime,
             Calendar.getInstance().timeInMillis
         )
-        list = schedule.getDDlFromRelativeTime(curWeekDay.week.toInt(), curWeekDay.day.toInt())
+        list = schedule.getDDlFromRelativeTime(curWeekDay.week, curWeekDay.day)
             .toMutableStateList()
         Log.d("ddllist", list.size.toString())
     }
@@ -65,8 +66,8 @@ class StackRemoteViewsFactory(
 
     override fun getViewAt(position: Int): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_item).apply {
-            setTextViewText(R.id.timeView, list[position].getString())
-            setTextViewText(R.id.infoView, list[position].Name)
+            setTextViewText(R.id.timeView, list[position].getString(MainActivity.GlobalInformation.activity.schedule.termInfo)) // TODO 给个Schedule
+            setTextViewText(R.id.infoView, list[position].name)
             val fillInIntent = Intent().apply {
                 Bundle().also { extras ->
                     extras.putInt(EXTRA_ITEM, position)

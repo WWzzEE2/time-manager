@@ -1,31 +1,42 @@
 package com.google.android.material.composethemeadapter.sample.backstage
 
-import com.example.myapplication.backstage.getHour
-import com.example.myapplication.backstage.getPastMin
-import com.example.myapplication.backstage.getTimeStamp
+import com.fasterxml.jackson.annotation.JsonIgnore
 
-data class TermInfo (
-    var StartingTime: Long=0,
-    var RowStart : MutableList<Long> = mutableListOf(),
-    var RowEnd : MutableList<Long> =mutableListOf()
-) {
-    fun setTime(year: Long,month: Long,day: Long)
-    {
-        StartingTime= getTimeStamp(year, month, day)
+class TermInfo internal constructor(start:Long=0, end:Long=0, rowStart: MutableList<Long> = mutableListOf(), rowEnd:MutableList<Long> = mutableListOf()) {
+
+    var startingTime: Long
+        internal set
+    var endingTime: Long
+        internal set
+
+    var rowStart : MutableList<Long>
+    var rowEnd : MutableList<Long>
+
+    init {
+        startingTime = start
+        endingTime = end
+        this.rowStart = rowStart
+        this.rowEnd = rowEnd
     }
+
+    fun setStartTime(year: Long, month: Long, day: Long) { startingTime= getTimeStamp(year, month, day) }
+
+    /**
+     * Get time stamp of the given week and day of this term
+     */
+    fun getTermTime(week: Long, day: Long) : Long = startingTime + (week * 7 + day) * 24 * 3600 * 1000
+
 }
-var termInfo: TermInfo = TermInfo()
 
 data class DDlInfo(
-    val Name:  String,                  //DDL名字
-    val Id : Long,
-    val EndingTime : Long,              //DDL结束时间
-    val Prompt : String,                //DDL描述
-    val StartingTime : Long             //DDL开始工作时间
-){
-    fun wrapTime(time:Long):String=if (time<10) {"0"+time.toString()} else {time.toString()}
-    fun getString():String
-    {
+    val name:  String,                  //DDL名字
+    val id: Long,
+    val endingTime: Long,              //DDL结束时间
+    val prompt: String,                //DDL描述
+    val startingTime: Long             //DDL开始工作时间
+) {
+    fun wrapTime(time: Long) : String = if (time<10) "0$time" else time.toString()
+    fun getString(termInfo: TermInfo) : String {
         //val weekDay= getWeekDay(termInfo.StartingTime,EndingTime)
         var output =""
         /*output.plus(weekDay.week.toString())
@@ -42,8 +53,8 @@ data class DDlInfo(
             7.toLong() -> day_string="周日"
         }
         output.plus(day_string)*/
-        val hour= getHour(EndingTime)
-        val min= getPastMin(EndingTime) -hour*60
+        val hour= getHour(endingTime, termInfo)
+        val min= getPastMin(endingTime, termInfo) - hour * 60
         output+=wrapTime(hour)
         output+=":"
         output+=wrapTime(min)
@@ -52,27 +63,26 @@ data class DDlInfo(
 }
 
 data class CourseTemplate(              //模板，对应以周为单位的日历上的一块\
-    var Column: Long,                   //课程位于哪一列
-    var StartingTime : Long,            //课程开始于哪一行
-    var EndingTime : Long,              //课程结束于哪一行
-    var Period: Long                    //一周一次或两周一次(应该不存在三天一次的课吧，
-                                        // 一周两次的话就建立两个template)
+    var column: Long,                  //课程位于哪一列
+    var startingTime: Long,           //课程开始于哪一行
+    var endingTime: Long,             //课程结束于哪一行
+    var period: Long                    //一周一次或两周一次(应该不存在三天一次的课吧，
+    // 一周两次的话就建立两个template)
 ) {
+    @JsonIgnore
     lateinit var info: CourseInfo
 }
 
 data class CourseInfo(
-    var Name:  String,                  //课程名字
-    var StartingTime : Long,            //课程开始时间，直接使用时间戳
-    var EndingTime : Long,              //课程结束时间，直接使用时间戳，(前端输入时可以选择持续多少周，但后端不记录)
-    var TimeInfo : MutableList<CourseTemplate>,//课程时间，存放CourseTemplate的List
-    var Prompt : String,                //课程描述
-    var Location: String,               //课程位置
+    var name:  String,                  //课程名字
+    var startingTime: Long,            //课程开始时间，直接使用时间戳
+    var endingTime: Long,              //课程结束时间，直接使用时间戳，(前端输入时可以选择持续多少周，但后端不记录)
+    var timeInfo: MutableList<CourseTemplate>,//课程时间，存放CourseTemplate的List
+    var prompt: String,                //课程描述
+    var location: String,               //课程位置
 ){
-    fun addCourse(courseTime: CourseTemplate)
-    {
+    fun addCourse(courseTime: CourseTemplate) {
         courseTime.info= this
-        TimeInfo.add(courseTime)
+        timeInfo.add(courseTime)
     }
 }
-
