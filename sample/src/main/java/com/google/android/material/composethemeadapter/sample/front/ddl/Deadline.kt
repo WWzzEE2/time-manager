@@ -15,15 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
-import com.example.myapplication.backstage.WeekDay
 import com.example.myapplication.backstage.getWeekDay
-import com.google.android.material.composethemeadapter.sample.backstage.termInfo
-import com.example.myapplication.ui.theme.ddlBlockColor
-
 import com.example.myapplication.front.*
+import com.example.myapplication.ui.theme.ddlBlockColor
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.R
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
+import com.google.android.material.composethemeadapter.sample.backstage.termInfo
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.*
 
@@ -53,10 +51,11 @@ enum class DayTab(val title: Int) {
 }
 
 enum class WeekTab {
-    Week1, Week2, Week3, Week4, Week5, Week6, Week7, Week8, Week9, Week10, Week11, Week12, Week13, Week14, Week15, Week16, Week17;
+    Week0,Week1, Week2, Week3, Week4, Week5, Week6, Week7, Week8, Week9, Week10, Week11, Week12, Week13, Week14, Week15, Week16, Week17;
 
     fun getWeek(Week: Int): WeekTab =
         when (Week) {
+            0 -> Week0
             1 -> Week1
             2 -> Week2
             3 -> Week3
@@ -74,19 +73,17 @@ enum class WeekTab {
             15 -> Week15
             16 -> Week16
             17 -> Week17
-            else -> Week1
+            else -> Week0
         }
 }
 
-val CurrentTime=System.currentTimeMillis()
-var Cur: WeekDay= getWeekDay(termInfo.StartingTime,CurrentTime)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeadLineCard(
     ddl: DeadLine,
     onCloseTask: () -> Unit,
-    modifier: Modifier = Modifier.padding(10.dp, 5.dp)
+    modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val surfaceColor by animateColorAsState(
@@ -191,22 +188,20 @@ fun DDLTopBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-public fun DDLScreen(
+fun DDLScreen(
     screenState: ScreenState,
     modifier: Modifier = Modifier
 ) {
     val activity = LocalContext.current as MainActivity
     val schedule = activity.schedule
     var list: MutableList<DDlInfo>
-    Cur.week= screenState.getCurWeek()
-    Cur.day= screenState.getCurDay()
-    var selectedWeekTab by remember { mutableStateOf(WeekTab.Week1.getWeek(Cur.week.toInt())) }
-    var selectedDayTab by remember { mutableStateOf(DayTab.Monday.getDay(Cur.day.toInt())) }
+    var selectedWeekTab by remember { mutableStateOf(WeekTab.Week1.getWeek(screenState.getCurWeek().toInt())) }
+    var selectedDayTab by remember { mutableStateOf(DayTab.Monday.getDay(screenState.getCurDay().toInt())) }
     Scaffold(
         topBar = {
             DDLTopBar(
                 DateAction ={
-                    val date = CurrentTime
+                    val date = screenState.getCurTime()
                     val picker = MaterialDatePicker.Builder.datePicker()
                         .setSelection(date)
                         .build()
@@ -214,7 +209,9 @@ public fun DDLScreen(
                         picker.show(it.supportFragmentManager, picker.toString())
                         picker.addOnPositiveButtonClickListener {
                             picker.selection?.let { selectedDate ->
-                                Cur= getWeekDay(termInfo.StartingTime,selectedDate)
+                                val Cur= getWeekDay(termInfo.StartingTime,selectedDate)
+                                screenState.setCurDay(Cur.day)
+                                screenState.setCurWeek(Cur.week)
                                 selectedWeekTab=WeekTab.Week1.getWeek(Cur.week.toInt())
                                 selectedDayTab=DayTab.Monday.getDay(Cur.day.toInt())
                             }
@@ -230,7 +227,7 @@ public fun DDLScreen(
             JetLaggedHeaderTabs(
                 screenState,
                 onTabSelected = {
-                    selectedWeekTab = it;
+                    selectedWeekTab = it
                     screenState.setCurWeek(it.ordinal.toLong()) },
                 selectedTab = selectedWeekTab,
             )
@@ -238,7 +235,7 @@ public fun DDLScreen(
 
             JetLaggedHeaderTabs(
                 screenState,
-                onTabSelected = { selectedDayTab = it;
+                onTabSelected = { selectedDayTab = it
                     screenState.setCurDay(it.ordinal.toLong()) },
                 selectedTab = selectedDayTab,
             )
