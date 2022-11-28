@@ -15,7 +15,7 @@
 
 package com.google.android.material.composethemeadapter.sample
 
-import android.content.Intent
+import android.accounts.Account
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -23,17 +23,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import com.example.myapplication.backstage.Import
+import com.example.myapplication.backstage.UserAccount
 import com.google.android.material.composethemeadapter.sample.backstage.Schedule
 import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
 import com.google.android.material.composethemeadapter.sample.backstage.load
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.composethemeadapter.sample.backstage.save
-import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
 import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
+    var account = UserAccount(
+        "先輩",
+        "114514",
+        "1919180"
+    )
 
     object GlobalInformation {
         @JvmStatic
@@ -52,12 +57,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(contentView)
 
         var config = TestDataConfig(20,1000,20,12)
-        schedule = Schedule(this)
+        schedule = Schedule(this, config)
+
+        contentView.setContent {
+            Mdc3Theme {
+                BottomNavigation(this)
+            }
+        }
 
         var test = Import()
         val testdata = """
             学生网上选课 >> 查看选课结果： 【信息科学技术学院 陈萧白】
-
+            
             课程名	课程类别	学分	周学时	教师	班号	开课单位	教室信息	选课结果	IP地址	操作时间
             概率统计 （A）	专业必修	3.0	3.0	章复熹(副教授)	1	数学科学学院	1~16周 每周周五3~4节 二教205
             1~16周 单周周三7~8节 二教205
@@ -86,22 +97,8 @@ class MainActivity : AppCompatActivity() {
         """.trimIndent()
         test.importFromElective(testdata, this)
         Log.d("Testdata","TestDone")
-        schedule.saveAll()
-
-        contentView.setContent {
-            Mdc3Theme {
-                Greeting()
-            }
-        }
-
-
     }
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Greeting() {
-    BottomNavigation()
-}
+
 
