@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
+import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 
 
 data class account( // future to use
@@ -34,7 +36,7 @@ class Import {
         if (startIndex == -2) {
             return false
         }
-        var courseNum = (splitLen - startIndex - 1) / 10 - 1
+        val courseNum = (splitLen - startIndex - 1) / 10 - 1
         for (i in 1..courseNum) {
             //Course i: split[10*i .. 10*i+9]
             if (split[10*i+8]=="未选上")

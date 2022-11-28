@@ -16,10 +16,14 @@ internal fun crossover(s1: Long, e1: Long, s2: Long, e2: Long) = max(s1, s2) < m
 data class WeekDay (
     var week: Long,
     var day:Long
-)
+) {
+    fun getTime(): Long {
+        return termInfo.StartingTime+((week-1)*7+day+1)*24*3600*1000
+    }
+}
 
 internal fun getWeekDay(termStart: Long, timeStamp: Long) : WeekDay {
-    val week = (timeStamp - termStart) /( 24 * 3600 * 1000 * 7)  + 1
+    val week = (timeStamp - termStart) /( 24 * 3600 * 1000 * 7)+1
     val day= ((timeStamp-termStart)/(1000*3600*24))%7
     return WeekDay(week,day)
 }
@@ -51,7 +55,7 @@ fun getRow(timeStamp: Long):Short{
     val past_min=getPastMin(timeStamp)
     var column=-1
     for(index in 1..termInfo.RowStart.size)
-        if(past_min>= termInfo.RowStart.get(index)!!&&past_min< termInfo.RowEnd.get(index)!!)
+        if(past_min>= termInfo.RowStart.get(index) &&past_min< termInfo.RowEnd.get(index))
         {
             column=index
             break
@@ -68,7 +72,7 @@ fun getPastMin(hour: Short, min:Short):Long{
 }
 
 fun getTimeStamp(year: Long, month: Long, day: Long): Long {
-    var dateTime:String = ""
+    var dateTime = ""
     dateTime += year.toString()
     dateTime += ("-")
     if(month<10)

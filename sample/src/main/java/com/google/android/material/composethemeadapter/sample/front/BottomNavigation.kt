@@ -19,7 +19,7 @@ import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 import java.util.*
 
-class ScreenState (private val inPage: String) {
+class ScreenState (inPage: String) {
     var page by mutableStateOf(inPage)
     var editType = ""
 
@@ -37,6 +37,7 @@ class ScreenState (private val inPage: String) {
 
     fun getCurWeek(): Long { return curWeekDay.week}
     fun getCurDay(): Long { return curWeekDay.day}
+    fun getCurTime():Long { return curWeekDay.getTime()}
     fun setCurWeekDay(wd: WeekDay) {curWeekDay = wd}
     fun setCurWeek(w: Long) { curWeekDay.week = w}
     fun setCurDay(d: Long) { curWeekDay.day = d}
@@ -55,11 +56,11 @@ class ScreenState (private val inPage: String) {
 @Composable
 fun BottomNavigation() {
 
-    var currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
-    var activity = LocalContext.current as MainActivity
-    var schedule = activity.schedule
-    var curWeekDay = getWeekDay(
-        schedule.termStartTime.toLong(),
+    val currentState by remember(){mutableStateOf(ScreenState("Calendar"))}
+    val activity = LocalContext.current as MainActivity
+    val schedule = activity.schedule
+    val curWeekDay = getWeekDay(
+        schedule.termStartTime,
         Calendar.getInstance().timeInMillis
     )
     currentState.setCurWeekDay(curWeekDay.copy())
