@@ -78,4 +78,10 @@ data class CourseInfo(
         courseTime.info = this
         timeInfo.add(courseTime)
     }
+    fun addTemplate(template: MutableList<CourseTemplate>)
+    {
+        for (t in template)
+            t.info=this
+        timeInfo=template
+    }
 }
