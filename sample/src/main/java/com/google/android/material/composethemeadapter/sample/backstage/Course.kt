@@ -2,15 +2,20 @@ package com.google.android.material.composethemeadapter.sample.backstage
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 
-class TermInfo internal constructor(start:Long=0, end:Long=0, rowStart: MutableList<Long> = mutableListOf(), rowEnd:MutableList<Long> = mutableListOf()) {
+class TermInfo internal constructor(
+    start: Long = 0,
+    end: Long = 0,
+    rowStart: MutableList<Long> = mutableListOf(),
+    rowEnd: MutableList<Long> = mutableListOf()
+) {
 
     var startingTime: Long
         internal set
     var endingTime: Long
         internal set
 
-    var rowStart : MutableList<Long>
-    var rowEnd : MutableList<Long>
+    var rowStart: MutableList<Long>
+    var rowEnd: MutableList<Long>
 
     init {
         startingTime = start
@@ -19,45 +24,33 @@ class TermInfo internal constructor(start:Long=0, end:Long=0, rowStart: MutableL
         this.rowEnd = rowEnd
     }
 
-    fun setStartTime(year: Long, month: Long, day: Long) { startingTime= getTimeStamp(year, month, day) }
+    fun setStartTime(year: Long, month: Long, day: Long) {
+        startingTime = getTimeStamp(year, month, day)
+    }
 
     /**
      * Get time stamp of the given week and day of this term
      */
-    fun getTermTime(week: Long, day: Long) : Long = startingTime + (week * 7 + day) * 24 * 3600 * 1000
+    fun getTermTime(week: Long, day: Long): Long =
+        startingTime + (week * 7 + day) * 24 * 3600 * 1000
 
 }
 
 data class DDlInfo(
-    val name:  String,                  //DDL名字
+    val name: String,                  //DDL名字
     val id: Long,
     val endingTime: Long,              //DDL结束时间
     val prompt: String,                //DDL描述
     val startingTime: Long             //DDL开始工作时间
 ) {
-    fun wrapTime(time: Long) : String = if (time<10) "0$time" else time.toString()
-    fun getString(termInfo: TermInfo) : String {
-        //val weekDay= getWeekDay(termInfo.StartingTime,EndingTime)
-        var output =""
-        /*output.plus(weekDay.week.toString())
-        output.plus("周 ")
-        var day_string =""
-        when(weekDay.day)
-        {
-            1.toLong() -> day_string="周一"
-            2.toLong() -> day_string="周二"
-            3.toLong() -> day_string="周三"
-            4.toLong() -> day_string="周四"
-            5.toLong() -> day_string="周五"
-            6.toLong() -> day_string="周六"
-            7.toLong() -> day_string="周日"
-        }
-        output.plus(day_string)*/
-        val hour= getHour(endingTime, termInfo)
-        val min= getPastMin(endingTime, termInfo) - hour * 60
-        output+=wrapTime(hour)
-        output+=":"
-        output+=wrapTime(min)
+    fun wrapTime(time: Long): String = if (time < 10) "0$time" else time.toString()
+    fun getString(termInfo: TermInfo): String {
+        var output = ""
+        val hour = getHour(endingTime, termInfo)
+        val min = getPastMin(endingTime, termInfo) - hour * 60
+        output += wrapTime(hour)
+        output += ":"
+        output += wrapTime(min)
         return output
     }
 }
@@ -74,15 +67,15 @@ data class CourseTemplate(              //模板，对应以周为单位的日�
 }
 
 data class CourseInfo(
-    var name:  String,                  //课程名字
+    var name: String,                  //课程名字
     var startingTime: Long,            //课程开始时间，直接使用时间戳
     var endingTime: Long,              //课程结束时间，直接使用时间戳，(前端输入时可以选择持续多少周，但后端不记录)
     var timeInfo: MutableList<CourseTemplate>,//课程时间，存放CourseTemplate的List
     var prompt: String,                //课程描述
     var location: String,               //课程位置
-){
+) {
     fun addCourse(courseTime: CourseTemplate) {
-        courseTime.info= this
+        courseTime.info = this
         timeInfo.add(courseTime)
     }
 }

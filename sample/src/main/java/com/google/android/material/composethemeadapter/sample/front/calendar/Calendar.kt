@@ -24,6 +24,7 @@ import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.google.android.material.composethemeadapter.sample.backstage.getPastMin
+import java.lang.Math.abs
 
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
@@ -280,7 +281,6 @@ fun DailyList(
         //render classBlock
         println(weekIndex)
         while (i <= 12) {
-            schedule.getAllCourse()
             var course: CourseTemplate? =
                 schedule.getTemplate(
                     i.toLong(),
@@ -319,7 +319,7 @@ fun DailyList(
 
                 ClassBlock(
                     screenState,
-                    courseBlockColor.getColor(i * (weekIndex + 1) + dayIndex),
+                    courseBlockColor.getColor(kotlin.math.abs(course.info.name.hashCode())),
                     len,
                     MultiClick(
                         onClick = {},

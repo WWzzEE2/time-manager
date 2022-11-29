@@ -1,5 +1,7 @@
 package com.google.android.material.composethemeadapter.sample.front.ddl
 
+import android.content.Intent
+import android.os.Bundle
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
@@ -50,7 +52,7 @@ enum class DayTab(val title: Int) {
 }
 
 enum class WeekTab {
-    Week0,Week1, Week2, Week3, Week4, Week5, Week6, Week7, Week8, Week9, Week10, Week11, Week12, Week13, Week14, Week15, Week16, Week17;
+    Week0, Week1, Week2, Week3, Week4, Week5, Week6, Week7, Week8, Week9, Week10, Week11, Week12, Week13, Week14, Week15, Week16, Week17;
 
     fun getWeek(Week: Int): WeekTab =
         when (Week) {
@@ -82,14 +84,14 @@ enum class WeekTab {
 fun DeadLineCard(
     ddl: DeadLine,
     onCloseTask: () -> Unit,
-    modifier: Modifier = Modifier.padding(15.dp,5.dp)
+    modifier: Modifier = Modifier.padding(15.dp, 5.dp)
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val surfaceColor by animateColorAsState(
         if (isExpanded) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.background,
     )
     Button(
-        onClick = {isExpanded = !isExpanded},
+        onClick = { isExpanded = !isExpanded },
         shape = RoundedCornerShape(10.dp),
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = ddlBlockColor.getColor(0)),
@@ -108,8 +110,9 @@ fun DeadLineCard(
             Spacer(modifier = Modifier.width(10.dp))
 
 
-            Column(modifier = Modifier
-                .weight(1f)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
             ) {
                 Text(
                     text = ddl.name,
@@ -169,13 +172,12 @@ fun DeadLineList(
 @Composable
 fun DDLTopBar(
     DateAction: () -> Unit
-)
-{
+) {
     TopAppBar(
         title = { Text("DDL时间表") },
         actions = {
             // RowScope here, so these icons will be placed horizontally
-            IconButton(onClick = {DateAction()}) {
+            IconButton(onClick = { DateAction() }) {
                 Icon(Icons.Outlined.DateRange, contentDescription = "Localized description")
             }
             IconButton(onClick = { /* doSomething() */ }) {
@@ -194,12 +196,24 @@ fun DDLScreen(
     val activity = LocalContext.current as MainActivity
     val schedule = activity.schedule
     var list: MutableList<DDlInfo>
-    var selectedWeekTab by remember { mutableStateOf(WeekTab.Week1.getWeek(screenState.getCurWeek().toInt())) }
-    var selectedDayTab by remember { mutableStateOf(DayTab.Monday.getDay(screenState.getCurDay().toInt())) }
+    var selectedWeekTab by remember {
+        mutableStateOf(
+            WeekTab.Week1.getWeek(
+                screenState.getCurWeek().toInt()
+            )
+        )
+    }
+    var selectedDayTab by remember {
+        mutableStateOf(
+            DayTab.Monday.getDay(
+                screenState.getCurDay().toInt()
+            )
+        )
+    }
     Scaffold(
         topBar = {
             DDLTopBar(
-                DateAction ={
+                DateAction = {
                     val date = screenState.getCurTime()
                     val picker = MaterialDatePicker.Builder.datePicker()
                         .setSelection(date)
@@ -208,18 +222,18 @@ fun DDLScreen(
                         picker.show(it.supportFragmentManager, picker.toString())
                         picker.addOnPositiveButtonClickListener {
                             picker.selection?.let { selectedDate ->
-                                val Cur= getWeekDay(schedule.termInfo.startingTime,selectedDate)
+                                val Cur = getWeekDay(schedule.termInfo.startingTime, selectedDate)
                                 screenState.setCurDay(Cur.day)
                                 screenState.setCurWeek(Cur.week)
-                                selectedWeekTab= WeekTab.Week1.getWeek(Cur.week.toInt())
-                                selectedDayTab= DayTab.Monday.getDay(Cur.day.toInt())
+                                selectedWeekTab = WeekTab.Week1.getWeek(Cur.week.toInt())
+                                selectedDayTab = DayTab.Monday.getDay(Cur.day.toInt())
                             }
                         }
                     }
                 }
             )
         },
-    ){  padding ->
+    ) { padding ->
         Column(modifier.padding(padding)) {
 
 
@@ -227,25 +241,34 @@ fun DDLScreen(
                 screenState,
                 onTabSelected = {
                     selectedWeekTab = it
-                    screenState.setCurWeek(it.ordinal.toLong()) },
+                    screenState.setCurWeek(it.ordinal.toLong())
+                },
                 selectedTab = selectedWeekTab,
             )
 
 
             JetLaggedHeaderTabs(
                 screenState,
-                onTabSelected = { selectedDayTab = it
-                    screenState.setCurDay(it.ordinal.toLong()) },
+                onTabSelected = {
+                    selectedDayTab = it
+                    screenState.setCurDay(it.ordinal.toLong())
+                },
                 selectedTab = selectedDayTab,
             )
 
-            list = schedule.getDDlFromRelativeTime(selectedWeekTab.ordinal.toLong(),
+            list = schedule.getDDlFromRelativeTime(
+                selectedWeekTab.ordinal.toLong(),
                 selectedDayTab.ordinal.toLong()
             )
                 .toMutableStateList()
             DeadLineList(
                 list = list,
-                onCloseTask = { task -> list.remove(task);schedule.removeDDl(task)}
+                onCloseTask = { task ->
+                    list.remove(task)
+                    schedule.removeDDl(task)
+                    schedule.saveAll()
+                    schedule.updateWidget()
+                }
             )
             Spacer(Modifier.height(16.dp))
         }
