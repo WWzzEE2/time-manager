@@ -53,17 +53,11 @@ class MainActivity : AppCompatActivity() {
 
         var config = TestDataConfig(20,1000,20,12)
         schedule = Schedule(this)
-        schedule.saveAll()
-        contentView.setContent {
-            Mdc3Theme {
-                Greeting()
-            }
-        }
 
         var test = Import()
         val testdata = """
             学生网上选课 >> 查看选课结果： 【信息科学技术学院 陈萧白】
-            
+
             课程名	课程类别	学分	周学时	教师	班号	开课单位	教室信息	选课结果	IP地址	操作时间
             概率统计 （A）	专业必修	3.0	3.0	章复熹(副教授)	1	数学科学学院	1~16周 每周周五3~4节 二教205
             1~16周 单周周三7~8节 二教205
@@ -90,8 +84,17 @@ class MainActivity : AppCompatActivity() {
             1~15周 每周周一7~8节 二教205
             考试时间：20221226下午；	已选上	125.115.42.228	2022-07-07 12:22:55
         """.trimIndent()
-        //test.importFromElective(testdata, this)
-        //Log.d("Testdata","TestDone")
+        test.importFromElective(testdata, this)
+        Log.d("Testdata","TestDone")
+        schedule.saveAll()
+
+        contentView.setContent {
+            Mdc3Theme {
+                Greeting()
+            }
+        }
+
+
     }
 
 }
