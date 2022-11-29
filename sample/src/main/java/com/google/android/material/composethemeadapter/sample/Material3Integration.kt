@@ -90,8 +90,8 @@ class MainActivity : AppCompatActivity() {
             1~15周 每周周一7~8节 二教205
             考试时间：20221226下午；	已选上	125.115.42.228	2022-07-07 12:22:55
         """.trimIndent()
-        test.importFromElective(testdata, this)
-        Log.d("Testdata","TestDone")
+        //test.importFromElective(testdata, this)
+        //Log.d("Testdata","TestDone")
     }
 
 }
