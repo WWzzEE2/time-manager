@@ -87,3 +87,11 @@ fun getTimeStamp(year: Long,month: Long,day: Long): Long {
     val timestamp = date?.time
     return timestamp!!.toLong()
 }
+
+fun getWeekStamp(startingTime: Long, week: Long): Long {
+    return startingTime + week * 7 * 24 * 3600 * 1000
+}
+
+fun getTime(startingTime: Long, week: Long, day: Long): Long {
+    return startingTime + (week * 7 + day - 1) * 7 * 24 * 3600 * 1000
+}
