@@ -97,10 +97,9 @@ class Import {
             }
             course.startingTime=startingTime
             course.endingTime=endingTime
-            course.timeInfo=templateList.toMutableList()
+            course.addTemplate(templateList)
 
-            for(template in course.timeInfo)
-                template.info = course
+
 
 
             for (s in templateList)
