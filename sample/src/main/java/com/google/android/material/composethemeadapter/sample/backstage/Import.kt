@@ -47,19 +47,17 @@ class Import {
             if (split[10*i+8]=="未选上")
                 continue
             val name = split[10*i].split("\n")[1]
-            Log.d("name",name.toString())
+            Log.d("TestdataName",name.toString())
             var course = CourseInfo(name,0,0,
                 emptyList<CourseTemplate>().toMutableList(),"Prompt", "Location")
             var templateList = mutableStateListOf<CourseTemplate>()
-            // copy from front/calendar/edit.kt
-            //course.StartingTime = schedule.termStartTime
-            //course.EndingTime = schedule.termStartTime + 1000L * 3600 * 24 * 7 * 20
+
             var startingTime:Long=0
             var endingTime:Long=0
 
             val timeAndLocationSplit = split[10*i+7].split("\n")
             for (info in timeAndLocationSplit) {
-                if (info.startsWith("考试时间")) {
+                if (info.startsWith("考试时间") or info.startsWith("考试方式")) {
                     break
                 }
                 Log.d("TestdataBeforeSplit",info)
@@ -91,8 +89,6 @@ class Import {
                     Log.d("TestdataSplit", s.trimIndent()+" "+ k.toString())
                     k++
                 }
-                //TODO: 使用infoSplit中的信息填充course、templateList，最后调用addCourse
-                //      Split具体内容可看Logcat搜Testdata，原data在Material3Integration.kt中
 
             }
             course.startingTime=startingTime
@@ -106,7 +102,10 @@ class Import {
                 Log.d("TestdataTemplateList", s.toString())
 
             Log.d("TestdataCourse", course.toString())
-            schedule.addCourse(course)
+            if (!schedule.addCourse(course)) {
+                Log.d("TestdataCourse","add failed")
+                return false
+            }
             Log.d("TestdataCourse", "add successfully")
 
         }
