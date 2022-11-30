@@ -36,6 +36,8 @@ import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
+    lateinit var testdata:String
+
     var account = UserAccount(
         "Mr.Beaver",
         "2000012345",
@@ -63,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
 
         var test = Import()
-        val testdata = """
+        testdata = """
             学生网上选课 >> 查看选课结果： 【信息科学技术学院 陈萧白】
 
             课程名	课程类别	学分	周学时	教师	班号	开课单位	教室信息	选课结果	IP地址	操作时间
