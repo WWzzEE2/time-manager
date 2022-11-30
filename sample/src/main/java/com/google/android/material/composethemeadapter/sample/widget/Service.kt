@@ -8,23 +8,20 @@ import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.compose.runtime.toMutableStateList
-import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.google.android.material.composethemeadapter.sample.R
 import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.google.android.material.composethemeadapter.sample.backstage.Schedule
-import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
 import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
-import com.google.android.material.composethemeadapter.sample.R
 import java.util.*
 
-private const val REMOTE_VIEW_COUNT: Int = 10
 const val TOAST_ACTION = "com.example.android.stackwidget.TOAST_ACTION"
 const val BUTTON_ACTION = "com.example.android.stackwidget.BUTTON_ACTION"
 const val EXTRA_ITEM = "com.example.android.stackwidget.EXTRA_ITEM"
-
+const val DDL_NAME = "com.example.android.stackwidget.DDL_NAME"
+const val UPDATE="com.ideal.note.widget"
 class StackWidgetService : RemoteViewsService() {
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        Log.d("ddllist", "222")
         return StackRemoteViewsFactory(this.applicationContext, intent)
     }
 }
@@ -34,6 +31,13 @@ class StackRemoteViewsFactory(
     intent: Intent
 ) : RemoteViewsService.RemoteViewsFactory {
 
+
+    val schedule = Schedule(context)
+    val curWeekDay = getWeekDay(
+        schedule.termInfo.startingTime,
+        Calendar.getInstance().timeInMillis
+    )
+
     lateinit var list: MutableList<DDlInfo>
 
     private val appWidgetId: Int = intent.getIntExtra(
@@ -42,23 +46,18 @@ class StackRemoteViewsFactory(
     )
 
     override fun onCreate() {
-        Log.d("ddllist", "111")
-        val config = TestDataConfig(20, 1000, 20, 12)
-        val schedule = Schedule(context, config)
-        val curWeekDay = getWeekDay(
-            schedule.termInfo.startingTime,
-            Calendar.getInstance().timeInMillis
-        )
+        Log.println(Log.ERROR,"114514","we are created")
         list = schedule.getDDlFromRelativeTime(curWeekDay.week, curWeekDay.day)
             .toMutableStateList()
-        Log.d("ddllist", list.size.toString())
     }
 
     override fun onDataSetChanged() {
+        Log.println(Log.ERROR,"114514","we are in")
+        list = schedule.getDDlFromRelativeTime(curWeekDay.week, curWeekDay.day)
+            .toMutableStateList()
     }
 
     override fun onDestroy() {
-
     }
 
     override fun getCount(): Int = list.size
@@ -66,15 +65,25 @@ class StackRemoteViewsFactory(
 
     override fun getViewAt(position: Int): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_item).apply {
-            setTextViewText(R.id.timeView, list[position].getString(MainActivity.GlobalInformation.activity.schedule.termInfo)) // TODO 给个Schedule
+            setTextViewText(R.id.timeView, list[position].getString(schedule.termInfo))
             setTextViewText(R.id.infoView, list[position].name)
-            val fillInIntent = Intent().apply {
+            val toastInIntent = Intent().apply {
+                action=TOAST_ACTION
                 Bundle().also { extras ->
-                    extras.putInt(EXTRA_ITEM, position)
+                    extras.putInt(EXTRA_ITEM, list[position].id.toInt())
                     putExtras(extras)
                 }
             }
-            setOnClickFillInIntent(R.id.widget_item, fillInIntent)
+            val buttonInIntent = Intent().apply {
+                action=BUTTON_ACTION
+                Bundle().also { extras ->
+                    extras.putInt(EXTRA_ITEM, list[position].id.toInt())
+                    extras.putString(DDL_NAME, list[position].name)
+                    putExtras(extras)
+                }
+            }
+            setOnClickFillInIntent(R.id.button,buttonInIntent )
+            setOnClickFillInIntent(R.id.widget_item, toastInIntent)
         }
     }
 

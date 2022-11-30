@@ -2,41 +2,58 @@ package com.google.android.material.composethemeadapter.sample.widget
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
-import android.app.Service
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
-import android.widget.RemoteViewsService
 import android.widget.Toast
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.R
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
+import com.google.android.material.composethemeadapter.sample.backstage.Schedule
+import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
+import java.util.*
 
 
 class TimeManagerWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val mgr: AppWidgetManager = AppWidgetManager.getInstance(context)
+        //Toast.makeText(context,intent.action,Toast.LENGTH_SHORT).show()
+        intent.action?.let { Log.println(Log.ERROR,"114514","Action is "+ it) }
+        val appWidgetId: Int = intent.getIntExtra(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        )
+        Log.println(Log.ERROR,"114514", "receive "+appWidgetId.toString())
         if (intent.action == TOAST_ACTION) {
-            val appWidgetId: Int = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID
-            )
-            val viewIndex: Int = intent.getIntExtra(EXTRA_ITEM, 0)
-            Toast.makeText(context, "Touched view $viewIndex", Toast.LENGTH_SHORT).show()
-            val pendingIntent=Intent(context, MainActivity::class.java)
-            pendingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(pendingIntent)
+            val MainIntent=Intent(context, MainActivity::class.java)
+            val bundle = Bundle()
+            //可以通过Bundle添加数据了
+            MainIntent.putExtras(bundle)
+            MainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(MainIntent)
         }
         else if(intent.action == BUTTON_ACTION){
             val appWidgetId: Int = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID
             )
-            //Do whatever you want
+            val viewIndex: Int= intent.getIntExtra(EXTRA_ITEM, 0)
+            val viewName: String? = intent.getStringExtra(DDL_NAME)
+            Toast.makeText(context,"Task "+viewIndex+":"+viewName+" Finish",Toast.LENGTH_SHORT).show()
+
+            val schedule=Schedule(context)
+            //schedule.removeDDlFromId(viewIndex)
+            schedule.saveAll()
+            UpdateWidget(context,appWidgetId,mgr)
+        }
+        else if (intent.action==UPDATE){
+            Log.println(Log.ERROR,"114514","good to receive")
         }
 
         super.onReceive(context, intent)
@@ -48,46 +65,36 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        Log.d("ddllist","111")
         appWidgetIds.forEach { appWidgetId ->
-            val intent = Intent(context, StackWidgetService::class.java).apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
-            }
-
-            val rv = RemoteViews(context.packageName, R.layout.widget_layout).apply {
-                setRemoteAdapter(R.id.stack_view, intent)
-                setEmptyView(R.id.stack_view, R.id.empty_view)
-            }
-
-            val toastPendingIntent: PendingIntent = Intent(
-                context,
-                TimeManagerWidgetProvider::class.java
-            ).run {
-                action = TOAST_ACTION
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
-
-                PendingIntent.getBroadcast(context, 0, this, PendingIntent.FLAG_UPDATE_CURRENT)
-            }
-
-            val buttonPendingIntent: PendingIntent = Intent(
-                context,
-                TimeManagerWidgetProvider::class.java
-            ).run {
-                action = BUTTON_ACTION
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
-
-                PendingIntent.getBroadcast(context, 0, this, PendingIntent.FLAG_UPDATE_CURRENT)
-            }
-
-            rv.setPendingIntentTemplate(R.id.stack_view, toastPendingIntent)
-            rv.setOnClickPendingIntent(R.id.button, buttonPendingIntent)
-
-            appWidgetManager.updateAppWidget(appWidgetId, rv)
+            Log.println(Log.ERROR,"114514", "create:"+appWidgetId.toString())
+            UpdateWidget(context,appWidgetId,appWidgetManager)
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    fun UpdateWidget(context: Context, appWidgetId: Int,appWidgetManager: AppWidgetManager){
+        val intent = Intent(context, StackWidgetService::class.java).apply {
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+        }
+
+        val rv = RemoteViews(context.packageName, R.layout.widget_layout).apply {
+            setRemoteAdapter(R.id.stack_view, intent)
+            setEmptyView(R.id.stack_view, R.id.empty_view)
+        }
+
+        val toastPendingIntent: PendingIntent = Intent(
+            context,
+            TimeManagerWidgetProvider::class.java
+        ).run {
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+            PendingIntent.getBroadcast(context, 0, this, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        rv.setPendingIntentTemplate(R.id.stack_view, toastPendingIntent)
+        appWidgetManager.updateAppWidget(appWidgetId, rv)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,R.layout.widget_layout)
     }
 
 }

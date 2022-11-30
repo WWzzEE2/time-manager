@@ -1,5 +1,7 @@
 package com.google.android.material.composethemeadapter.sample.front.ddl
 
+import android.content.Intent
+import android.os.Bundle
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
@@ -265,6 +267,7 @@ fun DDLScreen(
                     list.remove(task)
                     schedule.removeDDl(task)
                     schedule.saveAll()
+                    schedule.updateWidget()
                 }
             )
             Spacer(Modifier.height(16.dp))

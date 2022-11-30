@@ -1,0 +1,45 @@
+Index: sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Function.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication.backstage\r\n\r\nimport com.google.android.material.composethemeadapter.sample.backstage.termInfo\r\nimport java.text.SimpleDateFormat\r\nimport java.util.*\r\nimport kotlin.math.abs\r\nimport kotlin.math.max\r\nimport kotlin.math.min\r\n\r\ninternal fun min(a: Short, b: Short) = if (a < b) a else b\r\ninternal tailrec fun gcd(a: Int, b: Int): Int = if (b == 0) abs(a) else gcd(b, a % b)\r\ninternal tailrec fun gcd(a: Long, b: Long): Long = if (b == 0L) abs(a) else gcd(b, a % b)\r\ninternal fun crossover(s1: Int, e1: Int, s2: Int, e2: Int) = max(s1, s2) < min(e1, e2)\r\ninternal fun crossover(s1: Long, e1: Long, s2: Long, e2: Long) = max(s1, s2) < min(e1, e2)\r\n\r\ndata class WeekDay (\r\n    var week: Long,\r\n    var day:Long\r\n) {\r\n    fun getTime(): Long {\r\n        return termInfo.StartingTime+((week-1)*7+day+1)*24*3600*1000\r\n    }\r\n}\r\n\r\ninternal fun getWeekDay(termStart: Long, timeStamp: Long) : WeekDay {\r\n    val week = (timeStamp - termStart) /( 24 * 3600 * 1000 * 7)+1\r\n    val day= ((timeStamp-termStart)/(1000*3600*24))%7\r\n    return WeekDay(week,day)\r\n}\r\n\r\ninternal fun getWeek(termStart: Long, timeStamp: Long) = ((timeStamp - termStart) / 24 / 3600 / 1000 / 7)\r\n\r\nfun getDay(timeStamp: Long) = Calendar.getInstance().let {\r\n    it.time = Date(timeStamp)\r\n    (it[Calendar.DAY_OF_WEEK]-1).toLong()\r\n}\r\n\r\nfun getHour(timeStamp: Long) :Long{\r\n    val pasthour=((timeStamp- termInfo.StartingTime)/1000/3600)%24\r\n    return pasthour\r\n}\r\n\r\n/**\r\n * 输入时间戳，返回位于一天中的第几分钟\r\n */\r\nfun getPastMin(timeStamp: Long): Long {\r\n    val past_min=((timeStamp- termInfo.StartingTime)/1000/60)%(24*60)\r\n    return past_min\r\n}\r\n\r\n/**\r\n * 输入时间戳，返回属于哪一列\r\n */\r\nfun getRow(timeStamp: Long):Short{\r\n    val past_min=getPastMin(timeStamp)\r\n    var column=-1\r\n    for(index in 1..termInfo.RowStart.size)\r\n        if(past_min>= termInfo.RowStart.get(index) &&past_min< termInfo.RowEnd.get(index))\r\n        {\r\n            column=index\r\n            break\r\n        }\r\n    return column.toShort()\r\n}\r\n\r\n/**\r\n * 输入小时和分钟，返回位于当天多少分钟\r\n */\r\nfun getPastMin(hour: Short, min:Short):Long{\r\n    val past_min=(hour*60+min).toLong()\r\n    return past_min\r\n}\r\n\r\nfun getTimeStamp(year: Long, month: Long, day: Long): Long {\r\n    var dateTime = \"\"\r\n    dateTime += year.toString()\r\n    dateTime += (\"-\")\r\n    if(month<10)\r\n        dateTime+=(\"0\")\r\n    dateTime+=(month.toString())\r\n    dateTime+=(\"-\")\r\n    if (day<10)\r\n        dateTime+=(0)\r\n    dateTime+=(day.toString())\r\n\r\n    dateTime+=(\" 00:00:01\")\r\n    val simpleDateFormat = SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\", Locale.getDefault())\r\n    val date = simpleDateFormat.parse(dateTime)\r\n    val timestamp = date?.time\r\n    return timestamp!!.toLong()\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Function.kt b/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Function.kt
+--- a/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Function.kt	(revision 5a01dc5e4f9523318af279f6f08d11f25ab7dd0f)
++++ b/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Function.kt	(date 1669625073423)
+@@ -49,7 +49,7 @@
+ }
+ 
+ /**
+- * 输入时间戳，返回属于哪一列
++ * 输入时间戳，返回属于哪一行
+  */
+ fun getRow(timeStamp: Long):Short{
+     val past_min=getPastMin(timeStamp)
+@@ -88,4 +88,9 @@
+     val date = simpleDateFormat.parse(dateTime)
+     val timestamp = date?.time
+     return timestamp!!.toLong()
++}
++
++fun getClassStartTime(time:short):Long
++{
++    return termInfo.RowStart[time]
+ }
+\ No newline at end of file
+Index: sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Course.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.google.android.material.composethemeadapter.sample.backstage\r\n\r\nimport com.example.myapplication.backstage.getHour\r\nimport com.example.myapplication.backstage.getPastMin\r\nimport com.example.myapplication.backstage.getTimeStamp\r\n\r\ndata class TermInfo (\r\n    var StartingTime: Long=0,\r\n    var RowStart : MutableList<Long> = mutableListOf(),\r\n    var RowEnd : MutableList<Long> =mutableListOf()\r\n) {\r\n    fun setTime(year: Long,month: Long,day: Long)\r\n    {\r\n        StartingTime= getTimeStamp(year, month, day)\r\n    }\r\n}\r\nvar termInfo: TermInfo = TermInfo()\r\n\r\ndata class DDlInfo(\r\n    val Name:  String,                  //DDL名字\r\n    val Id : Long,\r\n    val EndingTime : Long,              //DDL结束时间\r\n    val Prompt : String,                //DDL描述\r\n    val StartingTime : Long             //DDL开始工作时间\r\n){\r\n    fun wrapTime(time:Long):String=if (time<10) {\"0\"+time.toString()} else {time.toString()}\r\n    fun getString():String\r\n    {\r\n        //val weekDay= getWeekDay(termInfo.StartingTime,EndingTime)\r\n        var output =\"\"\r\n        /*output.plus(weekDay.week.toString())\r\n        output.plus(\"周 \")\r\n        var day_string =\"\"\r\n        when(weekDay.day)\r\n        {\r\n            1.toLong() -> day_string=\"周一\"\r\n            2.toLong() -> day_string=\"周二\"\r\n            3.toLong() -> day_string=\"周三\"\r\n            4.toLong() -> day_string=\"周四\"\r\n            5.toLong() -> day_string=\"周五\"\r\n            6.toLong() -> day_string=\"周六\"\r\n            7.toLong() -> day_string=\"周日\"\r\n        }\r\n        output.plus(day_string)*/\r\n        val hour= getHour(EndingTime)\r\n        val min= getPastMin(EndingTime) -hour*60\r\n        output+=wrapTime(hour)\r\n        output+=\":\"\r\n        output+=wrapTime(min)\r\n        return output\r\n    }\r\n}\r\n\r\ndata class CourseTemplate(              //模板，对应以周为单位的日历上的一块\\\r\n    var Column: Long,                   //课程位于哪一列\r\n    var StartingTime : Long,            //课程开始于哪一行\r\n    var EndingTime : Long,              //课程结束于哪一行\r\n    var Period: Long                    //一周一次或两周一次(应该不存在三天一次的课吧，\r\n                                        // 一周两次的话就建立两个template)\r\n) {\r\n    lateinit var info: CourseInfo\r\n}\r\n\r\ndata class CourseInfo(\r\n    var Name:  String,                  //课程名字\r\n    var StartingTime : Long,            //课程开始时间，直接使用时间戳\r\n    var EndingTime : Long,              //课程结束时间，直接使用时间戳，(前端输入时可以选择持续多少周，但后端不记录)\r\n    var TimeInfo : MutableList<CourseTemplate>,//课程时间，存放CourseTemplate的List\r\n    var Prompt : String,                //课程描述\r\n    var Location: String,               //课程位置\r\n){\r\n    fun addCourse(courseTime: CourseTemplate)\r\n    {\r\n        courseTime.info= this\r\n        TimeInfo.add(courseTime)\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Course.kt b/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Course.kt
+--- a/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Course.kt	(revision 5a01dc5e4f9523318af279f6f08d11f25ab7dd0f)
++++ b/sample/src/main/java/com/google/android/material/composethemeadapter/sample/backstage/Course.kt	(date 1669624490742)
+@@ -76,3 +76,4 @@
+     }
+ }
+ 
++
