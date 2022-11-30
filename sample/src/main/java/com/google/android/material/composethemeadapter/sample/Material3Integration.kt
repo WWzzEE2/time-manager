@@ -61,12 +61,6 @@ class MainActivity : AppCompatActivity() {
         var config = TestDataConfig(20,1000,20,12)
         schedule = Schedule(this, config)
 
-//        contentView.setContent {
-//            Mdc3Theme {
-//                BottomNavigation(this)
-//            }
-//        }
-
 
         var test = Import()
         val testdata = """
@@ -102,9 +96,10 @@ class MainActivity : AppCompatActivity() {
         Log.d("Testdata","TestDone")
         schedule.saveAll()
 
+
         contentView.setContent {
             Mdc3Theme {
-                Greeting()
+                BottomNavigation(this)
             }
         }
 
