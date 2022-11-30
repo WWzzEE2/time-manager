@@ -153,12 +153,10 @@ fun SelectTime(Label: String, Index: Int) {
     val days = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     if (Label != "Column")
         valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
-    if (Label == "EndingTime")
-        valueList.add(14)
     selectValue = when (Label) {
         "Column" -> templateList[Index].column
         "StartingTime" -> templateList[Index].startingTime
-        else -> templateList[Index].endingTime
+        else -> templateList[Index].endingTime - 1
     } + 1
     Box() {
         TextButton(onClick = { expanded = !expanded }) {
@@ -354,7 +352,7 @@ fun changeData(type: String, content: String) {
                 templateList[num].endingTime = templateList[num].startingTime + 1
         }
         "EndingTime" -> {
-            templateList[num].endingTime = content.toLong() - 1
+            templateList[num].endingTime = content.toLong()
             if (templateList[num].endingTime <= templateList[num].startingTime)
                 templateList[num].endingTime = templateList[num].startingTime + 1
         }
