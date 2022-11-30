@@ -15,10 +15,10 @@ import com.example.myapplication.EditPage
 import com.example.myapplication.SettingsPage
 import com.example.myapplication.backstage.*
 import com.example.myapplication.front.calendar.CalendarPage
-import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 import com.google.android.material.composethemeadapter.sample.backstage.WeekDay
 import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
+import com.google.android.material.composethemeadapter.sample.MainActivity
 import java.util.*
 import android.content.Context
 

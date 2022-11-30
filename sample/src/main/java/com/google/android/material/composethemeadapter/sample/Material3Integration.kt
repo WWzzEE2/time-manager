@@ -16,6 +16,7 @@
 package com.google.android.material.composethemeadapter.sample
 
 import android.accounts.Account
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -30,14 +31,15 @@ import com.google.android.material.composethemeadapter.sample.backstage.load
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.composethemeadapter.sample.backstage.save
+import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
 import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
     var account = UserAccount(
-        "先輩",
-        "114514",
-        "1919180"
+        "Mr.Beaver",
+        "2000012345",
+        "123456"
     )
 
     object GlobalInformation {
@@ -59,16 +61,11 @@ class MainActivity : AppCompatActivity() {
         var config = TestDataConfig(20,1000,20,12)
         schedule = Schedule(this, config)
 
-        contentView.setContent {
-            Mdc3Theme {
-                BottomNavigation(this)
-            }
-        }
 
         var test = Import()
         val testdata = """
             学生网上选课 >> 查看选课结果： 【信息科学技术学院 陈萧白】
-            
+
             课程名	课程类别	学分	周学时	教师	班号	开课单位	教室信息	选课结果	IP地址	操作时间
             概率统计 （A）	专业必修	3.0	3.0	章复熹(副教授)	1	数学科学学院	1~16周 每周周五3~4节 二教205
             1~16周 单周周三7~8节 二教205
@@ -97,7 +94,18 @@ class MainActivity : AppCompatActivity() {
         """.trimIndent()
         test.importFromElective(testdata, this)
         Log.d("Testdata","TestDone")
+        schedule.saveAll()
+
+
+        contentView.setContent {
+            Mdc3Theme {
+                BottomNavigation(this)
+            }
+        }
+
+
     }
+
 }
 
 

@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 
 import com.example.myapplication.front.*
 import com.example.myapplication.front.calendar.CenterText
-import com.google.android.material.composethemeadapter.sample.MainActivity
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -27,8 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.google.android.material.composethemeadapter.sample.R
+import com.google.android.material.composethemeadapter.sample.MainActivity
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -49,7 +51,7 @@ fun SettingsPage(context: Context) {
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.profile_picture),
+                        painter = painterResource(R.drawable.beaver),
                         contentDescription = "Contact profile picture",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -103,13 +105,63 @@ fun SimpleText(Label: String, content: String, context: Context) {
             value = text,
             onValueChange = {
                 text = it
-                changeUserInfo(Label, content, context)
+                changeUserInfo(Label, text, context)
             },
             label = { Text(Label) },
         )
     }
 }
 
+@ExperimentalMaterial3Api
+@Composable
+fun SimplePasswordText(Label: String, content: String, context: Context) {
+
+    var password by rememberSaveable { mutableStateOf(content) }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = password,
+        onValueChange = {
+            password = it
+            changeUserInfo(Label, password, context)
+        },
+        label = { Text("Password") },
+        singleLine = true,
+        placeholder = { Text("Password") },
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            val image = if (passwordVisible)
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
+
+            // Please provide localized description for accessibility services
+            val description = if (passwordVisible) "Hide password" else "Show password"
+
+            IconButton(onClick = {passwordVisible = !passwordVisible}){
+                Icon(imageVector  = image, description)
+            }
+        }
+    )
+
+//    var text by rememberSaveable { mutableStateOf(content) }
+//    Column() { OutlinedTextField(
+//        value = text,
+//        onValueChange = {
+//            text = it
+//            changeUserInfo(Label, content, context)
+//        },
+//        label = { Text(Label) },
+//        visualTransformation = {
+//            if (passwordVisible)
+//                VisualTransformation.None
+//            else
+//                PasswordVisualTransformation
+//        }
+//            )
+//        }
+//    }
+}
 
 @ExperimentalMaterial3Api
 @Composable
@@ -164,7 +216,7 @@ fun EditPassword(context: Context) {
                 .height(35.dp),
             contentDescription = "Location"
         )
-        SimpleText(Label = "Password", content = activity.account.PassWord, context)
+        SimplePasswordText(Label = "Password", content = activity.account.PassWord, context)
     }
 }
 
