@@ -37,11 +37,11 @@ class TermInfo internal constructor(
 }
 
 data class DDlInfo(
-    val name: String,                  //DDL名字
+    var name: String,                  //DDL名字
     val id: Long,
-    val endingTime: Long,              //DDL结束时间
+    var endingTime: Long,              //DDL结束时间
     val prompt: String,                //DDL描述
-    val startingTime: Long             //DDL开始工作时间
+    var startingTime: Long             //DDL开始工作时间
 ) {
     fun wrapTime(time: Long): String = if (time < 10) "0$time" else time.toString()
     fun getString(termInfo: TermInfo): String {
