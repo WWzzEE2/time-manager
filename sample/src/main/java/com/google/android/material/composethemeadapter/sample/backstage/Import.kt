@@ -6,10 +6,15 @@ import androidx.compose.runtime.mutableStateListOf
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
-import com.google.android.material.composethemeadapter.sample.backstage.getWeekStamp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.*
+import java.io.IOException
 
 
-data class UserAccount( // future to use
+data class UserAccount(
+    // future to use
     var UserName: String,
     var ID: String,
     var PassWord: String,
@@ -17,6 +22,23 @@ data class UserAccount( // future to use
 )
 
 class Import {
+
+    private var defaultHeaders =  Headers.Builder()
+    .add("Accept","application/json, text/javascript, */*; q=0.01")
+    .add("Accept-Encoding", "gzip, deflate, br")
+    .add("Accept-Language", "en-US,en;q=0.9")
+    .add("Host", "iaaa.pku.edu.cn")
+    .add("Origin","https://iaaa.pku.edu.cn")
+    .add("Connection","keep-alive").build()
+
+    private val homeUrl="https://iaaa.pku.edu.cn/iaaa/oauth.jsp"
+    private val loginUrl="https://iaaa.pku.edu.cn/iaaa/oauthlogin.do"
+    private val redirUrl="https://course.pku.edu.cn/webapps/bb-sso-bb_bb60/execute/authValidate/campusLogin"
+
+    //DEBUG:your account here
+    private val user = UserAccount("","1","")
+    //DEBUG:your account here
+
     /**
      * Add a course with data pasted from elective website
      * @return False when add fail
@@ -112,4 +134,62 @@ class Import {
         }
         return true
     }
+
+    private fun visitIAAA() {
+        val homeHeaders = Headers.Builder().addAll(defaultHeaders)
+            .add("Referer","https://course.pku.edu.cn/")
+            .add("Upgrade-Insecure-Requests","1").build()
+        val formBody = FormBody.Builder()
+            .add("appID", "blackboard")
+            .add("appName","1")
+            .add("redirectUrl",redirUrl).build()
+        val okHttpClient = OkHttpClient()
+        val request = Request.Builder()
+            .headers(homeHeaders).url(homeUrl).post(formBody).build()
+        val call = okHttpClient.newCall(request)
+
+        try {
+            var response = call.execute()
+            if (response.isSuccessful) {
+                Log.d("TestWebLogin", response.body!!.string())
+            }
+        } catch (e:IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loginIAAA() {
+        val loginHeaders = Headers.Builder().addAll(defaultHeaders)
+            .add("Referer", homeUrl)
+            .add("X-Requested-With","XMLHttpRequest").build()
+        val formBody=FormBody.Builder()
+            .add("appid","blackboard")
+            .add("userName",user.UserName)
+            .add("password",user.PassWord)
+            .add("randCode","")
+            .add("smsCode","")
+            .add("otpCode","")
+            .add("redirUrl",redirUrl).build()
+        val okHttpClient = OkHttpClient()
+        val request = Request.Builder()
+            .headers(loginHeaders).url(loginUrl).post(formBody).build()
+        val call = okHttpClient.newCall(request)
+
+        try {
+            var response = call.execute()
+            if (response.isSuccessful) {
+                Log.d("TestWebLogin", response.body!!.string())
+            }
+        } catch (e:IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun importFromCourse() {
+        GlobalScope.launch {
+            visitIAAA()
+            loginIAAA()
+        }
+    }
+
 }
