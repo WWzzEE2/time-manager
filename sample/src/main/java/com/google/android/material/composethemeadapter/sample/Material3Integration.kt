@@ -15,6 +15,7 @@
 
 package com.google.android.material.composethemeadapter.sample
 
+import android.accounts.Account
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import com.example.myapplication.backstage.Import
+import com.example.myapplication.backstage.UserAccount
 import com.google.android.material.composethemeadapter.sample.backstage.Schedule
 import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
 import com.google.android.material.composethemeadapter.sample.backstage.load
@@ -34,6 +36,13 @@ import com.google.android.material.composethemeadapter3.Mdc3Theme
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
+    lateinit var testdata:String
+
+    var account = UserAccount(
+        "Mr.Beaver",
+        "2000012345",
+        "123456"
+    )
 
     object GlobalInformation {
         @JvmStatic
@@ -52,10 +61,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(contentView)
 
         var config = TestDataConfig(20,1000,20,12)
-        schedule = Schedule(this)
+        schedule = Schedule(this, config)
+
 
         var test = Import()
-        val testdata = """
+        testdata = """
             学生网上选课 >> 查看选课结果： 【信息科学技术学院 陈萧白】
 
             课程名	课程类别	学分	周学时	教师	班号	开课单位	教室信息	选课结果	IP地址	操作时间
@@ -88,9 +98,10 @@ class MainActivity : AppCompatActivity() {
         Log.d("Testdata","TestDone")
         schedule.saveAll()
 
+
         contentView.setContent {
             Mdc3Theme {
-                Greeting()
+                BottomNavigation(this)
             }
         }
 
@@ -99,9 +110,5 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Greeting() {
-    BottomNavigation()
-}
+
 

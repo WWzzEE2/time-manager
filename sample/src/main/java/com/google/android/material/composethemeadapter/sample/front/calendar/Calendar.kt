@@ -1,5 +1,6 @@
 package com.example.myapplication.front.calendar
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import com.example.myapplication.backstage.Import
 import com.example.myapplication.front.*
 import com.example.myapplication.ui.theme.*
 import com.google.android.material.composethemeadapter.sample.MainActivity
@@ -31,8 +33,13 @@ val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 private class WeekIdx(
     var index: MutableState<Int>,
     var showDdl: MutableState<Boolean>,
-    var showWeekSelector: MutableState<Boolean>
-)
+    var showWeekSelector: MutableState<Boolean>,
+    var recompose: MutableState<Boolean>,
+) {
+    fun forceRecompose() {
+        recompose.value = !recompose.value
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,19 +47,21 @@ fun CalendarPage(
     screenState: ScreenState
 ) {
 
-    var week = WeekIdx(remember { mutableStateOf(screenState.getCurWeek().toInt()) },
+    var week = WeekIdx(
+        remember { mutableStateOf(screenState.getCurWeek().toInt()) },
         remember { mutableStateOf(true) },
-        remember { mutableStateOf(false) })
+        remember { mutableStateOf(false) },
+        remember { mutableStateOf(false) }
+    )
     Scaffold(
         topBar = { TopBar(screenState, week) },
-    ) { padding->
+    ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             WeekSelector(screenState, week)
             Spacer(modifier = Modifier.height(5.dp))
             CalendarGrid(
                 screenState,
-                week.index.value,
-                week.showDdl.value
+                week
             )
             println("regenerate")
         }
@@ -119,6 +128,22 @@ private fun CalendarSetting(week: WeekIdx) {
                     expanded = false
                 },
             )
+            DropdownMenuItem(
+                modifier = Modifier
+                    .height(50.dp),
+                text = { CenterText(text = "load from excel") },
+                onClick = {
+                    var test = Import()
+                    test.importFromElective(
+                        MainActivity.GlobalInformation.activity.testdata,
+                        MainActivity.GlobalInformation.activity
+                    )
+                    MainActivity.GlobalInformation.activity.schedule.saveAll()
+                    expanded = false
+                    week.recompose.value = !week.recompose.value
+//                    week.forceRecompose()
+                },
+            )
 
         }
     }
@@ -156,7 +181,7 @@ private fun WeekSelector(
 //                        week.showWeekSelector.value = false
                     },
                     selectedContentColor = Color.Black,
-                    unselectedContentColor = when(i.toLong() == screenState.getRealWeek()) {
+                    unselectedContentColor = when (i.toLong() == screenState.getRealWeek()) {
                         true -> Color.Gray
                         false -> Color.LightGray
                     }
@@ -171,11 +196,13 @@ private fun WeekSelector(
 
 
 @Composable
-fun CalendarGrid(
+private fun CalendarGrid(
     screenState: ScreenState,
-    weekIndex: Int,
-    showDDLlist: Boolean = true
+    week: WeekIdx,
 ) {
+    var weekIndex = week.index.value
+    var showDDLlist = week.showDdl.value
+    var recompose = week.recompose.value
     println(weekIndex)
     LazyRow(
         modifier = Modifier.padding(5.dp, 0.dp),
@@ -186,8 +213,9 @@ fun CalendarGrid(
                 val width = 100.dp//width of each column
                 Row() {
                     for (i in 0..6) {
-                        if(i.toLong() == screenState.getRealDay()
-                            && weekIndex.toLong() == screenState.getRealWeek()) {
+                        if (i.toLong() == screenState.getRealDay()
+                            && weekIndex.toLong() == screenState.getRealWeek()
+                        ) {
                             SpecialCenterText(
                                 modifier = Modifier
                                     .padding(5.dp, 0.dp)
@@ -304,7 +332,7 @@ fun DailyList(
                             CourseTemplate(
                                 dayIndex.toLong(),
                                 startTime.toLong(),
-                                (startTime+1).toLong(),
+                                (startTime + 1).toLong(),
                                 1
                             ),
                             "click_null"
@@ -427,6 +455,7 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
         // get ddl info
     }
 }
+
 @Composable
 fun DdlLine(
     color: Color,
@@ -465,7 +494,6 @@ inline fun MultiClick(
 fun previewddllinelist() {
     DdlLineList(modifier = Modifier, weekIndex = 0, dayIndex = 0, width = 100.dp);
 }
-
 
 
 @Preview
