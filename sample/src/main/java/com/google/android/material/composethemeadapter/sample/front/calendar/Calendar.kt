@@ -1,6 +1,5 @@
 package com.example.myapplication.front.calendar
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
@@ -26,7 +25,6 @@ import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.google.android.material.composethemeadapter.sample.backstage.getPastMin
-import java.lang.Math.abs
 
 val weekday = arrayListOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
@@ -90,7 +88,7 @@ private fun TopBar(screenState: ScreenState, week: WeekIdx) {
         actions = {
             // RowScope here, so these icons will be placed horizontally
 
-            CalendarSetting(week)
+            CalendarSetting(week,screenState)
             IconButton(
                 onClick = {
                     screenState.goToEdit(
@@ -105,8 +103,9 @@ private fun TopBar(screenState: ScreenState, week: WeekIdx) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CalendarSetting(week: WeekIdx) {
+private fun CalendarSetting(week: WeekIdx, screenState: ScreenState) {
     var expanded by remember { mutableStateOf(false) }
     Box()
     {
@@ -122,7 +121,7 @@ private fun CalendarSetting(week: WeekIdx) {
             DropdownMenuItem(
                 modifier = Modifier
                     .height(50.dp),
-                text = { CenterText(text = "show ddl") },
+                text = { CenterText(text = if(week.showDdl.value) "hide ddl" else "show ddl")},
                 onClick = {
                     week.showDdl.value = !week.showDdl.value
                     expanded = false
@@ -131,20 +130,20 @@ private fun CalendarSetting(week: WeekIdx) {
             DropdownMenuItem(
                 modifier = Modifier
                     .height(50.dp),
-                text = { CenterText(text = "load from excel") },
+                text = { CenterText(text = "load from text") },
                 onClick = {
-                    var test = Import()
-                    test.importFromElective(
-                        MainActivity.GlobalInformation.activity.testdata,
-                        MainActivity.GlobalInformation.activity
-                    )
-                    MainActivity.GlobalInformation.activity.schedule.saveAll()
+                    screenState.goToLoad()
+//                    var test = Import()
+//                    test.importFromElective(
+//                        MainActivity.GlobalInformation.activity.testdata,
+//                        MainActivity.GlobalInformation.activity
+//                    )
+//                    MainActivity.GlobalInformation.activity.schedule.saveAll()
                     expanded = false
                     week.recompose.value = !week.recompose.value
 //                    week.forceRecompose()
                 },
             )
-
         }
     }
 }
@@ -442,15 +441,21 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
         var ddllist = schedule.getDDlFromRelativeTime(weekIndex.toLong(), dayIndex.toLong())
-        var lastminute: Long = 0
         for (ddl in ddllist) {
             val pastMinute = getPastMin(ddl.endingTime, schedule.termInfo)
-            val parse: Int = (pastMinute - lastminute).toInt()
-            Column() {
-                Spacer(modifier = modifier.height(parse * 1.dp))
-                DdlLine(color = Red_T, modifier = Modifier.width(width))
+
+            for (i in 1 until schedule.termInfo.rowStart.size)
+            {
+                if(pastMinute<schedule.termInfo.rowStart[i])
+                {
+                    var height: Long = 65*(i-1) + 65 * (pastMinute-schedule.termInfo.rowStart[i-1])/(schedule.termInfo.rowStart[i]-schedule.termInfo.rowStart[i-1])
+                    Column() {
+                        Spacer(modifier = modifier.height(height.toInt() * 1.dp))
+                        DdlLine(color = Red_T, modifier = Modifier.width(width))
+                    }
+                    break
+                }
             }
-            lastminute = pastMinute;
         }
         // get ddl info
     }
