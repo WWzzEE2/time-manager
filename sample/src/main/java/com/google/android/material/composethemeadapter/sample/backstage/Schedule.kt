@@ -4,6 +4,7 @@ package com.google.android.material.composethemeadapter.sample.backstage
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
@@ -387,7 +388,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     }
 
     fun updateWidget(){
-        val mWidgetIntent = Intent()
+        val mWidgetIntent = Intent(scheduleContext,TimeManagerWidgetProvider::class.java)
         mWidgetIntent.action = "com.ideal.note.widget"
         scheduleContext.sendBroadcast(mWidgetIntent)
     }

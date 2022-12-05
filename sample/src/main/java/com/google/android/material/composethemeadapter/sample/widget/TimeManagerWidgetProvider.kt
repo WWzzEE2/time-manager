@@ -13,23 +13,22 @@ import android.widget.RemoteViews
 import android.widget.Toast
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.R
-import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.google.android.material.composethemeadapter.sample.backstage.Schedule
-import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
 import java.util.*
 
+var idsSet: MutableSet<Int> = HashSet()
 
 class TimeManagerWidgetProvider : AppWidgetProvider() {
-
     override fun onReceive(context: Context, intent: Intent) {
         val mgr: AppWidgetManager = AppWidgetManager.getInstance(context)
         //Toast.makeText(context,intent.action,Toast.LENGTH_SHORT).show()
-        intent.action?.let { Log.println(Log.ERROR,"114514","Action is "+ it) }
         val appWidgetId: Int = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
-        Log.println(Log.ERROR,"114514", "receive "+appWidgetId.toString())
+        intent.action?.let { Log.println(Log.ERROR,"114514","Action is "+ it) }
+        //Log.println(Log.ERROR,"114514", "receive "+appWidgetId.toString())
+        //Log.println(Log.ERROR,"114514", "idset is"+idsSet.toString())
         if (intent.action == TOAST_ACTION) {
             val MainIntent=Intent(context, MainActivity::class.java)
             val bundle = Bundle()
@@ -53,7 +52,9 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
             UpdateWidget(context,appWidgetId,mgr)
         }
         else if (intent.action==UPDATE){
-            Log.println(Log.ERROR,"114514","good to receive")
+            for (id in idsSet) {
+                UpdateWidget(context,id,mgr)
+            }
         }
 
         super.onReceive(context, intent)
@@ -66,10 +67,19 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         appWidgetIds.forEach { appWidgetId ->
-            Log.println(Log.ERROR,"114514", "create:"+appWidgetId.toString())
+            idsSet.add(appWidgetId)
+            //Log.println(Log.ERROR,"114514", "create:"+appWidgetId.toString())
             UpdateWidget(context,appWidgetId,appWidgetManager)
         }
+        //.println(Log.ERROR,"114514", "idset is"+idsSet.toString())
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
+
+    override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
+        for (appWidgetId in appWidgetIds!!) {
+            idsSet.remove(appWidgetId)
+        }
+        super.onDeleted(context, appWidgetIds)
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -94,7 +104,7 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
         }
         rv.setPendingIntentTemplate(R.id.stack_view, toastPendingIntent)
         appWidgetManager.updateAppWidget(appWidgetId, rv)
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,R.layout.widget_layout)
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,R.id.stack_view)
     }
 
 }
