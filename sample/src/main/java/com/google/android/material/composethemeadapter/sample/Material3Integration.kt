@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(contentView)
 
         var config = TestDataConfig(20,1000,20,12)
-        schedule = Schedule(this)
+        schedule = Schedule(this,config)
 
         var test = Import()
 
