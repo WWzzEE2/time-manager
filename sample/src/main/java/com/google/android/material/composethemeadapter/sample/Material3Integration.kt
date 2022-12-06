@@ -94,9 +94,9 @@ class MainActivity : AppCompatActivity() {
             考试时间：20221226下午；	已选上	125.115.42.228	2022-07-07 12:22:55
         """.trimIndent()
         //test.importFromElective(testdata, this)
-        test.importFromCourse()
+        //test.importFromCourse()
         Log.d("TestWeb","TestDone")
-        schedule.saveAll()
+        //schedule.saveAll()
 
 
         contentView.setContent {

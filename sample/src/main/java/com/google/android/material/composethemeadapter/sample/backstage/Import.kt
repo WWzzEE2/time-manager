@@ -90,6 +90,12 @@ class Import {
                 if(infoSplit.size<=3)
                     continue
                 var column:Long=0
+                var period:Long=1
+                when(infoSplit[2][0]){
+                    '每'->period=1
+                    '单'->period=2
+                    '双'->period=2
+                }
                 when(infoSplit[3][0])
                 {
                     '一'->column=0
@@ -101,12 +107,12 @@ class Import {
                     '日'->column=6
                 }
                 startingTime= schedule.getWeekStamp(infoSplit[0].toLong())
-                endingTime=schedule.getWeekStamp(infoSplit[1].toLong())
+                endingTime=schedule.getWeekStamp(infoSplit[1].toLong()+1)
                 var rowStart=infoSplit[3].substring(1).toString().toLong()
                 var rowEnd=infoSplit[4].toLong() + 1
                 Log.d("rowStart", rowStart.toString())
                 Log.d("rowEnd", rowEnd.toString())
-                templateList.add(CourseTemplate(column,rowStart, rowEnd,1))
+                templateList.add(CourseTemplate(column,rowStart, rowEnd,period))
                 var k:Int=0
                 for (s in infoSplit) {
                     Log.d("TestdataSplit", s.trimIndent()+" "+ k.toString())
