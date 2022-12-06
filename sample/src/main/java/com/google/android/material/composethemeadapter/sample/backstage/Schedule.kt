@@ -164,6 +164,8 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
     private val courseSet = HashSet<CourseInfo>()
 
+    internal val pulledDDl = HashSet<String>()
+
     private val scheduleContext=context
     var termInfo = TermInfo(getTimeStamp(2022, 9, 5), getTimeStamp(2023, 2, 10))
         internal set

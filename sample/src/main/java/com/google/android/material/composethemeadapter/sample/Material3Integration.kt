@@ -39,9 +39,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var testdata:String
 
     var account = UserAccount(
-        "Mr.Beaver",
-        "2000012345",
-        "123456"
+        "你的学号",
+        "你的学号",
+        "你的密码"
     )
 
     object GlobalInformation {
@@ -61,13 +61,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(contentView)
 
         var config = TestDataConfig(20,1000,20,12)
-        schedule = Schedule(this,config)
+        schedule = Schedule(this)
 
         var test = Import()
 
         test.importFromCourse()
-        Log.d("TestWeb","TestDone")
-        schedule.saveAll()
+//        Log.d("TestWeb","TestDone")
+
 
 
         contentView.setContent {

@@ -3,10 +3,18 @@ package com.example.myapplication.backstage
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.Version
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
 import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
+import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -14,6 +22,12 @@ import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
 import kotlin.random.Random
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 
 data class UserAccount(
@@ -59,6 +73,16 @@ class Import {
         .add("Refer","https://iaaa.pku.edu.cn/")
         .build()
 
+    private val ddlHeader =  Headers.Builder()
+        .add("Accept", "*/*")
+        .add("Accept-Encoding", "gzip, deflate, br")
+        .add("Accept-Language", "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7")
+        .add("Connection","keep-alive")
+        .add("Host", "course.pku.edu.cn")
+        .add("Referer", "https://course.pku.edu.cn/webapps/calendar/viewPersonal")
+        .add("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
+        .build()
+
     private val homeUrl="https://iaaa.pku.edu.cn/iaaa/oauth.jsp"
     private val loginUrl="https://iaaa.pku.edu.cn/iaaa/oauthlogin.do"
     private val ssoUrl="https://course.pku.edu.cn/webapps/bb-sso-bb_bb60/execute/authValidate/campusLogin"
@@ -66,7 +90,7 @@ class Import {
     private val cookieJar = storeCookieJar()
 
     //DEBUG:your account here
-    private val user = UserAccount("username","1","password")
+    private val user = MainActivity.GlobalInformation.activity.account
     //DEBUG:your account here
 
     /**
@@ -302,6 +326,53 @@ class Import {
         return true
     }
 
+    private fun importDDLFromCourse(startTime:Long, endTime:Long): Boolean {
+        val url = "https://course.pku.edu.cn/webapps/calendar/calendarData/selectedCalendarEvents"//?start=${startTime}&end=${endTime}&course_id=&mode=personal"
+        val getUrl = url.toHttpUrlOrNull()!!.newBuilder()
+        getUrl.addQueryParameter("start", startTime.toString())
+        getUrl.addQueryParameter("end", endTime.toString())
+        getUrl.addQueryParameter("course_id", "")
+        getUrl.addQueryParameter("mode", "personal")
+        val okHttpClient = OkHttpClient.Builder().cookieJar(cookieJar).build()
+        val request = Request.Builder()
+            .headers(ddlHeader).url(getUrl.build()).get().build()
+        val call = okHttpClient.newCall(request)
+        try {
+            val response = call.execute()
+            if (response.isSuccessful) {
+//                Log.d("TestDDLGet", response.body!!.string())
+                parseDDlFromNetJson(response.body!!.string())
+            }
+            else {
+                Log.d("TestDDLGet", "code: ${response.code}")
+                return false
+            }
+        } catch (e:IOException) {
+            e.printStackTrace()
+            return false
+        }
+        return true
+    }
+
+    private fun parseDDlFromNetJson(json: String) {
+        val objectMapper = jacksonObjectMapper()
+        val schedule = MainActivity.GlobalInformation.activity.schedule
+        val pulledDDl = schedule.pulledDDl
+        val simpleModule = SimpleModule("CustomDDlDeserializer", Version(1,0,0,null,null,null))
+        simpleModule.addDeserializer(PackedDDl::class.java, CustomDDlDeserializer())
+
+        objectMapper.registerModule(simpleModule)
+        val ddlList = objectMapper.readValue<List<PackedDDl>>(json)
+
+        for (ddlPack in ddlList) {
+            if (!pulledDDl.contains(ddlPack.uid) && ddlPack.ddl != null) {
+                pulledDDl.add(ddlPack.uid)
+                schedule.addDDl(ddlPack.ddl)
+            }
+        }
+
+    }
+
     fun importFromCourse() {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             Log.d("TestWebERR", "catch a coroutine error: $throwable")
@@ -326,7 +397,41 @@ class Import {
                 Log.d("TestWebERR","SSO login failed")
                 return@launch
             }
+
+            val schedule = MainActivity.GlobalInformation.activity.schedule
+            val term = schedule.termInfo
+
+            importDDLFromCourse(term.startingTime, term.endingTime)
+
+            schedule.saveAll()
         }
     }
 
+}
+
+data class PackedDDl(val ddl: DDlInfo?, val uid: String)
+
+class CustomDDlDeserializer() : StdDeserializer<PackedDDl>(PackedDDl::class.java) {
+    override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): PackedDDl? {
+
+        if (p != null) {
+            val codec = p.codec
+            val node = codec.readTree<JsonNode>(p)
+            val schedule = MainActivity.GlobalInformation.activity.schedule
+
+            var endDate = node.get("endDate").asText()
+            endDate= endDate.substring(0,10)+" "+endDate.substring(11,19)
+            val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val date = simpleDateFormat.parse(endDate)
+            var timestamp = date?.time
+            timestamp = timestamp?.plus(8L*3600*1000)
+
+            return PackedDDl(
+                if(timestamp != null) DDlInfo(node.get("calendarName").asText(), System.currentTimeMillis(), timestamp, node.get("title").asText(), schedule.termInfo.startingTime) else null,
+                node.get("id").asText()
+            )
+        }
+        else
+            throw NotImplementedError("No parser")
+    }
 }
