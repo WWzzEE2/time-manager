@@ -120,11 +120,11 @@ class Import {
                 if(infoSplit.size<=3)
                     continue
                 var column:Long=0
-                var period:Long=1
+                var period:Long=0
                 when(infoSplit[2][0]){
-                    '每'->period=1
+                    '每'->period=0
                     '单'->period=2
-                    '双'->period=2
+                    '双'->period=1
                 }
                 when(infoSplit[3][0])
                 {
