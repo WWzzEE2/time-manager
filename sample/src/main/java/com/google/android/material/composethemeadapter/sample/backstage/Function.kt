@@ -95,3 +95,6 @@ fun getWeekStamp(startingTime: Long, week: Long): Long {
 fun getTime(startingTime: Long, week: Long, day: Long): Long {
     return startingTime + ((week-1) * 7 + day - 1) * 7 * 24 * 3600 * 1000
 }
+fun transToString(time:Long):String{
+    return SimpleDateFormat("yyyy-MM-DD-hh-mm-ss").format(time).substring(0,10)
+}
