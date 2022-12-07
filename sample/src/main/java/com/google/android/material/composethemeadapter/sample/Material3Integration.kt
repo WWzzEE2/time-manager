@@ -62,9 +62,10 @@ class MainActivity : AppCompatActivity() {
         var config = TestDataConfig(20,1000,20,12)
         schedule = Schedule(this)
 
-        var test = Import()
 
-        test.importFromCourse()
+//        var test = Import()
+//
+//        test.importFromCourse()
 
         contentView.setContent {
             Mdc3Theme {
