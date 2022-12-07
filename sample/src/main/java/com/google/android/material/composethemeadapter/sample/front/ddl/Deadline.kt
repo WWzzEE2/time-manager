@@ -2,6 +2,7 @@ package com.google.android.material.composethemeadapter.sample.front.ddl
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
@@ -155,13 +156,14 @@ fun DeadLineList(
         item { Spacer(modifier = Modifier.height(20.dp)) }
         items(
             items = list,
-            key = { task -> task.endingTime + 1.0 / task.id }
+            key = { task -> listOf(task.endingTime , task.hashCode()) }
         )
         { message ->
             DeadLineCard(
                 ddl = message,
                 onCloseTask = { onCloseTask(message) }
             )
+            Log.d("ddl list", message.id.toString())
         }
         item { Spacer(modifier = Modifier.height(100.dp)) }
     }
@@ -257,10 +259,18 @@ fun DDLScreen(
             )
 
             list = schedule.getDDlFromRelativeTime(
-                selectedWeekTab.ordinal.toLong()-1,
+                selectedWeekTab.ordinal.toLong() - 1,
                 selectedDayTab.ordinal.toLong()
             )
                 .toMutableStateList()
+            for (ddlinfo in list) {
+                Log.d(
+                    "ddl list",
+                    ddlinfo.getString(MainActivity.GlobalInformation.activity.schedule.termInfo)
+                        .toString()
+                )
+                Log.d("ddl list", ddlinfo.id.toString())
+            }
             DeadLineList(
                 list = list,
                 onCloseTask = { task ->
