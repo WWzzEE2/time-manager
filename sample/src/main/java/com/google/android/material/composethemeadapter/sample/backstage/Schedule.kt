@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -161,6 +162,8 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     private val courseMap = Array(7) { TemplateMap(this) }
 
     private val ddlMap = DDLMap(this)
+
+    private val id2DDl = HashMap<Long, DDlInfo>()
 
     private val courseSet = HashSet<CourseInfo>()
 
@@ -347,6 +350,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
      */
     fun addDDl(ddl: DDlInfo) {
         ddlMap.addDDl(ddl)
+        id2DDl.put(ddl.id, ddl)
     }
 
     /**
@@ -354,8 +358,18 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
      */
     fun removeDDl(ddl: DDlInfo) {
         ddlMap.removeDDl(ddl)
+        id2DDl.remove(ddl.id)
     }
 
+    fun removeDDlById(id: Long) : Boolean {
+        if (id2DDl.containsKey(id)) {
+            this.removeDDl(id2DDl[id]!!)
+            return true
+        }
+        else {
+            return false
+        }
+    }
     /**
      * @see DDLMap.getDDl
      */
