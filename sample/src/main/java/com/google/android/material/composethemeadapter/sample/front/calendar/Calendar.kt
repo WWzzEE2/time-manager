@@ -1,5 +1,6 @@
 package com.example.myapplication.front.calendar
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
@@ -44,7 +45,7 @@ private class WeekIdx(
 fun CalendarPage(
     screenState: ScreenState
 ) {
-
+    Log.d("curweek",screenState.getRealWeek().toString())
     var week = WeekIdx(
         remember { mutableStateOf(screenState.getCurWeek().toInt()) },
         remember { mutableStateOf(true) },
@@ -312,7 +313,7 @@ fun DailyList(
                 schedule.getTemplate(
                     i.toLong(),
                     dayIndex.toLong(),
-                    weekIndex.toLong()
+                    weekIndex.toLong()-1
                 )
             var ddl: DDlInfo
             var len: Int
@@ -440,7 +441,7 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
     ) {
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
-        var ddllist = schedule.getDDlFromRelativeTime(weekIndex.toLong(), dayIndex.toLong())
+        var ddllist = schedule.getDDlFromRelativeTime(weekIndex.toLong()-1, dayIndex.toLong())
         for (ddl in ddllist) {
             val pastMinute = getPastMin(ddl.endingTime, schedule.termInfo)
 

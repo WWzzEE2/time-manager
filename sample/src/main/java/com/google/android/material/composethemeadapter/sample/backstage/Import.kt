@@ -340,7 +340,7 @@ class Import {
         try {
             val response = call.execute()
             if (response.isSuccessful) {
-//                Log.d("TestDDLGet", response.body!!.string())
+                //Log.d("TestDDLGet", response.body!!.string())
                 parseDDlFromNetJson(response.body!!.string())
             }
             else {
@@ -354,7 +354,8 @@ class Import {
         return true
     }
 
-    private fun parseDDlFromNetJson(json: String) {
+    private fun parseDDlFromNetJson(json: String?) {
+        Log.d("ddlList", "start")
         val objectMapper = jacksonObjectMapper()
         val schedule = MainActivity.GlobalInformation.activity.schedule
         val pulledDDl = schedule.pulledDDl
@@ -362,8 +363,8 @@ class Import {
         simpleModule.addDeserializer(PackedDDl::class.java, CustomDDlDeserializer())
 
         objectMapper.registerModule(simpleModule)
-        val ddlList = objectMapper.readValue<List<PackedDDl>>(json)
-
+        val ddlList = objectMapper.readValue<List<PackedDDl>>(json!!)
+        Log.d("ddlList", ddlList.toString())
         for (ddlPack in ddlList) {
             if (!pulledDDl.contains(ddlPack.uid) && ddlPack.ddl != null) {
                 pulledDDl.add(ddlPack.uid)
@@ -401,7 +402,7 @@ class Import {
             val schedule = MainActivity.GlobalInformation.activity.schedule
             val term = schedule.termInfo
 
-            importDDLFromCourse(term.startingTime, term.endingTime)
+            importDDLFromCourse(Calendar.getInstance().timeInMillis, term.endingTime)
 
             schedule.saveAll()
         }
