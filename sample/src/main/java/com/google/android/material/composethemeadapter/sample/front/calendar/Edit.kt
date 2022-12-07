@@ -229,17 +229,23 @@ fun SelectTime(Label: String, Index: Int) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     var selectValue by rememberSaveable { mutableStateOf<Long>(1) }
     val days = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    val period = arrayOf("Every Week", "Odd Weeks", "Dual Weeks")
     if (Label != "Column")
         valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+    if (Label == "Period")
+        valueList = mutableListOf(0, 2, 1)
     selectValue = when (Label) {
         "Column" -> templateList[Index].column
         "StartingTime" -> templateList[Index].startingTime
+        "Period" -> templateList[Index].period - 1
         else -> templateList[Index].endingTime - 1
     } + 1
     Box() {
         TextButton(onClick = { expanded = !expanded }) {
             if (Label == "Column")
                 Text(text = days[selectValue.toInt() - 1])
+            else if (Label == "Period")
+                Text(text = period[selectValue.toInt()])
             else
                 Text(text = "Course${selectValue}")
         }
@@ -250,6 +256,8 @@ fun SelectTime(Label: String, Index: Int) {
                     DropdownMenuItem(text = {
                         if (Label == "Column")
                             Text(text = days[it.toInt() - 1])
+                        else if (Label == "Period")
+                            Text(text = period[it.toInt()])
                         else
                             Text(text = "Course${it}")
                     }, onClick = {
@@ -296,8 +304,10 @@ fun EditLocation() {
             contentDescription = "Location"
         )
         SimpleOutlinedTextField(Label = "Location", content = course.location)
+
     }
 }
+
 
 //边界时间信息
 @Composable
@@ -310,6 +320,7 @@ fun EditTimeChunk() {
                 EditColumn(index)
                 EditStartingTime(index)
                 EditEndingTime(index)
+                EditPeriod(index)
             }
             item {
                 IconButton(
@@ -392,6 +403,23 @@ fun EditEndingTime(Number: Int = 0) {
     }
 }
 
+
+//编辑上课间隔
+@Composable
+fun EditPeriod(Number : Int = 0){
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Spacer(
+            modifier = Modifier
+                .width(35.dp)
+                .height(35.dp),
+        )
+        SelectTime(Label = "Period", Number)
+    }
+}
+
 @Composable
 fun EditDdlTime(screenState: ScreenState) {
     //test
@@ -442,8 +470,8 @@ fun EditDdlTime(screenState: ScreenState) {
                 val mTimePickerDialog = TimePickerDialog(
                     mContext,
                     { _, mHour: Int, mMinute: Int ->
-                        mTime = "$mHour:$mMinute"
-                        ddl.endingTime += mHour*3600*1000L + mMinute*60*1000L
+                        mTime = String.format("%02d: %02d", mHour, mMinute)
+                        ddl.endingTime += (mHour*3600*1000L + mMinute*60*1000L + 60*1000L)
                     }, mHour, mMinute, false
                 )
                 mTimePickerDialog.show()
@@ -489,6 +517,7 @@ fun changeData(type: String, content: String, editType: String = "editCourse") {
                 ddl.name = content
         }
         "Location" -> course.location = content
+        "Period" -> templateList[num].period = content.toLong()
         "StartingTime" -> {
             templateList[num].startingTime = content.toLong() - 1
             if (templateList[num].endingTime <= templateList[num].startingTime)
@@ -544,7 +573,7 @@ fun saveData(
 }
 
 //向缓存列表中加入新的template
-fun addTemplateToList(template: CourseTemplate = CourseTemplate(0, 0, 1, 1)) {
+fun addTemplateToList(template: CourseTemplate = CourseTemplate(0, 0, 1, 0)) {
     templateList.add(template)
 }
 
