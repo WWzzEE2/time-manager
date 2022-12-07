@@ -569,7 +569,6 @@ fun saveData(
     if (editType == "editDdl") {
         if (ddl.endingTime == 0L)
             return false
-        ddl.endingTime += 3600*1000*8
         ddl.id = System.currentTimeMillis()
         schedule.addDDl(ddl)
         ddl = DDlInfo("", 0, 0, "", 0)
@@ -577,12 +576,13 @@ fun saveData(
     }
     if (editType == "click_course")
         schedule.removeCourse(myCourseTemplate.info)
-    templateList.forEach() {
+        templateList.forEach() {
         it.info = course
     }
     course.timeInfo = templateList.toMutableList()
     if (!schedule.addCourse(course)) {
-        schedule.addCourse(myCourseTemplate.info)
+        if (editType == "click_course")
+            schedule.addCourse(myCourseTemplate.info)
         return false
     }
     templateList.clear()
