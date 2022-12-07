@@ -44,10 +44,10 @@ internal fun load(schedule: Schedule, context: Context):Boolean  {
         try {
             mapper.readValue<List<CourseInfo>>(json).let {
                 for (course in it)
-                    schedule.addCourse(course)
-                for (course in it)
                     for (template in course.timeInfo)
                         template.info = course
+                for (course in it)
+                    schedule.addCourse(course)
             }
         } catch (e: Exception) {
             Log.d("LoadErr", "Course load failed")

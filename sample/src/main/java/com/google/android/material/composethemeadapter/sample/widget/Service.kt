@@ -71,14 +71,14 @@ class StackRemoteViewsFactory(
             val toastInIntent = Intent().apply {
                 action=TOAST_ACTION
                 Bundle().also { extras ->
-                    extras.putInt(EXTRA_ITEM, list[position].id.toInt())
+                    extras.putLong(EXTRA_ITEM, list[position].id)
                     putExtras(extras)
                 }
             }
             val buttonInIntent = Intent().apply {
                 action=BUTTON_ACTION
                 Bundle().also { extras ->
-                    extras.putInt(EXTRA_ITEM, list[position].id.toInt())
+                    extras.putLong(EXTRA_ITEM, list[position].id)
                     extras.putString(DDL_NAME, list[position].name)
                     putExtras(extras)
                 }
