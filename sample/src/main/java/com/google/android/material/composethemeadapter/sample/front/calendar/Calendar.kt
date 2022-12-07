@@ -449,7 +449,7 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
             {
                 if(pastMinute<schedule.termInfo.rowStart[i])
                 {
-                    var height: Long = 65*(i-1) + 65 * (pastMinute-schedule.termInfo.rowStart[i-1])/(schedule.termInfo.rowStart[i]-schedule.termInfo.rowStart[i-1])
+                    var height: Long = 65*(i-1) + 65 * kotlin.math.min(1,(pastMinute-schedule.termInfo.rowStart[i-1])/(schedule.termInfo.rowEnd[i-1]-schedule.termInfo.rowStart[i-1]))
                     Column() {
                         Spacer(modifier = modifier.height(height.toInt() * 1.dp))
                         DdlLine(color = Red_T, modifier = Modifier.width(width))

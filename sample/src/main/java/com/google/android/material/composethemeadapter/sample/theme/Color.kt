@@ -37,6 +37,13 @@ class courseBlockColor {
                 Color(0xFF97CED7),
                 Color(0xFF46909D),
                 Color(0xFFB1D8DF),
+                Color(0xFFD0D49F),
+                Color(0xFFB1C69B),
+                Color(0xFF62A5AE),
+                Color(0xFFB594B3),
+                Color(0xFFF2C1BB),
+                Color(0xFFA4A4C9),
+
             ),
             mutableListOf(
                 Color(0xFF288BD8),

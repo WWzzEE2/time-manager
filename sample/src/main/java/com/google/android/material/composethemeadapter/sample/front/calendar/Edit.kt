@@ -115,6 +115,7 @@ fun EditPage(
                 confirmButton = {
                     TextButton(onClick = {
                         schedule.removeCourse(course)
+                        schedule.saveAll()
                         screenState.goToCalendar()
                     }) {
                         Text(text = "Confirm")
