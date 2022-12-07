@@ -24,6 +24,7 @@ import com.example.myapplication.front.*
 import com.example.myapplication.ui.theme.ddlBlockColor
 import com.google.android.material.composethemeadapter.sample.MainActivity
 import com.google.android.material.composethemeadapter.sample.R
+import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 import com.google.android.material.composethemeadapter.sample.backstage.DDlInfo
 import com.google.android.material.datepicker.MaterialDatePicker
 
@@ -173,6 +174,7 @@ fun DeadLineList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DDLTopBar(
+    screenState: ScreenState,
     DateAction: () -> Unit
 ) {
     TopAppBar(
@@ -182,7 +184,12 @@ fun DDLTopBar(
             IconButton(onClick = { DateAction() }) {
                 Icon(Icons.Outlined.DateRange, contentDescription = "Localized description")
             }
-            IconButton(onClick = { /* doSomething() */ }) {
+            IconButton(onClick = {
+                screenState.goToEdit(
+                    CourseTemplate(0, 0, 1, 0),
+                    "editDdl"
+                )
+            }) {
                 Icon(Icons.Filled.Add, contentDescription = "Localized description")
             }
         })
@@ -215,6 +222,7 @@ fun DDLScreen(
     Scaffold(
         topBar = {
             DDLTopBar(
+                screenState,
                 DateAction = {
                     val date = screenState.getCurTime()
                     val picker = MaterialDatePicker.Builder.datePicker()

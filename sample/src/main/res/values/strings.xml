@@ -25,7 +25,7 @@
     <string name="Friday">Friday</string>
     <string name="Saturday">Saturday</string>
     <string name="Sunday">Sunday</string>
-    <string name="empty_view_text">This is the empty view</string>
+    <string name="empty_view_text">Today task has been Finished!</string>
     <string name="time_string">Time</string>
     <string name="info_string">info</string>
 </resources>

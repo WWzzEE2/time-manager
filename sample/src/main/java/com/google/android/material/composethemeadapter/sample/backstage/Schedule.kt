@@ -331,7 +331,6 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
             courseMap[template.column.toInt()].addTemplate(template, false)
 
         courseSet.add(course)
-
         return true
     }
 
