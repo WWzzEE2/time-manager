@@ -254,6 +254,7 @@ private fun CalendarGrid(
                                         width = width
                                     )
 
+                                    Log.d("show",showDDLlist.toString())
                                     if (showDDLlist) {
                                         DdlLineList(
                                             Modifier.padding(10.dp, 0.dp),
@@ -442,13 +443,17 @@ fun DdlLineList(modifier: Modifier = Modifier, weekIndex: Int, dayIndex: Int, wi
         var activity = LocalContext.current as MainActivity
         var schedule = activity.schedule
         var ddllist = schedule.getDDlFromRelativeTime(weekIndex.toLong()-1, dayIndex.toLong())
+        Log.d("ddllist1",ddllist.toString())
         for (ddl in ddllist) {
             val pastMinute = getPastMin(ddl.endingTime, schedule.termInfo)
-
+            Log.d("ddllist1",ddl.name)
+            Log.d("ddllist1",schedule.termInfo.rowStart.toString())
             for (i in 1 until schedule.termInfo.rowStart.size)
             {
+                Log.d("ddllist1",i.toString())
                 if(pastMinute<schedule.termInfo.rowStart[i])
                 {
+                    Log.d("ddllist1","draw")
                     var height: Long = 65*(i-1) + 65 * kotlin.math.min(1,(pastMinute-schedule.termInfo.rowStart[i-1])/(schedule.termInfo.rowEnd[i-1]-schedule.termInfo.rowStart[i-1]))
                     Column() {
                         Spacer(modifier = modifier.height(height.toInt() * 1.dp))

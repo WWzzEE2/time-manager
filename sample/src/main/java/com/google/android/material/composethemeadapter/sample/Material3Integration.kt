@@ -15,25 +15,16 @@
 
 package com.google.android.material.composethemeadapter.sample
 
-import android.accounts.Account
-import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
-import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import com.example.myapplication.backstage.Import
 import com.example.myapplication.backstage.UserAccount
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.composethemeadapter.sample.backstage.*
-import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
-import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
+import com.google.android.material.composethemeadapter.sample.backstage.Schedule
+import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
 import com.google.android.material.composethemeadapter3.Mdc3Theme
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule

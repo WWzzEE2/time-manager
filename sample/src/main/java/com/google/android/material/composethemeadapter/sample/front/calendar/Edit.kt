@@ -471,7 +471,7 @@ fun EditDdlTime(screenState: ScreenState) {
                     datePicker.show(it.supportFragmentManager, datePicker.toString())
                     datePicker.addOnPositiveButtonClickListener {
                         datePicker.selection?.let { selectedDate ->
-                            ddl.endingTime = selectedDate
+                            ddl.endingTime = selectedDate-3600*1000*8
                             mTime = "Select Time"
                             mDate = transToString(selectedDate)
                         }
