@@ -28,7 +28,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import com.google.android.material.composethemeadapter.sample.R
 import com.google.android.material.composethemeadapter.sample.MainActivity
 
@@ -178,7 +177,7 @@ fun EditUserName(context: Context) {
                 .height(35.dp),
             contentDescription = "Name"
         )
-        SimpleText(Label = "Name", content = activity.account.UserName, context)
+        SimpleText(Label = "Name", content = activity.account.userName, context)
     }
 }
 
@@ -197,7 +196,7 @@ fun EditID(context: Context) {
                 .height(35.dp),
             contentDescription = "Location"
         )
-        SimpleText(Label = "ID", content = activity.account.ID, context)
+        SimpleText(Label = "ID", content = activity.account.id, context)
     }
 }
 
@@ -216,16 +215,16 @@ fun EditPassword(context: Context) {
                 .height(35.dp),
             contentDescription = "Location"
         )
-        SimplePasswordText(Label = "Password", content = activity.account.PassWord, context)
+        SimplePasswordText(Label = "Password", content = activity.account.passWord, context)
     }
 }
 
 fun changeUserInfo(type: String, content: String, context: Context) {
     var activity = context as MainActivity
     when (type) {
-        "Name" -> activity.account.UserName = content
-        "ID" -> activity.account.ID = content
-        "Password" -> activity.account.PassWord = content
+        "Name" -> activity.account.userName = content
+        "ID" -> activity.account.id = content
+        "Password" -> activity.account.passWord = content
     }
 }
 
