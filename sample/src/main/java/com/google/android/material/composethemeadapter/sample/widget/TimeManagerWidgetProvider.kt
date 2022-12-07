@@ -42,12 +42,12 @@ class TimeManagerWidgetProvider : AppWidgetProvider() {
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID
             )
-            val viewIndex: Int= intent.getIntExtra(EXTRA_ITEM, 0)
+            val viewIndex= intent.getLongExtra(EXTRA_ITEM, 0)
             val viewName: String? = intent.getStringExtra(DDL_NAME)
             Toast.makeText(context,"Task "+viewIndex+":"+viewName+" Finish",Toast.LENGTH_SHORT).show()
 
             val schedule=Schedule(context)
-            //schedule.removeDDlFromId(viewIndex)
+            schedule.removeDDlById(viewIndex)
             schedule.saveAll()
             UpdateWidget(context,appWidgetId,mgr)
         }

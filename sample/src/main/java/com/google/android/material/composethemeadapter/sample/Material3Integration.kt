@@ -18,7 +18,9 @@ package com.google.android.material.composethemeadapter.sample
 import android.accounts.Account
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -63,9 +65,8 @@ class MainActivity : AppCompatActivity() {
         schedule = Schedule(this)
 
 
-//        var test = Import()
-//
-//        test.importFromCourse()
+        var test = Import()
+        test.importFromCourse()
 
         contentView.setContent {
             Mdc3Theme {
@@ -75,6 +76,7 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
 
 }
 

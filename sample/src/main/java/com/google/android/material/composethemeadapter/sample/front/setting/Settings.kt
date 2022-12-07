@@ -226,6 +226,7 @@ fun changeUserInfo(type: String, content: String, context: Context) {
         "ID" -> activity.account.id = content
         "Password" -> activity.account.passWord = content
     }
+
 }
 
 

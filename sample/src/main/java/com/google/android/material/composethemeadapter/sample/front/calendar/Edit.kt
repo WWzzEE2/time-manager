@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.CalendarToday
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Task
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -62,7 +64,8 @@ fun EditPage(
                         "Prompt",
                         "Location"
                     )
-                    screenState.goToCalendar()
+                    if (editCourse){screenState.goToCalendar()}
+                    else {screenState.goToDeadline()}
                 }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
@@ -73,7 +76,8 @@ fun EditPage(
                     IconButton(onClick = {
                         editCourse = !editCourse
                     }) {
-                        Icon(Icons.Rounded.Refresh, contentDescription = "Switch edit type")
+                        if (editCourse){Icon(Icons.Rounded.Task, contentDescription = "Switch edit type")}
+                        else {Icon(Icons.Rounded.CalendarToday, contentDescription = "Switch edit type")}
                     }
                     if(editType == "click_course") {
                         IconButton(onClick = {

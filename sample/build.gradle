@@ -50,6 +50,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    namespace 'com.google.android.material.composethemeadapter.sample'
 }
 
 dependencies {

@@ -355,7 +355,6 @@ class Import {
     }
 
     private fun parseDDlFromNetJson(json: String?) {
-        Log.d("ddlList", "start")
         val objectMapper = jacksonObjectMapper()
         val schedule = MainActivity.GlobalInformation.activity.schedule
         val pulledDDl = schedule.pulledDDl
