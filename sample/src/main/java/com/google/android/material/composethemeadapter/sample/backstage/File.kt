@@ -1,9 +1,12 @@
 package com.google.android.material.composethemeadapter.sample.backstage
 
+import android.accounts.Account
 import android.content.Context
 import android.util.Log
+import com.example.myapplication.backstage.UserAccount
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.android.material.composethemeadapter.sample.MainActivity
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -13,6 +16,7 @@ internal fun save(schedule: Schedule, context: Context) {
     saveAsJSON(schedule.getAllCourse(), context.openFileOutput("course.json", Context.MODE_PRIVATE))
     saveAsJSON(schedule.termInfo, context.openFileOutput("term_info.json", Context.MODE_PRIVATE))
     saveAsJSON(schedule.pulledDDl.toList(), context.openFileOutput("pulled.json", Context.MODE_PRIVATE))
+    saveAsJSON(MainActivity.GlobalInformation.activity.account, context.openFileOutput("account.json", Context.MODE_PRIVATE))
 }
 
 internal fun load(schedule: Schedule, context: Context):Boolean  {
@@ -71,7 +75,17 @@ internal fun load(schedule: Schedule, context: Context):Boolean  {
         }
     }
 
+    loadJson("account.json", context)?.let { json ->
+        try {
+            MainActivity.GlobalInformation.activity.account = mapper.readValue(json)
+        } catch (e: Exception) {
+            Log.d("LoadErr", "Account load failed")
+            success = false
+            MainActivity.GlobalInformation.activity.account =  UserAccount("", "", "")
+        }
+    }
     return success
+
 }
 
 private fun <T> saveAsJSON(obj:T, file: FileOutputStream) = file.use{it.writer().use{
