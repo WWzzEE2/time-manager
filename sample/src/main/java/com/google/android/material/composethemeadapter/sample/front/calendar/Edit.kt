@@ -43,8 +43,10 @@ fun EditPage(
     val schedule = activity.schedule
     var timeConflict by rememberSaveable { mutableStateOf(false) }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
-    var editCourse by rememberSaveable { mutableStateOf(true) }
     var editType by rememberSaveable { mutableStateOf(editType) }
+    var editCourse by rememberSaveable { mutableStateOf(true) }
+    if (editType == "editDdl")
+        editCourse = false
 
     Scaffold(topBar = {
         initData(myCourseTemplate, editType, context)
