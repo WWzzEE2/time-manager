@@ -4,6 +4,7 @@ package com.google.android.material.composethemeadapter.sample.backstage
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
@@ -87,14 +88,16 @@ private class TemplateMap(val bindSchedule: Schedule) : TreeMap<Long, HashSet<Co
 
             val laterT = if (t1.info.startingTime > t2.info.startingTime) t1 else t2
             val otherT = if (laterT == t1) t2 else t1
-            val otherStart = bindSchedule.getWeek(otherT.info.startingTime)
+            val otherStart = bindSchedule.getWeek(otherT.info.startingTime)+otherT.period%2
             val endWeek = min(
                 bindSchedule.getWeek(t1.info.endingTime),
                 bindSchedule.getWeek(t2.info.endingTime)
             )
-
-            for (w in bindSchedule.getWeek(laterT.info.startingTime) until endWeek step laterT.period) {
-                if ((w - otherStart) % otherT.period == 0L) return true
+            var realPeriod:Long=1
+            if(otherT.period>0)
+                realPeriod=2
+            for (w in bindSchedule.getWeek(laterT.info.startingTime) until endWeek step realPeriod) {
+                if ((w - otherStart) % realPeriod == 0L) return true
             }
         }
         return false
@@ -160,6 +163,8 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     private val ddlMap = DDLMap(this)
 
     private val courseSet = HashSet<CourseInfo>()
+
+    internal val pulledDDl = HashSet<String>()
 
     private val scheduleContext=context
     var termInfo = TermInfo(getTimeStamp(2022, 9, 5), getTimeStamp(2023, 2, 10))
@@ -370,9 +375,12 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 
 
     internal fun templateAvailable(template: CourseTemplate, week: Short): Boolean {
-        val startTime = getWeek(template.info.startingTime)
+        val startTime = getWeek(template.info.startingTime)+template.period%2
         val endTime = getWeek(template.info.endingTime)
-        return week in startTime until endTime && (week - startTime) % template.period == 0L
+        var realPeriod=1;
+        if(template.period>0)
+            realPeriod=2;
+        return week in startTime until endTime && (week - startTime) % realPeriod == 0L
     }
 
     fun clear() {
@@ -387,7 +395,7 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
     }
 
     fun updateWidget(){
-        val mWidgetIntent = Intent()
+        val mWidgetIntent = Intent(scheduleContext,TimeManagerWidgetProvider::class.java)
         mWidgetIntent.action = "com.ideal.note.widget"
         scheduleContext.sendBroadcast(mWidgetIntent)
     }
