@@ -113,6 +113,7 @@ fun EditPage(
                 confirmButton = {
                     TextButton(onClick = {
                         schedule.removeCourse(course)
+                        schedule.saveAll()
                         screenState.goToCalendar()
                     }) {
                         Text(text = "Confirm")
@@ -526,6 +527,7 @@ fun saveData(
             return false
         schedule.addDDl(ddl)
         ddl = DDlInfo("DDL", 0, 0, "Prompt", 0)
+        schedule.saveAll()
         return true
     }
     if (editType == "click_course")
