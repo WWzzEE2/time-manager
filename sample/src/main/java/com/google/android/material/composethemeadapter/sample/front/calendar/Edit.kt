@@ -39,7 +39,10 @@ fun EditPage(
     editType: String
 ) {
     val context = LocalContext.current
+    val activity = context as MainActivity
+    val schedule = activity.schedule
     var timeConflict by rememberSaveable { mutableStateOf(false) }
+    var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var editCourse by rememberSaveable { mutableStateOf(true) }
     var editType by rememberSaveable { mutableStateOf(editType) }
 
@@ -70,6 +73,16 @@ fun EditPage(
                     }) {
                         Icon(Icons.Rounded.Refresh, contentDescription = "Switch edit type")
                     }
+                    if(editType == "click_course") {
+                        IconButton(onClick = {
+                            confirmDelete = !confirmDelete
+                        }) {
+                            Icon(
+                                Icons.Outlined.DeleteForever,
+                                contentDescription = "Switch edit type"
+                            )
+                        }
+                    }
                     IconButton(onClick = {
                         if (!editCourse)
                             editType = "editDdl"
@@ -82,6 +95,30 @@ fun EditPage(
                 }
             },
         )
+        if (confirmDelete){
+            val warningContent = "This action will delete your course!"
+            AlertDialog(
+                onDismissRequest = {
+                    confirmDelete = false
+                },
+                title = { Text(text = "Warning!") },
+                text = { Text(warningContent) },
+                dismissButton = {
+                    TextButton(onClick = {
+                        confirmDelete = false
+                    }) {
+                        Text(text = "Cancel")
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        schedule.removeCourse(course)
+                        screenState.goToCalendar()
+                    }) {
+                        Text(text = "Confirm")
+                    }
+                })
+        }
         if (timeConflict) {
             var warningContent = "Courses' time conflict!"
             if (editType == "editDdl")
