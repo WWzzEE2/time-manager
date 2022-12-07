@@ -1,32 +1,35 @@
 package com.example.myapplication
 
+import android.app.TimePickerDialog
 import android.content.Context
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.Face
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.google.android.material.composethemeadapter.sample.backstage.CourseInfo
-import com.google.android.material.composethemeadapter.sample.backstage.CourseTemplate
 
 import com.example.myapplication.front.*
 import com.google.android.material.composethemeadapter.sample.MainActivity
-import com.google.android.material.composethemeadapter.sample.backstage.save
+import com.google.android.material.composethemeadapter.sample.backstage.*
+import com.google.android.material.datepicker.MaterialDatePicker
+
 
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
 private var templateList = mutableStateListOf<CourseTemplate>()
 private var course =
     CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
-
+private var ddl = DDlInfo("DDL", 0, 0, "Prompt", 0)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,68 +38,139 @@ fun EditPage(
     myCourseTemplate: CourseTemplate,
     editType: String
 ) {
-    Scaffold(topBar = { ChangeStat(screenState, myCourseTemplate, editType) })
-    {padding ->
-        EditDetail(Modifier.padding(padding))
+    val context = LocalContext.current
+    var timeConflict by rememberSaveable { mutableStateOf(false) }
+    var editCourse by rememberSaveable { mutableStateOf(true) }
+    var editType by rememberSaveable { mutableStateOf(editType) }
+
+    Scaffold(topBar = {
+        initData(myCourseTemplate, editType, context)
+        TopAppBar(
+            navigationIcon = {
+                IconButton(onClick = {
+                    templateList.clear()
+                    course = CourseInfo(
+                        "Name",
+                        0,
+                        0,
+                        emptyList<CourseTemplate>().toMutableList(),
+                        "Prompt",
+                        "Location"
+                    )
+                    screenState.goToCalendar()
+                }) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                }
+            },
+            title = { Text("Edit") },
+            actions = {
+                Row {
+                    IconButton(onClick = {
+                        editCourse = !editCourse
+                    }) {
+                        Icon(Icons.Rounded.Refresh, contentDescription = "Switch edit type")
+                    }
+                    IconButton(onClick = {
+                        if (!editCourse)
+                            editType = "editDdl"
+                        timeConflict = !saveData(context, myCourseTemplate, editType)
+                        if (!timeConflict)
+                            screenState.goToCalendar()
+                    }) {
+                        Icon(Icons.Filled.Done, contentDescription = "Save")
+                    }
+                }
+            },
+        )
+        if (timeConflict) {
+            var warningContent = "Courses' time conflict!"
+            if (editType == "editDdl")
+                warningContent = "Please select valid time!"
+            AlertDialog(
+                onDismissRequest = {
+                    timeConflict = false
+                },
+                title = { Text(text = "Warning!") },
+                text = { Text(warningContent) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        timeConflict = false
+                    }) {
+                        Text(text = "Ok")
+                    }
+                })
+        }
+    })
+    { padding ->
+        if (editCourse)
+            EditCourse(Modifier.padding(padding))
+        else
+            EditDdl(Modifier.padding(padding), screenState)
     }
+
 }
 
 //顶部状态栏，包括back和done按钮
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ChangeStat(screenState: ScreenState, myCourseTemplate: CourseTemplate, editType: String) {
-    val context = LocalContext.current
-    var timeConflict by rememberSaveable { mutableStateOf(false) }
-    initData(myCourseTemplate, editType, context)
-    TopAppBar(
-        navigationIcon = {
-            IconButton(onClick = {
-                templateList.clear()
-                course = CourseInfo(
-                    "Name",
-                    0,
-                    0,
-                    emptyList<CourseTemplate>().toMutableList(),
-                    "Prompt",
-                    "Location"
-                )
-                screenState.goToCalendar()
-            }) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-            }
-        },
-        title = { Text("Edit") },
-        actions = {
-            IconButton(onClick = {
-                timeConflict = !saveData(context, editType, myCourseTemplate)
-                if (!timeConflict)
-                    screenState.goToCalendar()
-            }) {
-                Icon(Icons.Filled.Done, contentDescription = "Save")
-            }
-        },
-    )
-    if (timeConflict) {
-        AlertDialog(
-            onDismissRequest = {
-                timeConflict = false},
-            title = { Text(text = "Warning!") },
-            text = { Text(text = "Courses' time conflict!") },
-            confirmButton = {
-                TextButton(onClick = {
-                    timeConflict = false
-                }) {
-                    Text(text = "Ok")
-                }
-            })
-    }
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun ChangeStat(screenState: ScreenState, myCourseTemplate: CourseTemplate, editType: String) {
+//
+//    val context = LocalContext.current
+//    var timeConflict by rememberSaveable { mutableStateOf(false) }
+//    initData(myCourseTemplate, editType, context)
+//    TopAppBar(
+//        navigationIcon = {
+//            IconButton(onClick = {
+//                templateList.clear()
+//                course = CourseInfo(
+//                    "Name",
+//                    0,
+//                    0,
+//                    emptyList<CourseTemplate>().toMutableList(),
+//                    "Prompt",
+//                    "Location"
+//                )
+//                screenState.goToCalendar()
+//            }) {
+//                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+//            }
+//        },
+//        title = { Text("Edit") },
+//        actions = {
+//            IconButton(onClick = {
+//                timeConflict = !saveData(context, myCourseTemplate, editType)
+//                if (!timeConflict)
+//                    screenState.goToCalendar()
+//            }) {
+//                Icon(Icons.Filled.Done, contentDescription = "Save")
+//            }
+//        },
+//    )
+//    if (timeConflict) {
+//        var warningContent = "Courses' time conflict!"
+//        if (editType == "editDdl")
+//            warningContent = "Please select valid time!"
+//        AlertDialog(
+//            onDismissRequest = {
+//                timeConflict = false
+//            },
+//            title = { Text(text = "Warning!") },
+//            text = { Text(warningContent) },
+//            confirmButton = {
+//                TextButton(onClick = {
+//                    timeConflict = false
+//                }) {
+//                    Text(text = "Ok")
+//                }
+//            })
+//    }
+//}
 
 //编辑相关信息
 @Composable
-fun EditDetail(
+fun EditCourse(
     modifier: Modifier = Modifier
-){
+) {
     Column(
         modifier = modifier.padding(65.dp, 10.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -107,41 +181,45 @@ fun EditDetail(
     }
 }
 
+//编辑DDL相关信息
+@Composable
+fun EditDdl(modifier: Modifier = Modifier, screenState: ScreenState) {
+    Column(
+        modifier = modifier.padding(65.dp, 10.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                modifier = Modifier
+                    .width(35.dp)
+                    .height(35.dp),
+                contentDescription = "Name"
+            )
+            SimpleOutlinedTextField(Label = "Name", content = ddl.name, "ddl")
+        }
+        EditDdlTime(screenState = screenState)
+    }
+}
+
 //编辑时的文本框
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleOutlinedTextField(Label: String, content: String) {
+fun SimpleOutlinedTextField(Label: String, content: String, editType: String = "editCourse") {
     var text by rememberSaveable { mutableStateOf(content) }
-    if (Regex("[A-Za-z]+[0-9]").containsMatchIn(Label))
-        Column() {
-            OutlinedTextField(
-                value = text,
-                onValueChange = {
-                    if (Regex("Column[0-9]").containsMatchIn(Label))
-                        if (it.toInt() in 1..7) {
-                            text = it
-                            //changeData(Label, text)
-                        } else
-                            if (it.toInt() in 1..13) {
-                                text = it
-                                //changeData(Label,text)
-                            }
-                },
-                label = { Text(Label) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-        }
-    else
-        Column() {
-            OutlinedTextField(
-                value = text,
-                onValueChange = {
-                    text = it
-                    changeData(Label, text)
-                },
-                label = { Text(Label) },
-            )
-        }
+    Column() {
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                text = it
+                changeData(Label, text, editType)
+            },
+            label = { Text(Label) },
+        )
+    }
 }
 
 //编辑时间信息时选择时间
@@ -153,12 +231,10 @@ fun SelectTime(Label: String, Index: Int) {
     val days = arrayOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     if (Label != "Column")
         valueList = mutableListOf<Long>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
-    if (Label == "EndingTime")
-        valueList.add(14)
     selectValue = when (Label) {
         "Column" -> templateList[Index].column
         "StartingTime" -> templateList[Index].startingTime
-        else -> templateList[Index].endingTime
+        else -> templateList[Index].endingTime - 1
     } + 1
     Box() {
         TextButton(onClick = { expanded = !expanded }) {
@@ -187,7 +263,7 @@ fun SelectTime(Label: String, Index: Int) {
     }
 }
 
-//编辑课程名
+//编辑课程/DDL名
 @Composable
 fun EditName() {
     Row(
@@ -316,6 +392,66 @@ fun EditEndingTime(Number: Int = 0) {
     }
 }
 
+@Composable
+fun EditDdlTime(screenState: ScreenState) {
+    //test
+    val activity = LocalContext.current as MainActivity
+    var mTime by remember { mutableStateOf("Select Time") }
+    Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    )
+    {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Icon(
+                Icons.Outlined.DateRange, contentDescription = "Edit deadline date",
+                Modifier
+                    .width(35.dp)
+                    .height(35.dp),
+            )
+            Text(text = "Select Date", Modifier.clickable() {
+                val date = screenState.getCurTime()
+                val datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setSelection(date)
+                    .build()
+                activity.let {
+                    datePicker.show(it.supportFragmentManager, datePicker.toString())
+                    datePicker.addOnPositiveButtonClickListener {
+                        datePicker.selection?.let { selectedDate ->
+                            ddl.endingTime = selectedDate
+                            mTime = "Select Time"
+                        }
+                    }
+                }
+            })
+        }
+        val mContext = LocalContext.current
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Icon(
+                Icons.Default.Notifications, contentDescription = "Edit Deadline time",
+                Modifier
+                    .width(35.dp)
+                    .height(35.dp),
+            )
+            Text(text = mTime, Modifier.clickable() {
+                val mHour = 0
+                val mMinute = 0
+                val mTimePickerDialog = TimePickerDialog(
+                    mContext,
+                    { _, mHour: Int, mMinute: Int ->
+                        mTime = "$mHour:$mMinute"
+                        ddl.endingTime += mHour*3600*1000L + mMinute*60*1000L
+                    }, mHour, mMinute, false
+                )
+                mTimePickerDialog.show()
+            })
+        }
+    }
+}
+
 fun initData(myCourseTemplate: CourseTemplate, editType: String, context: Context) {
     val activity = context as MainActivity
     val schedule = activity.schedule
@@ -335,7 +471,7 @@ fun initData(myCourseTemplate: CourseTemplate, editType: String, context: Contex
 
 
 //将编辑的信息同步到缓存中
-fun changeData(type: String, content: String) {
+fun changeData(type: String, content: String, editType: String = "editCourse") {
     val operate: String
     var num = 0
 
@@ -346,7 +482,12 @@ fun changeData(type: String, content: String) {
         operate = type
 
     when (operate) {
-        "Name" -> course.name = content
+        "Name" -> {
+            if (editType == "editCourse")
+                course.name = content
+            else
+                ddl.name = content
+        }
         "Location" -> course.location = content
         "StartingTime" -> {
             templateList[num].startingTime = content.toLong() - 1
@@ -354,7 +495,7 @@ fun changeData(type: String, content: String) {
                 templateList[num].endingTime = templateList[num].startingTime + 1
         }
         "EndingTime" -> {
-            templateList[num].endingTime = content.toLong() - 1
+            templateList[num].endingTime = content.toLong()
             if (templateList[num].endingTime <= templateList[num].startingTime)
                 templateList[num].endingTime = templateList[num].startingTime + 1
         }
@@ -363,9 +504,21 @@ fun changeData(type: String, content: String) {
 }
 
 //保存信息
-fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplate): Boolean {
+fun saveData(
+    context: Context,
+    myCourseTemplate: CourseTemplate,
+    editType: String
+): Boolean {
     val activity = context as MainActivity
     val schedule = activity.schedule
+    if (editType == "editDdl") {
+        if (ddl.endingTime == 0L)
+            return false
+        ddl.endingTime += 24 * 7 * 3600 * 1000L
+        schedule.addDDl(ddl)
+        ddl = DDlInfo("DDL", 0, 0, "Prompt", 0)
+        return true
+    }
     if (editType == "click_course")
         schedule.removeCourse(myCourseTemplate.info)
     templateList.forEach() {
@@ -378,7 +531,14 @@ fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplat
     }
     templateList.clear()
     course =
-        CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
+        CourseInfo(
+            "Course",
+            0,
+            0,
+            emptyList<CourseTemplate>().toMutableList(),
+            "Prompt",
+            "Location"
+        )
     schedule.saveAll()
     return true
 }
