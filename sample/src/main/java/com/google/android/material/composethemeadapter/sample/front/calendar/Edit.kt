@@ -444,6 +444,7 @@ fun EditDdlTime(screenState: ScreenState) {
     //test
     val activity = LocalContext.current as MainActivity
     var mTime by remember { mutableStateOf("Select Time") }
+    var mDate by remember { mutableStateOf("Select Date") }
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     )
@@ -457,7 +458,7 @@ fun EditDdlTime(screenState: ScreenState) {
                     .width(35.dp)
                     .height(35.dp),
             )
-            Text(text = "Select Date", Modifier.clickable() {
+            Text(text = mDate, Modifier.clickable() {
                 val date = screenState.getCurTime()
                 val datePicker = MaterialDatePicker.Builder.datePicker()
                     .setSelection(date)
@@ -468,6 +469,8 @@ fun EditDdlTime(screenState: ScreenState) {
                         datePicker.selection?.let { selectedDate ->
                             ddl.endingTime = selectedDate
                             mTime = "Select Time"
+                            mDate = transToString(selectedDate)
+                            Log.d("mDate", selectedDate.toString())
                         }
                     }
                 }
