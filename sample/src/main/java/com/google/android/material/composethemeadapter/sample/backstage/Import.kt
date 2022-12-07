@@ -32,9 +32,9 @@ import kotlin.collections.HashSet
 
 data class UserAccount(
     // future to use
-    var UserName: String,
-    var ID: String,
-    var PassWord: String
+    var userName: String,
+    var id: String,
+    var passWord: String
     // Login Status to add
 ) {
     var token = ""
@@ -267,8 +267,8 @@ class Import {
             .add("X-Requested-With","XMLHttpRequest").build()
         val formBody=FormBody.Builder()
             .add("appid","blackboard")
-            .add("userName",user.UserName)
-            .add("password",user.PassWord)
+            .add("userName",user.userName)
+            .add("password",user.passWord)
             .add("randCode","")
             .add("smsCode","")
             .add("otpCode","")
