@@ -471,10 +471,9 @@ fun EditDdlTime(screenState: ScreenState) {
                     datePicker.show(it.supportFragmentManager, datePicker.toString())
                     datePicker.addOnPositiveButtonClickListener {
                         datePicker.selection?.let { selectedDate ->
-                            ddl.endingTime = selectedDate
+                            ddl.endingTime = selectedDate-3600*1000*8
                             mTime = "Select Time"
                             mDate = transToString(selectedDate)
-                            Log.d("mDate", selectedDate.toString())
                         }
                     }
                 }
@@ -581,12 +580,13 @@ fun saveData(
     }
     if (editType == "click_course")
         schedule.removeCourse(myCourseTemplate.info)
-    templateList.forEach() {
+        templateList.forEach() {
         it.info = course
     }
     course.timeInfo = templateList.toMutableList()
     if (!schedule.addCourse(course)) {
-        schedule.addCourse(myCourseTemplate.info)
+        if (editType == "click_course")
+            schedule.addCourse(myCourseTemplate.info)
         return false
     }
     templateList.clear()

@@ -201,7 +201,6 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
             termInfo.rowEnd.add(getPastMin(19,30))
             termInfo.rowEnd.add(getPastMin(20,30))
             termInfo.rowEnd.add(getPastMin(21,50))
-
 //            val weekSec = 1000L * 3600 * 24 * 7
 //            val course = CourseInfo("Test Course", termInfo.startingTime, termInfo.startingTime + weekSec * testData.totWeek, ArrayList(), "test", "Void")
 //            course.timeInfo.add(CourseTemplate(0, 0 , 2, 1))
@@ -211,7 +210,36 @@ class Schedule(private val context: Context, testData: TestDataConfig? = null) {
 //            addCourse(course)
             saveAll()
         } else {
+
             load(this, context)
+            if (termInfo.rowStart.size==0){
+                termInfo.rowStart.add(getPastMin(8,0))
+                termInfo.rowStart.add(getPastMin(9,0))
+                termInfo.rowStart.add(getPastMin(10,10))
+                termInfo.rowStart.add(getPastMin(11,10))
+                termInfo.rowStart.add(getPastMin(13,0))
+                termInfo.rowStart.add(getPastMin(14,0))
+                termInfo.rowStart.add(getPastMin(15,10))
+                termInfo.rowStart.add(getPastMin(16,10))
+                termInfo.rowStart.add(getPastMin(17,0))
+                termInfo.rowStart.add(getPastMin(18,40))
+                termInfo.rowStart.add(getPastMin(19,40))
+                termInfo.rowStart.add(getPastMin(20,40))
+            }
+            if (termInfo.rowEnd.size==0){
+            termInfo.rowEnd.add(getPastMin(8,50))
+            termInfo.rowEnd.add(getPastMin(9,50))
+            termInfo.rowEnd.add(getPastMin(11,0))
+            termInfo.rowEnd.add(getPastMin(12,0))
+            termInfo.rowEnd.add(getPastMin(13,50))
+            termInfo.rowEnd.add(getPastMin(14,50))
+            termInfo.rowEnd.add(getPastMin(16,0))
+            termInfo.rowEnd.add(getPastMin(17,0))
+            termInfo.rowEnd.add(getPastMin(18,0))
+            termInfo.rowEnd.add(getPastMin(19,30))
+            termInfo.rowEnd.add(getPastMin(20,30))
+            termInfo.rowEnd.add(getPastMin(21,50))
+            }
         }
     }
 
