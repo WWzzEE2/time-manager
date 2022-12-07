@@ -257,7 +257,7 @@ fun DDLScreen(
             )
 
             list = schedule.getDDlFromRelativeTime(
-                selectedWeekTab.ordinal.toLong(),
+                selectedWeekTab.ordinal.toLong()-1,
                 selectedDayTab.ordinal.toLong()
             )
                 .toMutableStateList()

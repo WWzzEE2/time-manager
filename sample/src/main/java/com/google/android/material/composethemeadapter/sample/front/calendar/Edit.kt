@@ -384,7 +384,7 @@ fun saveData(context: Context, editType: String, myCourseTemplate: CourseTemplat
 }
 
 //向缓存列表中加入新的template
-fun addTemplateToList(template: CourseTemplate = CourseTemplate(0, 0, 1, 1)) {
+fun addTemplateToList(template: CourseTemplate = CourseTemplate(0, 0, 1, 0)) {
     templateList.add(template)
 }
 

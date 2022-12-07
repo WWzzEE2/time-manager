@@ -25,23 +25,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import com.example.myapplication.backstage.Import
 import com.example.myapplication.backstage.UserAccount
-import com.google.android.material.composethemeadapter.sample.backstage.Schedule
-import com.google.android.material.composethemeadapter.sample.backstage.TestDataConfig
-import com.google.android.material.composethemeadapter.sample.backstage.load
 import com.example.myapplication.front.BottomNavigation
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.composethemeadapter.sample.backstage.save
+import com.google.android.material.composethemeadapter.sample.backstage.*
+import com.google.android.material.composethemeadapter.sample.backstage.getWeekDay
 import com.google.android.material.composethemeadapter.sample.widget.TimeManagerWidgetProvider
 import com.google.android.material.composethemeadapter3.Mdc3Theme
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var schedule: Schedule
     lateinit var testdata:String
 
     var account = UserAccount(
-        "你的学号",
-        "你的学号",
-        "你的密码"
+        "2000013161",
+        "2000013161",
+        "nbyqy123"
     )
 
     object GlobalInformation {
@@ -66,9 +65,6 @@ class MainActivity : AppCompatActivity() {
         var test = Import()
 
         test.importFromCourse()
-//        Log.d("TestWeb","TestDone")
-
-
 
         contentView.setContent {
             Mdc3Theme {
