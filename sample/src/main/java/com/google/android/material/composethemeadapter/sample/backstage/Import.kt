@@ -162,8 +162,8 @@ class Import {
                 }
                 startingTime= schedule.getWeekStamp(infoSplit[0].toLong())
                 endingTime=schedule.getWeekStamp(infoSplit[1].toLong()+1)
-                var rowStart=infoSplit[3].substring(1).toString().toLong()
-                var rowEnd=infoSplit[4].toLong() + 1
+                var rowStart=infoSplit[3].substring(1).toString().toLong()-1
+                var rowEnd=infoSplit[4].toLong()
                 Log.d("rowStart", rowStart.toString())
                 Log.d("rowEnd", rowEnd.toString())
                 templateList.add(CourseTemplate(column,rowStart, rowEnd,period))

@@ -52,7 +52,7 @@ class StackRemoteViewsFactory(
     override fun onDataSetChanged() {
         //Log.println(Log.ERROR,"114514","onDataSetChanged")
         load(schedule,context)
-        list = schedule.getDDlFromRelativeTime(curWeekDay.week, curWeekDay.day)
+        list = schedule.getDDlFromRelativeTime(curWeekDay.week-1, curWeekDay.day)
             .toMutableStateList()
 /*        for (i in list)
             Log.println(Log.ERROR,"114514","list have "+i.name)*/
