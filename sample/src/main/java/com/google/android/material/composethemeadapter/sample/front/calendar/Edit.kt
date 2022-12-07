@@ -147,62 +147,6 @@ fun EditPage(
 
 }
 
-//顶部状态栏，包括back和done按钮
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ChangeStat(screenState: ScreenState, myCourseTemplate: CourseTemplate, editType: String) {
-//
-//    val context = LocalContext.current
-//    var timeConflict by rememberSaveable { mutableStateOf(false) }
-//    initData(myCourseTemplate, editType, context)
-//    TopAppBar(
-//        navigationIcon = {
-//            IconButton(onClick = {
-//                templateList.clear()
-//                course = CourseInfo(
-//                    "Name",
-//                    0,
-//                    0,
-//                    emptyList<CourseTemplate>().toMutableList(),
-//                    "Prompt",
-//                    "Location"
-//                )
-//                screenState.goToCalendar()
-//            }) {
-//                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-//            }
-//        },
-//        title = { Text("Edit") },
-//        actions = {
-//            IconButton(onClick = {
-//                timeConflict = !saveData(context, myCourseTemplate, editType)
-//                if (!timeConflict)
-//                    screenState.goToCalendar()
-//            }) {
-//                Icon(Icons.Filled.Done, contentDescription = "Save")
-//            }
-//        },
-//    )
-//    if (timeConflict) {
-//        var warningContent = "Courses' time conflict!"
-//        if (editType == "editDdl")
-//            warningContent = "Please select valid time!"
-//        AlertDialog(
-//            onDismissRequest = {
-//                timeConflict = false
-//            },
-//            title = { Text(text = "Warning!") },
-//            text = { Text(warningContent) },
-//            confirmButton = {
-//                TextButton(onClick = {
-//                    timeConflict = false
-//                }) {
-//                    Text(text = "Ok")
-//                }
-//            })
-//    }
-//}
-
 //编辑相关信息
 @Composable
 fun EditCourse(
@@ -580,7 +524,6 @@ fun saveData(
     if (editType == "editDdl") {
         if (ddl.endingTime == 0L)
             return false
-        ddl.endingTime += 24 * 7 * 3600 * 1000L
         schedule.addDDl(ddl)
         ddl = DDlInfo("DDL", 0, 0, "Prompt", 0)
         return true
