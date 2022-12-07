@@ -28,8 +28,8 @@ import com.google.android.material.datepicker.MaterialDatePicker
 // 缓存页面中修改时的course和template信息，当点击保存按钮时把修改的信息保存到后台
 private var templateList = mutableStateListOf<CourseTemplate>()
 private var course =
-    CourseInfo("Name", 0, 0, emptyList<CourseTemplate>().toMutableList(), "Prompt", "Location")
-private var ddl = DDlInfo("DDL", 0, 0, "Prompt", 0)
+    CourseInfo("", 0, 0, emptyList<CourseTemplate>().toMutableList(), "", "")
+private var ddl = DDlInfo("", 0, 0, "", 0)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +73,7 @@ fun EditPage(
                     }) {
                         Icon(Icons.Rounded.Refresh, contentDescription = "Switch edit type")
                     }
-                    if(editType == "click_course") {
+                    if (editType == "click_course") {
                         IconButton(onClick = {
                             confirmDelete = !confirmDelete
                         }) {
@@ -87,15 +87,17 @@ fun EditPage(
                         if (!editCourse)
                             editType = "editDdl"
                         timeConflict = !saveData(context, myCourseTemplate, editType)
-                        if (!timeConflict)
+                        if (!timeConflict) {
+                            schedule.saveAll()
                             screenState.goToCalendar()
+                        }
                     }) {
                         Icon(Icons.Filled.Done, contentDescription = "Save")
                     }
                 }
             },
         )
-        if (confirmDelete){
+        if (confirmDelete) {
             val warningContent = "This action will delete your course!"
             AlertDialog(
                 onDismissRequest = {
@@ -158,6 +160,7 @@ fun EditCourse(
     ) {
         EditName()
         EditLocation()
+        EditPrompt()
         EditTimeChunk()
     }
 }
@@ -180,7 +183,20 @@ fun EditDdl(modifier: Modifier = Modifier, screenState: ScreenState) {
                     .height(35.dp),
                 contentDescription = "Name"
             )
-            SimpleOutlinedTextField(Label = "Name", content = ddl.name, "ddl")
+            SimpleOutlinedTextField(Label = "Name", content = ddl.name, "editDdl")
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                modifier = Modifier
+                    .width(35.dp)
+                    .height(35.dp),
+                contentDescription = "Prompt"
+            )
+            SimpleOutlinedTextField(Label = "Prompt", content = ddl.name, "editDdl")
         }
         EditDdlTime(screenState = screenState)
     }
@@ -289,6 +305,25 @@ fun EditLocation() {
     }
 }
 
+//编辑课程描述
+@Composable
+fun EditPrompt() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Icon(
+            Icons.Filled.Info,
+            modifier = Modifier
+                .width(35.dp)
+                .height(35.dp),
+            contentDescription = "Prompt"
+        )
+        SimpleOutlinedTextField(Label = "Prompt", content = course.prompt)
+
+    }
+}
+
 
 //边界时间信息
 @Composable
@@ -358,7 +393,7 @@ fun EditStartingTime(Number: Int = 0) {
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Icon(
-            Icons.Filled.Info,
+            Icons.Filled.Timer,
             modifier = Modifier
                 .width(35.dp)
                 .height(35.dp),
@@ -387,7 +422,7 @@ fun EditEndingTime(Number: Int = 0) {
 
 //编辑上课间隔
 @Composable
-fun EditPeriod(Number : Int = 0){
+fun EditPeriod(Number: Int = 0) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -452,7 +487,7 @@ fun EditDdlTime(screenState: ScreenState) {
                     mContext,
                     { _, mHour: Int, mMinute: Int ->
                         mTime = String.format("%02d: %02d", mHour, mMinute)
-                        ddl.endingTime += (mHour*3600*1000L + mMinute*60*1000L + 60*1000L)
+                        ddl.endingTime += (mHour * 3600 * 1000L + mMinute * 60 * 1000L + 60 * 1000L)
                     }, mHour, mMinute, false
                 )
                 mTimePickerDialog.show()
@@ -499,6 +534,11 @@ fun changeData(type: String, content: String, editType: String = "editCourse") {
         }
         "Location" -> course.location = content
         "Period" -> templateList[num].period = content.toLong()
+        "Prompt" ->
+            if (editType == "editCourse")
+                course.prompt = content
+            else
+                ddl.prompt = content
         "StartingTime" -> {
             templateList[num].startingTime = content.toLong() - 1
             if (templateList[num].endingTime <= templateList[num].startingTime)
@@ -524,8 +564,9 @@ fun saveData(
     if (editType == "editDdl") {
         if (ddl.endingTime == 0L)
             return false
+        ddl.id = System.currentTimeMillis()
         schedule.addDDl(ddl)
-        ddl = DDlInfo("DDL", 0, 0, "Prompt", 0)
+        ddl = DDlInfo("", 0, 0, "", 0)
         return true
     }
     if (editType == "click_course")
@@ -541,14 +582,13 @@ fun saveData(
     templateList.clear()
     course =
         CourseInfo(
-            "Course",
+            "",
             0,
             0,
             emptyList<CourseTemplate>().toMutableList(),
-            "Prompt",
-            "Location"
+            "",
+            ""
         )
-    schedule.saveAll()
     return true
 }
 
