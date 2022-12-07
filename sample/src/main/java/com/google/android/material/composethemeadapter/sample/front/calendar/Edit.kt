@@ -470,7 +470,6 @@ fun EditDdlTime(screenState: ScreenState) {
                             ddl.endingTime = selectedDate
                             mTime = "Select Time"
                             mDate = transToString(selectedDate)
-                            Log.d("mDate", selectedDate.toString())
                         }
                     }
                 }
@@ -570,6 +569,7 @@ fun saveData(
     if (editType == "editDdl") {
         if (ddl.endingTime == 0L)
             return false
+        ddl.endingTime += 3600*1000*8
         ddl.id = System.currentTimeMillis()
         schedule.addDDl(ddl)
         ddl = DDlInfo("", 0, 0, "", 0)
