@@ -40,9 +40,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var testdata:String
 
     var account = UserAccount(
-        "2000013161",
-        "2000013161",
-        "nbyqy123"
+"username",
+        "userid",
+        "password",
     )
 
     object GlobalInformation {

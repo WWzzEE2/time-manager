@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.google.android.material.composethemeadapter.sample.R
 import com.google.android.material.composethemeadapter.sample.MainActivity
+import com.google.android.material.composethemeadapter.sample.backstage.save
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -226,6 +227,7 @@ fun changeUserInfo(type: String, content: String, context: Context) {
         "ID" -> activity.account.id = content
         "Password" -> activity.account.passWord = content
     }
+    save(activity.schedule,activity)
 
 }
 
